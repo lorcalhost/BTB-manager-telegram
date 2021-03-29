@@ -127,3 +127,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Custom
+data/
+config/
+binance_trade_bot/
+user.cfg
+user.cfg.backup
+supported_coin_list
+supported_coin_list.backup
+logs/
