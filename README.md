@@ -43,18 +43,18 @@ $ nohup python3 BTBManagerTelegram.py &
 ```
 Make sure  [Binance Trade Bot]'s `apprise.yaml` file is correctly setup before running.
 ### **Method 2:** Import script
-**BTBManagerPython** can be imported in your Python script and used in the following way:
+**BTBManagerTelegram** can be imported in your Python script and used in the following way:
 ```python
-from BTBManagerPython import BTBManagerPython
-BTBManagerPython()
+from BTBManagerTelegram import BTBManagerTelegram
+BTBManagerTelegram()
 ```
-The `BTBManagerPython()` class takes the following ***optional*** initialization arguments:
+The `BTBManagerTelegram()` class takes the following ***optional*** initialization arguments:
 - `root_path`:  
 *Default value*: `'./'`  
 *Description*: Current base directory, to be used in case the bot has not been put inside [Binance Trade Bot]'s installation folder.
 - `from_yaml`:  
 *Default value*: `True`  
-*Description*: Set to `False` if you **don't** want *BTBManagerPython* to automatically fetch Telegram `token` and `user_id` from `apprise.yaml` file.
+*Description*: Set to `False` if you **don't** want *BTBManagerTelegram* to automatically fetch Telegram `token` and `user_id` from `apprise.yaml` file.
 - `token`:  
 *Default value*: `None`  
 *Description*: If `from_yaml` is set to `False` this will be used as Telegram `token`.
@@ -62,6 +62,8 @@ The `BTBManagerPython()` class takes the following ***optional*** initialization
 *Default value*: `None`  
 *Description*: If `from_yaml` is set to `False` this will be used as Telegram `user_id`.
 
+## Interaction
+Interaction with *BTBManagerTelegram* can be started by sending the command `/start` in the bot's Telegram chat.
 ## Disclaimer
 
 This project is for informational purposes only. You should not construe any
