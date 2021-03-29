@@ -269,7 +269,7 @@ class BTBManagerTelegram:
         message = '⚠ Binance Trade Bot is already running\.'
         if not self.__find_process():
             if os.path.exists(f'{self.root_path}binance_trade_bot/'):
-                subprocess.call('$(which python) -m binance_trade_bot &', shell=True)
+                subprocess.call('$(which python3) -m binance_trade_bot &', shell=True)
                 if not self.__find_process():
                     message = '❌ Unable to start Binance Trade Bot\.'
                 else:
