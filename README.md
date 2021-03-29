@@ -13,7 +13,7 @@ As of now the bot is able to perform the following actions:
 - Edit coin list (`supported_coin_list` file)
 - Edit user configuration (`user.cfg` file)
 - Delete database file (`crypto_trading.db` file)
-- Display last 20 log lines
+- Display last 4096 characters of log file
 - WIP Display gains / current ratios in the database
 
 The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yaml` file.  
@@ -63,7 +63,7 @@ The `BTBManagerTelegram()` class takes the following ***optional*** initializati
 *Description*: If `from_yaml` is set to `False` this will be used as Telegram `user_id`.
 
 ## Interaction
-Interaction with *BTBManagerTelegram* can be started by sending the command `/start` in the bot's Telegram chat.
+Interaction with **BTBManagerTelegram** can be *started* by sending the command `/start` in the bot's Telegram chat.
 ## Disclaimer
 
 This project is for informational purposes only. You should not construe any

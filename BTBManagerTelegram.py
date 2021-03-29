@@ -36,7 +36,7 @@ class BTBManagerTelegram:
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.__start, Filters.user(user_id=eval(user_id)))],
             states={
-                MENU: [MessageHandler(Filters.regex('^(Begin|⚠ Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last 20 log lines|Go back)$'), self.__menu)],
+                MENU: [MessageHandler(Filters.regex('^(Begin|⚠ Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|Go back)$'), self.__menu)],
                 EDIT_COIN_LIST: [MessageHandler(Filters.regex('(.*?)'), self.__edit_coin)],
                 EDIT_USER_CONFIG: [MessageHandler(Filters.regex('(.*?)'), self.__edit_user_config)]
             },
@@ -93,7 +93,7 @@ class BTBManagerTelegram:
             ['⚠ Check bot status', '👛 Edit coin list'],
             ['▶ Start trade bot', '⚙ Edit user.cfg'],
             ['⏹ Stop trade bot', '❌ Delete database'],
-            ['📜 Read last 20 log lines', '📈 Calculate gains']
+            ['📜 Read last log lines', '📈 Calculate gains']
         ]
         reply_markup = ReplyKeyboardMarkup(
             keyboard,
@@ -165,7 +165,7 @@ class BTBManagerTelegram:
                     parse_mode='MarkdownV2'
                 )
 
-        elif update.message.text == '📜 Read last 20 log lines':
+        elif update.message.text == '📜 Read last log lines':
             update.message.reply_text(
                 self.__btn_read_log(),
                 reply_markup=reply_markup,
@@ -329,8 +329,7 @@ class BTBManagerTelegram:
         message = f'❌ Unable to find log file at `{log_file_path}`.'.replace('.', '\.')
         if os.path.exists(log_file_path):
             with open(log_file_path) as f:
-                file_content = '\n'.join(f.read().splitlines()[-20:])
-                message = f'Last *20* log lines:\n\n```\n{file_content}\n```'.replace('.', '\.')
+                message = f'Last *4096* characters in log file:\n\n```\n{f.read()[-4096:]}\n```'.replace('.', '\.')
         return message
 
     def __cancel(self, update: Update, _: CallbackContext) -> int:
