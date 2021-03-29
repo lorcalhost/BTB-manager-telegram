@@ -19,7 +19,7 @@ As of now the bot is able to perform the following actions:
 The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yaml` file.  
 Only the Telegram user with `user_id` equal to the one set in the `apprise.yaml` file will be able to use the bot.
 
-⚠ The program *should* be compatible with any operating system but has **not** been thoroughly tested on **Windows** nor **MacOS**.  
+⚠ The program is fully compatible with **Linux** and **Windows** through **[WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10)**, further compatibility testing needs to done for **native Windows** and **MacOS**.  
 ## Installation
 *Python 3* is required.
 1. Install dependencies:
