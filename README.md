@@ -1,5 +1,7 @@
 # Binance Trade Bot Manager Telegram
 A Telegram bot for remotely managing [Binance Trade Bot].  
+
+**If you have feature requests please open an issue on this repo, developers are also welcome to contribute!**
   
 ## About
 I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn't have to constantly ssh into the VPS and my non-techy friends could enjoy the benefits of the bot.  
@@ -17,7 +19,7 @@ As of now the bot is able to perform the following actions:
 The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yaml` file.  
 Only the Telegram user with `user_id` equal to the one set in the `apprise.yaml` file will be able to use the bot.
 
-⚠ The program *should* be compatible with any operating system but has **not** been thoroughly tested on **Windows** nor **MacOS**. 
+⚠ The program *should* be compatible with any operating system but has **not** been thoroughly tested on **Windows** nor **MacOS**.  
 ## Installation
 *Python 3* is required.
 1. Install dependencies:
@@ -60,7 +62,23 @@ The `BTBManagerPython()` class takes the following ***optional*** initialization
 *Default value*: `None`  
 *Description*: If `from_yaml` is set to `False` this will be used as Telegram `user_id`.
 
-##### ⚙ Developed for the love of task automation by @lorcalhost
+## Disclaimer
+
+This project is for informational purposes only. You should not construe any
+such information or other material as legal, tax, investment, financial, or
+other advice. Nothing contained here constitutes a solicitation, recommendation,
+endorsement, or offer by me or any third party service provider to buy or sell
+any securities or other financial instruments in this or in any other
+jurisdiction in which such solicitation or offer would be unlawful under the
+securities laws of such jurisdiction.
+
+If you plan to use real money, USE AT YOUR OWN RISK.
+
+Under no circumstances will I be held responsible or liable in any way for any
+claims, damages, losses, expenses, costs, or liabilities whatsoever, including,
+without limitation, any direct or indirect damages for loss of profits.
+
+##### ⚙ Developed for the love of task automation by [Lorenzo Callegari](https://github.com/lorcalhost)
 
 
 [Binance Trade Bot]: https://github.com/edeng23/binance-trade-bot
