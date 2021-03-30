@@ -13,7 +13,7 @@ As of now the bot is able to perform the following actions:
 - Edit coin list (`supported_coin_list` file)
 - Edit user configuration (`user.cfg` file)
 - Delete database file (`crypto_trading.db` file)
-- Display last 4096 characters of log file
+- Display last 4000 characters of log file
 - 👷🏻‍♂️ WIP Display gains / current ratios in the database
 
 The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yaml` file.  
