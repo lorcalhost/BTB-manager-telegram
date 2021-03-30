@@ -14,12 +14,12 @@ As of now the bot is able to perform the following actions:
 - Edit user configuration (`user.cfg` file)
 - Delete database file (`crypto_trading.db` file)
 - Display last 4096 characters of log file
-- WIP Display gains / current ratios in the database
+- 👷🏻‍♂️ WIP Display gains / current ratios in the database
 
 The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yaml` file.  
 Only the Telegram user with `user_id` equal to the one set in the `apprise.yaml` file will be able to use the bot.
 
-⚠ The program is fully compatible with **Linux** and **Windows** through **[WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10)**, further compatibility testing needs to done for **native Windows** and **MacOS**.  
+⚠ The program is fully compatible with **Linux** and **Windows** through **[WSL]**, further compatibility testing needs to be done for **native Windows** and **MacOS**.  
 ## Installation
 *Python 3* is required.
 1. Install dependencies:
@@ -84,3 +84,4 @@ without limitation, any direct or indirect damages for loss of profits.
 
 
 [Binance Trade Bot]: https://github.com/edeng23/binance-trade-bot
+[WSL]: https://docs.microsoft.com/en-us/windows/wsl/install-win10

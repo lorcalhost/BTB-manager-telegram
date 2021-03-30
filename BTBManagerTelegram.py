@@ -329,7 +329,8 @@ class BTBManagerTelegram:
         message = f'❌ Unable to find log file at `{log_file_path}`.'.replace('.', '\.')
         if os.path.exists(log_file_path):
             with open(log_file_path) as f:
-                message = f'Last *4096* characters in log file:\n\n```\n{f.read()[-4096:]}\n```'.replace('.', '\.')
+                file_content = f.read().replace('.', '\.')[-4000:]
+                message = f'Last *4000* characters in log file:\n\n```\n{file_content}\n```'
         return message
 
     def __cancel(self, update: Update, _: CallbackContext) -> int:
