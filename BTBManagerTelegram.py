@@ -380,6 +380,9 @@ class BTBManagerTelegram:
                 # Get current coin price in USD
                 cur.execute(f'''SELECT balance, usd_price, btc_price FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;''')
                 balance, usd_price, btc_price = cur.fetchone()
+                if balance is None: balance = 0
+                if usd_price is None: usd_price = 0
+                if btc_price is None: btc_price = 0
 
                 # Get current coin price in bridge currency
                 cur.execute('''SELECT current_coin_price FROM scout_history ORDER BY datetime DESC LIMIT 1;''')
