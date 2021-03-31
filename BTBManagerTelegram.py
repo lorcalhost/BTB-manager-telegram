@@ -188,14 +188,17 @@ class BTBManagerTelegram:
     def __edit_coin(self, update: Update, _: CallbackContext) -> int:
         self.logger.info(f'Editing coin list. ({update.message.text})')
 
-        message = f'✔ Successfully edited coin list file to:\n\n```\n{update.message.text}\n```'.replace('.', '\.')
-        coin_file_path = f'{self.root_path}supported_coin_list'
-        try:
-            copyfile(coin_file_path, f'{coin_file_path}.backup')
-            with open(coin_file_path, 'w') as f:
-                f.write(update.message.text + '\n')
-        except:
-            message = '❌ Unable to edit coin list file\.'
+        if update.message.text != '/stop':
+            message = f'✔ Successfully edited coin list file to:\n\n```\n{update.message.text}\n```'.replace('.', '\.')
+            coin_file_path = f'{self.root_path}supported_coin_list'
+            try:
+                copyfile(coin_file_path, f'{coin_file_path}.backup')
+                with open(coin_file_path, 'w') as f:
+                    f.write(update.message.text + '\n')
+            except:
+                message = '❌ Unable to edit coin list file\.'
+        else:
+            message = '👌 Exited without changes\.\nYour `supported_coin_list` file was *not* modified\.'
 
         keyboard = [['Go back']]
         reply_markup = ReplyKeyboardMarkup(
@@ -213,14 +216,17 @@ class BTBManagerTelegram:
     def __edit_user_config(self, update: Update, _: CallbackContext) -> int:
         self.logger.info(f'Editing user configuration. ({update.message.text})')
 
-        message = f'✔ Successfully edited user configuration file to:\n\n```\n{update.message.text}\n```'.replace('.', '\.')
-        user_cfg_file_path = f'{self.root_path}user.cfg'
-        try:
-            copyfile(user_cfg_file_path, f'{user_cfg_file_path}.backup')
-            with open(user_cfg_file_path, 'w') as f:
-                f.write(update.message.text + '\n\n\n')
-        except:
-            message = '❌ Unable to edit user configuration file\.'
+        if update.message.text != '/stop':
+            message = f'✔ Successfully edited user configuration file to:\n\n```\n{update.message.text}\n```'.replace('.', '\.')
+            user_cfg_file_path = f'{self.root_path}user.cfg'
+            try:
+                copyfile(user_cfg_file_path, f'{user_cfg_file_path}.backup')
+                with open(user_cfg_file_path, 'w') as f:
+                    f.write(update.message.text + '\n\n\n')
+            except:
+                message = '❌ Unable to edit user configuration file\.'
+        else:
+            message = '👌 Exited without changes\.\nYour `user.cfg` file was *not* modified\.'
 
         keyboard = [['Go back']]
         reply_markup = ReplyKeyboardMarkup(
@@ -280,7 +286,7 @@ class BTBManagerTelegram:
         if not self.__find_process():
             if os.path.exists(coin_file_path):
                 with open(coin_file_path) as f:
-                    message = f'Current coin list is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated coin list*_.'.replace('.', '\.')
+                    message = f'Current coin list is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated coin list*_.\n\nWrite /stop to stop editing and exit without changes.'.replace('.', '\.')
                     edit = True
             else:
                 message = f'❌ Unable to find coin list file at `{coin_file_path}`.'.replace('.', '\.')
@@ -339,7 +345,7 @@ class BTBManagerTelegram:
         if not self.__find_process():
             if os.path.exists(user_cfg_file_path):
                 with open(user_cfg_file_path) as f:
-                    message = f'Current configuration file is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated configuration*_.'.replace('.', '\.')
+                    message = f'Current configuration file is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated configuration*_.\n\nWrite /stop to stop editing and exit without changes.'.replace('.', '\.')
                     edit = True
             else:
                 message = f'❌ Unable to find user configuration file at `{user_cfg_file_path}`.'.replace('.', '\.')
