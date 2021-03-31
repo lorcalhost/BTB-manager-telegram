@@ -374,35 +374,44 @@ class BTBManagerTelegram:
                 cur = con.cursor()
 
                 # Get current coin symbol
-                cur.execute('''SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1;''')
-                current_coin = cur.fetchone()[0]
+                try:
+                    cur.execute('''SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1;''')
+                    current_coin = cur.fetchone()[0]
+                    if current_coin is None:
+                        raise Exception()
+                except:
+                    con.close()
+                    return [f'❌ Unable to fetch current coin from database\.']
 
-                # Get current coin price in USD
-                cur.execute(f'''SELECT balance, usd_price, btc_price FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;''')
-                balance, usd_price, btc_price = cur.fetchone()
-                if balance is None: balance = 0
-                if usd_price is None: usd_price = 0
-                if btc_price is None: btc_price = 0
-
-                # Get current coin price in bridge currency
-                cur.execute('''SELECT current_coin_price FROM scout_history ORDER BY datetime DESC LIMIT 1;''')
-                bridge_price = cur.fetchone()[0]
+                # Get balance, current coin price in USD, current coin price in BTC
+                try:
+                    cur.execute(f'''SELECT balance, usd_price, btc_price FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;''')
+                    balance, usd_price, btc_price = cur.fetchone()
+                    if balance is None: balance = 0
+                    if usd_price is None: usd_price = 0
+                    if btc_price is None: btc_price = 0
+                except:
+                    con.close()
+                    return [f'❌ Unable to fetch current coin information from database\.', f'⚠ If you tried using the `Current stats` button during a trade please try again after the trade has been completed\.']
 
                 # Get prices and ratios of all alt coins
-                cur.execute(f'''SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ( ( ( current_coin_price / other_coin_price ) - 0.001 * 5 * ( current_coin_price / other_coin_price ) ) - sh.target_ratio ) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs WHERE pairs.from_coin_id='{current_coin}');''')
-                query = cur.fetchall()
+                try:
+                    cur.execute(f'''SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ( ( ( current_coin_price / other_coin_price ) - 0.001 * 5 * ( current_coin_price / other_coin_price ) ) - sh.target_ratio ) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs WHERE pairs.from_coin_id='{current_coin}');''')
+                    query = cur.fetchall()
 
-                # Generate message
-                last_update = datetime.strptime(query[0][0], '%Y-%m-%d %H:%M:%S.%f')
-                query = sorted(query, key=lambda k: k[-1], reverse=True)
+                    # Generate message
+                    last_update = datetime.strptime(query[0][0], '%Y-%m-%d %H:%M:%S.%f')
+                    query = sorted(query, key=lambda k: k[-1], reverse=True)
 
-                m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *{bridge}*: `{round((balance * bridge_price), 6)}` {bridge}\n\t\- Value in *USD*: `{round((balance * usd_price), 6)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n*Other coins:*\n'.replace('.', '\.')]
-                for coin in query:
-                    m_list.append(f'{coin[1]}:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n'.replace('.', '\.'))
-
-                con.close()
-
-                message = self.__4096_cutter(m_list)
+                    m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n*Other coins:*\n'.replace('.', '\.')]
+                    for coin in query:
+                        m_list.append(f'{coin[1]}:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n'.replace('.', '\.'))
+                    
+                    message = self.__4096_cutter(m_list)
+                    con.close()
+                except:
+                    con.close()
+                    return [f'❌ Something went wrong, unable to generate stats at this time\.']
             except:
                 message = ['❌ Unable to perform actions on the database\.']
         return message
