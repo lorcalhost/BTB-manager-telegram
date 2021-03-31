@@ -93,10 +93,10 @@ class BTBManagerTelegram:
         self.logger.info(f'Menu selector. ({update.message.text})')
 
         keyboard = [
-            ['🔍 Check bot status', '👛 Edit coin list'],
-            ['▶ Start trade bot', '⚙ Edit user.cfg'],
-            ['⏹ Stop trade bot', '❌ Delete database'],
-            ['📜 Read last log lines', '📈 Current stats']
+            ['📈 Current stats', '🔍 Check bot status'],
+            ['▶️ Start trade bot', '⏹ Stop trade bot'],
+            ['📜 Read last log lines', '❌ Delete database']
+            ['⚙ Edit user.cfg',  '👛 Edit coin list']
         ]
         reply_markup = ReplyKeyboardMarkup(
             keyboard,
