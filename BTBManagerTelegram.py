@@ -4,6 +4,9 @@ import yaml
 import psutil
 import subprocess
 import os
+import sqlite3
+from datetime import datetime
+from configparser import ConfigParser
 from shutil import copyfile
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
@@ -36,7 +39,7 @@ class BTBManagerTelegram:
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.__start, Filters.user(user_id=eval(user_id)))],
             states={
-                MENU: [MessageHandler(Filters.regex('^(Begin|⚠ Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|Go back)$'), self.__menu)],
+                MENU: [MessageHandler(Filters.regex('^(Begin|⚠ Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|📈 Current stats|Go back)$'), self.__menu)],
                 EDIT_COIN_LIST: [MessageHandler(Filters.regex('(.*?)'), self.__edit_coin)],
                 EDIT_USER_CONFIG: [MessageHandler(Filters.regex('(.*?)'), self.__edit_user_config)]
             },
@@ -93,7 +96,7 @@ class BTBManagerTelegram:
             ['⚠ Check bot status', '👛 Edit coin list'],
             ['▶ Start trade bot', '⚙ Edit user.cfg'],
             ['⏹ Stop trade bot', '❌ Delete database'],
-            ['📜 Read last log lines', '📈 Calculate gains']
+            ['📜 Read last log lines', '📈 Current stats']
         ]
         reply_markup = ReplyKeyboardMarkup(
             keyboard,
@@ -172,6 +175,14 @@ class BTBManagerTelegram:
                 parse_mode='MarkdownV2'
             )
 
+        elif update.message.text == '📈 Current stats':
+            for m in self.__btn_current_stats():
+                update.message.reply_text(
+                    m,
+                    reply_markup=reply_markup,
+                    parse_mode='MarkdownV2'
+                )
+
         return MENU
 
     def __edit_coin(self, update: Update, _: CallbackContext) -> int:
@@ -239,6 +250,18 @@ class BTBManagerTelegram:
                     p.wait()
         except Exception as e:
             self.logger.info(f'ERROR: {e}')
+
+    @staticmethod
+    def __4096_cutter(m_list):
+        message = ['']
+        index = 0
+        for m in m_list:
+            if len(message[index]) + len(m) <= 4096:
+                message[index] += m
+            else:
+                message.append(m)
+                index += 1
+        return message
 
     def __btn_check_status(self):
         self.logger.info('Check status button pressed.')
@@ -332,6 +355,55 @@ class BTBManagerTelegram:
                 file_content = f.read().replace('.', '\.')[-4000:]
                 message = f'Last *4000* characters in log file:\n\n```\n{file_content}\n```'
         return message
+
+    def __btn_current_stats(self):
+        self.logger.info('Current stats button pressed.')
+
+        db_file_path = f'{self.root_path}data/crypto_trading.db'
+        user_cfg_file_path = f'{self.root_path}user.cfg'
+        message = [f'⚠ Unable to find database file at `{db_file_path}`\.']
+        if os.path.exists(db_file_path):
+            try:
+                # Get bridge currency symbol
+                with open(user_cfg_file_path) as cfg:
+                    config = ConfigParser()
+                    config.read_file(cfg)
+                    bridge = config.get('binance_user_config', 'bridge')
+
+                con = sqlite3.connect(db_file_path)
+                cur = con.cursor()
+
+                # Get current coin symbol
+                cur.execute('''SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1;''')
+                current_coin = cur.fetchone()[0]
+
+                # Get current coin price in USD
+                cur.execute(f'''SELECT balance, usd_price, btc_price FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;''')
+                balance, usd_price, btc_price = cur.fetchone()
+
+                # Get current coin price in bridge currency
+                cur.execute('''SELECT current_coin_price FROM scout_history ORDER BY datetime DESC LIMIT 1;''')
+                bridge_price = cur.fetchone()[0]
+
+                # Get prices and ratios of all alt coins
+                cur.execute(f'''SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ( ( ( current_coin_price / other_coin_price ) - 0.001 * 5 * ( current_coin_price / other_coin_price ) ) - sh.target_ratio ) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs WHERE pairs.from_coin_id='{current_coin}');''')
+                query = cur.fetchall()
+
+                # Generate message
+                last_update = datetime.strptime(query[0][0], '%Y-%m-%d %H:%M:%S.%f')
+                query = sorted(query, key=lambda k: k[-1], reverse=True)
+
+                m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *{bridge}*: `{round((balance * bridge_price), 6)}` {bridge}\n\t\- Value in *USD*: `{round((balance * usd_price), 6)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n*Other coins:*\n'.replace('.', '\.')]
+                for coin in query:
+                    m_list.append(f'{coin[1]}:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n'.replace('.', '\.'))
+
+                con.close()
+
+                message = self.__4096_cutter(m_list)
+            except:
+                message = ['❌ Unable to perform actions on the database\.']
+        return message
+                
 
     def __cancel(self, update: Update, _: CallbackContext) -> int:
         self.logger.info('Conversation canceled.')

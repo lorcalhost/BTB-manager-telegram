@@ -4,7 +4,7 @@ A Telegram bot for remotely managing [Binance Trade Bot].
 **If you have feature requests please open an issue on this repo, developers are also welcome to contribute!**
   
 ## About
-I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn't have to constantly ssh into the VPS and my non-techy friends could enjoy the benefits of the bot.  
+I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn't have to constantly ssh into the VPS, and my non-techy friends could enjoy the benefits of automated trading.  
   
 As of now the bot is able to perform the following actions:
 - Check bot status (running / not running)
@@ -14,7 +14,7 @@ As of now the bot is able to perform the following actions:
 - Edit user configuration (`user.cfg` file)
 - Delete database file (`crypto_trading.db` file)
 - Display last 4000 characters of log file
-- 👷🏻‍♂️ WIP Display gains / current ratios in the database
+- Current stats (current coin, balance, ratios & more)
 
 The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yaml` file.  
 Only the Telegram user with `user_id` equal to the one set in the `apprise.yaml` file will be able to use the bot.
