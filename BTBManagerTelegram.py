@@ -94,7 +94,7 @@ class BTBManagerTelegram:
 
         keyboard = [
             ['📈 Current stats', '🔍 Check bot status'],
-            ['▶️ Start trade bot', '⏹ Stop trade bot'],
+            ['▶ Start trade bot', '⏹ Stop trade bot'],
             ['📜 Read last log lines', '❌ Delete database'],
             ['⚙ Edit user.cfg', '👛 Edit coin list']
         ]
