@@ -4,6 +4,7 @@ import yaml
 import psutil
 import subprocess
 import os
+import argparse
 from shutil import copyfile
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
@@ -28,7 +29,7 @@ class BTBManagerTelegram:
 
         if from_yaml:
             token, user_id = self.__get_token_from_yaml()
-        
+
 
         updater = Updater(token)
         dispatcher = updater.dispatcher
@@ -103,10 +104,10 @@ class BTBManagerTelegram:
         if update.message.text in ['Begin', 'Go back']:
             message = 'Please select one of the options.'
             update.message.reply_text(
-                message, 
+                message,
                 reply_markup=reply_markup
             )
-        
+
         elif update.message.text == '⚠ Check bot status':
             update.message.reply_text(
                 self.__btn_check_status(),
@@ -192,7 +193,7 @@ class BTBManagerTelegram:
             resize_keyboard=True
         )
         update.message.reply_text(
-            message, 
+            message,
             reply_markup=reply_markup,
             parse_mode='MarkdownV2'
         )
@@ -217,7 +218,7 @@ class BTBManagerTelegram:
             resize_keyboard=True
         )
         update.message.reply_text(
-            message, 
+            message,
             reply_markup=reply_markup,
             parse_mode='MarkdownV2'
         )
@@ -344,4 +345,13 @@ class BTBManagerTelegram:
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--docker', help='If this arg is passed in, the script will run in a docker container')
+
+    args = parser.parse_args()
+    if args.docker:
+        os.system("docker build -t py-container .")
+        os.system("docker run --rm -it py-container")
+        os.system("docker rmi -f py-container")
+
     BTBManagerTelegram()
