@@ -95,8 +95,8 @@ class BTBManagerTelegram:
         keyboard = [
             ['📈 Current stats', '🔍 Check bot status'],
             ['▶️ Start trade bot', '⏹ Stop trade bot'],
-            ['📜 Read last log lines', '❌ Delete database']
-            ['⚙ Edit user.cfg',  '👛 Edit coin list']
+            ['📜 Read last log lines', '❌ Delete database'],
+            ['⚙ Edit user.cfg', '👛 Edit coin list']
         ]
         reply_markup = ReplyKeyboardMarkup(
             keyboard,
