@@ -64,6 +64,17 @@ The `BTBManagerTelegram()` class takes the following ***optional*** initializati
 
 ## Interaction
 Interaction with **BTBManagerTelegram** can be *started* by sending the command `/start` in the bot's Telegram chat.
+
+## Screenshots
+<details><summary>CLICK ME</summary>
+
+<p align="center">
+  	<img height="20%" width="20%" src="https://i.imgur.com/lg9pzGR.jpg" />&nbsp;&nbsp;&nbsp;&nbsp;
+    <img height="20%" width="20%" src="https://i.imgur.com/fSCjYzw.jpg" />
+</p>
+</details>
+</br>
+
 ## Disclaimer
 
 This project is for informational purposes only. You should not construe any

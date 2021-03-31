@@ -39,7 +39,7 @@ class BTBManagerTelegram:
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.__start, Filters.user(user_id=eval(user_id)))],
             states={
-                MENU: [MessageHandler(Filters.regex('^(Begin|⚠ Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|📈 Current stats|Go back)$'), self.__menu)],
+                MENU: [MessageHandler(Filters.regex('^(Begin|🔍 Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|📈 Current stats|Go back)$'), self.__menu)],
                 EDIT_COIN_LIST: [MessageHandler(Filters.regex('(.*?)'), self.__edit_coin)],
                 EDIT_USER_CONFIG: [MessageHandler(Filters.regex('(.*?)'), self.__edit_user_config)]
             },
@@ -75,7 +75,7 @@ class BTBManagerTelegram:
         self.logger.info('Started conversation.')
 
         keyboard = [['Begin']]
-        message = f'Hi *{update.message.from_user.first_name}*\!\nWelcome to _Binace Trade Bot Manager Telegram_\.\n\nThis telegram bot was developed by @lorcalhost\.\nFind out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.'
+        message = f'Hi *{update.message.from_user.first_name}*\!\nWelcome to _Binace Trade Bot Manager Telegram_\.\n\nThis Telegram bot was developed by @lorcalhost\.\nFind out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.'
         reply_markup=ReplyKeyboardMarkup(
             keyboard,
             one_time_keyboard=True,
@@ -93,7 +93,7 @@ class BTBManagerTelegram:
         self.logger.info(f'Menu selector. ({update.message.text})')
 
         keyboard = [
-            ['⚠ Check bot status', '👛 Edit coin list'],
+            ['🔍 Check bot status', '👛 Edit coin list'],
             ['▶ Start trade bot', '⚙ Edit user.cfg'],
             ['⏹ Stop trade bot', '❌ Delete database'],
             ['📜 Read last log lines', '📈 Current stats']
@@ -110,7 +110,7 @@ class BTBManagerTelegram:
                 reply_markup=reply_markup
             )
         
-        elif update.message.text == '⚠ Check bot status':
+        elif update.message.text == '🔍 Check bot status':
             update.message.reply_text(
                 self.__btn_check_status(),
                 reply_markup=reply_markup
