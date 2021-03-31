@@ -5,6 +5,9 @@ import psutil
 import subprocess
 import os
 import argparse
+import sqlite3
+from datetime import datetime
+from configparser import ConfigParser
 from shutil import copyfile
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
@@ -37,7 +40,7 @@ class BTBManagerTelegram:
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.__start, Filters.user(user_id=eval(user_id)))],
             states={
-                MENU: [MessageHandler(Filters.regex('^(Begin|⚠ Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|Go back)$'), self.__menu)],
+                MENU: [MessageHandler(Filters.regex('^(Begin|🔍 Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|📈 Current stats|Go back)$'), self.__menu)],
                 EDIT_COIN_LIST: [MessageHandler(Filters.regex('(.*?)'), self.__edit_coin)],
                 EDIT_USER_CONFIG: [MessageHandler(Filters.regex('(.*?)'), self.__edit_user_config)]
             },
@@ -73,7 +76,7 @@ class BTBManagerTelegram:
         self.logger.info('Started conversation.')
 
         keyboard = [['Begin']]
-        message = f'Hi *{update.message.from_user.first_name}*\!\nWelcome to _Binace Trade Bot Manager Telegram_\.\n\nThis telegram bot was developed by @lorcalhost\.\nFind out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.'
+        message = f'Hi *{update.message.from_user.first_name}*\!\nWelcome to _Binace Trade Bot Manager Telegram_\.\n\nThis Telegram bot was developed by @lorcalhost\.\nFind out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.'
         reply_markup=ReplyKeyboardMarkup(
             keyboard,
             one_time_keyboard=True,
@@ -91,10 +94,10 @@ class BTBManagerTelegram:
         self.logger.info(f'Menu selector. ({update.message.text})')
 
         keyboard = [
-            ['⚠ Check bot status', '👛 Edit coin list'],
-            ['▶ Start trade bot', '⚙ Edit user.cfg'],
-            ['⏹ Stop trade bot', '❌ Delete database'],
-            ['📜 Read last log lines', '📈 Calculate gains']
+            ['📈 Current stats', '🔍 Check bot status'],
+            ['▶ Start trade bot', '⏹ Stop trade bot'],
+            ['📜 Read last log lines', '❌ Delete database'],
+            ['⚙ Edit user.cfg', '👛 Edit coin list']
         ]
         reply_markup = ReplyKeyboardMarkup(
             keyboard,
@@ -107,8 +110,9 @@ class BTBManagerTelegram:
                 message,
                 reply_markup=reply_markup
             )
-
-        elif update.message.text == '⚠ Check bot status':
+        
+        elif update.message.text == '🔍 Check bot status':
+          
             update.message.reply_text(
                 self.__btn_check_status(),
                 reply_markup=reply_markup
@@ -173,19 +177,30 @@ class BTBManagerTelegram:
                 parse_mode='MarkdownV2'
             )
 
+        elif update.message.text == '📈 Current stats':
+            for m in self.__btn_current_stats():
+                update.message.reply_text(
+                    m,
+                    reply_markup=reply_markup,
+                    parse_mode='MarkdownV2'
+                )
+
         return MENU
 
     def __edit_coin(self, update: Update, _: CallbackContext) -> int:
         self.logger.info(f'Editing coin list. ({update.message.text})')
 
-        message = f'✔ Successfully edited coin list file to:\n\n```\n{update.message.text}\n```'.replace('.', '\.')
-        coin_file_path = f'{self.root_path}supported_coin_list'
-        try:
-            copyfile(coin_file_path, f'{coin_file_path}.backup')
-            with open(coin_file_path, 'w') as f:
-                f.write(update.message.text + '\n')
-        except:
-            message = '❌ Unable to edit coin list file\.'
+        if update.message.text != '/stop':
+            message = f'✔ Successfully edited coin list file to:\n\n```\n{update.message.text}\n```'.replace('.', '\.')
+            coin_file_path = f'{self.root_path}supported_coin_list'
+            try:
+                copyfile(coin_file_path, f'{coin_file_path}.backup')
+                with open(coin_file_path, 'w') as f:
+                    f.write(update.message.text + '\n')
+            except:
+                message = '❌ Unable to edit coin list file\.'
+        else:
+            message = '👌 Exited without changes\.\nYour `supported_coin_list` file was *not* modified\.'
 
         keyboard = [['Go back']]
         reply_markup = ReplyKeyboardMarkup(
@@ -203,14 +218,17 @@ class BTBManagerTelegram:
     def __edit_user_config(self, update: Update, _: CallbackContext) -> int:
         self.logger.info(f'Editing user configuration. ({update.message.text})')
 
-        message = f'✔ Successfully edited user configuration file to:\n\n```\n{update.message.text}\n```'.replace('.', '\.')
-        user_cfg_file_path = f'{self.root_path}user.cfg'
-        try:
-            copyfile(user_cfg_file_path, f'{user_cfg_file_path}.backup')
-            with open(user_cfg_file_path, 'w') as f:
-                f.write(update.message.text + '\n\n\n')
-        except:
-            message = '❌ Unable to edit user configuration file\.'
+        if update.message.text != '/stop':
+            message = f'✔ Successfully edited user configuration file to:\n\n```\n{update.message.text}\n```'.replace('.', '\.')
+            user_cfg_file_path = f'{self.root_path}user.cfg'
+            try:
+                copyfile(user_cfg_file_path, f'{user_cfg_file_path}.backup')
+                with open(user_cfg_file_path, 'w') as f:
+                    f.write(update.message.text + '\n\n\n')
+            except:
+                message = '❌ Unable to edit user configuration file\.'
+        else:
+            message = '👌 Exited without changes\.\nYour `user.cfg` file was *not* modified\.'
 
         keyboard = [['Go back']]
         reply_markup = ReplyKeyboardMarkup(
@@ -241,6 +259,18 @@ class BTBManagerTelegram:
         except Exception as e:
             self.logger.info(f'ERROR: {e}')
 
+    @staticmethod
+    def __4096_cutter(m_list):
+        message = ['']
+        index = 0
+        for m in m_list:
+            if len(message[index]) + len(m) <= 4096:
+                message[index] += m
+            else:
+                message.append(m)
+                index += 1
+        return message
+
     def __btn_check_status(self):
         self.logger.info('Check status button pressed.')
 
@@ -258,7 +288,7 @@ class BTBManagerTelegram:
         if not self.__find_process():
             if os.path.exists(coin_file_path):
                 with open(coin_file_path) as f:
-                    message = f'Current coin list is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated coin list*_.'.replace('.', '\.')
+                    message = f'Current coin list is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated coin list*_.\n\nWrite /stop to stop editing and exit without changes.'.replace('.', '\.')
                     edit = True
             else:
                 message = f'❌ Unable to find coin list file at `{coin_file_path}`.'.replace('.', '\.')
@@ -317,7 +347,7 @@ class BTBManagerTelegram:
         if not self.__find_process():
             if os.path.exists(user_cfg_file_path):
                 with open(user_cfg_file_path) as f:
-                    message = f'Current configuration file is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated configuration*_.'.replace('.', '\.')
+                    message = f'Current configuration file is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated configuration*_.\n\nWrite /stop to stop editing and exit without changes.'.replace('.', '\.')
                     edit = True
             else:
                 message = f'❌ Unable to find user configuration file at `{user_cfg_file_path}`.'.replace('.', '\.')
@@ -334,6 +364,67 @@ class BTBManagerTelegram:
                 message = f'Last *4000* characters in log file:\n\n```\n{file_content}\n```'
         return message
 
+    def __btn_current_stats(self):
+        self.logger.info('Current stats button pressed.')
+
+        db_file_path = f'{self.root_path}data/crypto_trading.db'
+        user_cfg_file_path = f'{self.root_path}user.cfg'
+        message = [f'⚠ Unable to find database file at `{db_file_path}`\.']
+        if os.path.exists(db_file_path):
+            try:
+                # Get bridge currency symbol
+                with open(user_cfg_file_path) as cfg:
+                    config = ConfigParser()
+                    config.read_file(cfg)
+                    bridge = config.get('binance_user_config', 'bridge')
+
+                con = sqlite3.connect(db_file_path)
+                cur = con.cursor()
+
+                # Get current coin symbol
+                try:
+                    cur.execute('''SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1;''')
+                    current_coin = cur.fetchone()[0]
+                    if current_coin is None:
+                        raise Exception()
+                except:
+                    con.close()
+                    return [f'❌ Unable to fetch current coin from database\.']
+
+                # Get balance, current coin price in USD, current coin price in BTC
+                try:
+                    cur.execute(f'''SELECT balance, usd_price, btc_price FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;''')
+                    balance, usd_price, btc_price = cur.fetchone()
+                    if balance is None: balance = 0
+                    if usd_price is None: usd_price = 0
+                    if btc_price is None: btc_price = 0
+                except:
+                    con.close()
+                    return [f'❌ Unable to fetch current coin information from database\.', f'⚠ If you tried using the `Current stats` button during a trade please try again after the trade has been completed\.']
+
+                # Get prices and ratios of all alt coins
+                try:
+                    cur.execute(f'''SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ( ( ( current_coin_price / other_coin_price ) - 0.001 * 5 * ( current_coin_price / other_coin_price ) ) - sh.target_ratio ) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs WHERE pairs.from_coin_id='{current_coin}');''')
+                    query = cur.fetchall()
+
+                    # Generate message
+                    last_update = datetime.strptime(query[0][0], '%Y-%m-%d %H:%M:%S.%f')
+                    query = sorted(query, key=lambda k: k[-1], reverse=True)
+
+                    m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n*Other coins:*\n'.replace('.', '\.')]
+                    for coin in query:
+                        m_list.append(f'{coin[1]}:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n'.replace('.', '\.'))
+                    
+                    message = self.__4096_cutter(m_list)
+                    con.close()
+                except:
+                    con.close()
+                    return [f'❌ Something went wrong, unable to generate stats at this time\.']
+            except:
+                message = ['❌ Unable to perform actions on the database\.']
+        return message
+                
+
     def __cancel(self, update: Update, _: CallbackContext) -> int:
         self.logger.info('Conversation canceled.')
 
@@ -345,13 +436,16 @@ class BTBManagerTelegram:
 
 
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--docker', help='If this arg is passed in, the script will run in a docker container')
 
     args = parser.parse_args()
+                              
     if args.docker:
         os.system("docker build -t py-container .")
         os.system("docker run --rm -it py-container")
         os.system("docker rmi -f py-container")
 
-    BTBManagerTelegram()
+    else:
+        BTBManagerTelegram()
