@@ -63,7 +63,7 @@ The `BTBManagerTelegram()` class takes the following ***optional*** initializati
 *Description*: If `from_yaml` is set to `False` this will be used as Telegram `user_id`.
 
 ## Interaction
-Interaction with **BTBManagerTelegram** can be *started* by sending the command `/start` in the bot's Telegram chat.
+Interaction with **BTBManagerTelegram** can be *started* by sending the command `/start` in the bot's Telegram chat.  
 
 ## Screenshots
 <details><summary>CLICK ME</summary>
@@ -71,6 +71,31 @@ Interaction with **BTBManagerTelegram** can be *started* by sending the command 
 <p align="center">
   	<img height="20%" width="20%" src="https://i.imgur.com/lg9pzGR.jpg" />&nbsp;&nbsp;&nbsp;&nbsp;
     <img height="20%" width="20%" src="https://i.imgur.com/fSCjYzw.jpg" />
+</p>
+</details>
+</br>
+
+## Troubleshooting
+### 1. I am sending the `/start` command to the bot but it's not answering:
+<details><summary>CLICK ME</summary>
+
+<p align="center">
+
+Usually when this happens it means that you haven't properly setup your `apprise.yml` file.  
+For security reasons the bot is programmed so that it only responds to the person with `user_id` equal to the the one set in the Telegram URL inside the `apprise.yml` file.  
+
+Example of `apprise.yml` file:
+```yaml
+version: 1
+urls:
+  - tgram://123456789:AABx8iXjE5C-vG4SDhf6ARgdFgxYxhuHb4A/606743502
+
+```
+In this URL:
+- `123456789:AABx8iXjE5C-vG4SDhf6ARgdFgxYxhuHb4A` is the bot's `token`
+- `606743502` is the `user_id`  
+
+You can find your `user_id` by sending a Telegram message to [@userinfobot](https://t.me/userinfobot).
 </p>
 </details>
 </br>
