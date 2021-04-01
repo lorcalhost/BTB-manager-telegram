@@ -115,20 +115,20 @@ class BTBManagerTelegram:
             resize_keyboard=True
         )
 
-        if update.message.text in ['Begin', 'Go back', 'OK', '⬅️ Back']:
+        if update.message.text in ['Begin', '⬅️ Back']:
             message = 'Please select one of the options.'
             update.message.reply_text(
                 message, 
                 reply_markup=reply_markup
             )
-        
-        elif update.message.text in ['⚙️ Configurations']:
+
+        elif update.message.text in ['Go back', 'OK', '⚙️ Configurations']:
             message = 'Please select one of the options.'
             update.message.reply_text(
                 message, 
                 reply_markup=reply_markup_config
             )
-        
+            
         elif update.message.text == '🔍 Check bot status':
             update.message.reply_text(
                 self.__btn_check_status(),
