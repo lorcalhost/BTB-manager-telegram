@@ -4,7 +4,7 @@ A Telegram bot for remotely managing [Binance Trade Bot].
 **If you have feature requests please open an issue on this repo, developers are also welcome to contribute!**
   
 ## About
-I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn't have to constantly ssh into the VPS and my non-techy friends could enjoy the benefits of the bot.  
+I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn't have to constantly ssh into the VPS, and my non-techy friends could enjoy the benefits of automated trading.  
   
 As of now the bot is able to perform the following actions:
 - Check bot status (running / not running)
@@ -14,10 +14,10 @@ As of now the bot is able to perform the following actions:
 - Edit user configuration (`user.cfg` file)
 - Delete database file (`crypto_trading.db` file)
 - Display last 4000 characters of log file
-- 👷🏻‍♂️ WIP Display gains / current ratios in the database
+- Current stats (current coin, balance, ratios & more)
 
-The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yaml` file.  
-Only the Telegram user with `user_id` equal to the one set in the `apprise.yaml` file will be able to use the bot.
+The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yml` file.  
+Only the Telegram user with `user_id` equal to the one set in the `apprise.yml` file will be able to use the bot.
 
 ⚠ The program is fully compatible with **Linux** and **Windows** through **[WSL]**, further compatibility testing needs to be done for **native Windows** and **MacOS**.  
 ## Installation
@@ -41,7 +41,7 @@ $ python3 BTBManagerTelegram.py
 # If the bot is running on a server you may want to keep it running even after ssh connection is closed by using nohup
 $ nohup python3 BTBManagerTelegram.py &
 ```
-Make sure  [Binance Trade Bot]'s `apprise.yaml` file is correctly setup before running.
+Make sure  [Binance Trade Bot]'s `apprise.yml` file is correctly setup before running.
 ### **Method 2:** Import script
 **BTBManagerTelegram** can be imported in your Python script and used in the following way:
 ```python
@@ -54,7 +54,7 @@ The `BTBManagerTelegram()` class takes the following ***optional*** initializati
 *Description*: Current base directory, to be used in case the bot has not been put inside [Binance Trade Bot]'s installation folder.
 - `from_yaml`:  
 *Default value*: `True`  
-*Description*: Set to `False` if you **don't** want *BTBManagerTelegram* to automatically fetch Telegram `token` and `user_id` from `apprise.yaml` file.
+*Description*: Set to `False` if you **don't** want *BTBManagerTelegram* to automatically fetch Telegram `token` and `user_id` from `apprise.yml` file.
 - `token`:  
 *Default value*: `None`  
 *Description*: If `from_yaml` is set to `False` this will be used as Telegram `token`.
@@ -64,6 +64,17 @@ The `BTBManagerTelegram()` class takes the following ***optional*** initializati
 
 ## Interaction
 Interaction with **BTBManagerTelegram** can be *started* by sending the command `/start` in the bot's Telegram chat.
+
+## Screenshots
+<details><summary>CLICK ME</summary>
+
+<p align="center">
+  	<img height="20%" width="20%" src="https://i.imgur.com/lg9pzGR.jpg" />&nbsp;&nbsp;&nbsp;&nbsp;
+    <img height="20%" width="20%" src="https://i.imgur.com/fSCjYzw.jpg" />
+</p>
+</details>
+</br>
+
 ## Disclaimer
 
 This project is for informational purposes only. You should not construe any
