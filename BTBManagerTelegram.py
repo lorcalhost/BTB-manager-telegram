@@ -346,12 +346,13 @@ class BTBManagerTelegram:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--docker', help='If this arg is passed in, the script will run in a docker container')
+    parser.add_argument('-d', '--docker', action='store_true', help='If this arg is passed in, the script will run in a docker container')
 
     args = parser.parse_args()
     if args.docker:
-        os.system("docker build -t py-container .")
+        os.system("docker build --no-cache -t py-container .")
         os.system("docker run --rm -it py-container")
         os.system("docker rmi -f py-container")
 
-    BTBManagerTelegram()
+    else:
+        BTBManagerTelegram()
