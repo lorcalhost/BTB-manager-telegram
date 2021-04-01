@@ -39,7 +39,7 @@ class BTBManagerTelegram:
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.__start, Filters.user(user_id=eval(user_id)))],
             states={
-                MENU: [MessageHandler(Filters.regex('^(Begin|🔍 Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|📈 Current stats|Go back|OK)$'), self.__menu)],
+                MENU: [MessageHandler(Filters.regex('^(Begin|⚙️ Configurations|🔍 Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|💵 Current value|📈 Current ratios|⬅️ Back|Go back|OK)$'), self.__menu)],
                 EDIT_COIN_LIST: [MessageHandler(Filters.regex('(.*?)'), self.__edit_coin)],
                 EDIT_USER_CONFIG: [MessageHandler(Filters.regex('(.*?)'), self.__edit_user_config)],
                 DELETE_DB: [MessageHandler(Filters.regex('^(⚠ Confirm|Go back)$'), self.__delete_db)]
@@ -94,27 +94,45 @@ class BTBManagerTelegram:
         self.logger.info(f'Menu selector. ({update.message.text})')
 
         keyboard = [
-            ['📈 Current stats', '🔍 Check bot status'],
+            ['💵 Current value', '📈 Current ratios'],
+            ['🔍 Check bot status', '⚙️ Configurations']
+        ]
+
+        config_keyboard = [
             ['▶ Start trade bot', '⏹ Stop trade bot'],
             ['📜 Read last log lines', '❌ Delete database'],
-            ['⚙ Edit user.cfg', '👛 Edit coin list']
+            ['⚙ Edit user.cfg', '👛 Edit coin list'],
+            ['⬅️ Back']
         ]
+
         reply_markup = ReplyKeyboardMarkup(
             keyboard,
             resize_keyboard=True
         )
 
-        if update.message.text in ['Begin', 'Go back', 'OK']:
+        reply_markup_config = ReplyKeyboardMarkup(
+            config_keyboard,
+            resize_keyboard=True
+        )
+
+        if update.message.text in ['Begin', '⬅️ Back']:
             message = 'Please select one of the options.'
             update.message.reply_text(
                 message, 
                 reply_markup=reply_markup
             )
-        
+
+        elif update.message.text in ['Go back', 'OK', '⚙️ Configurations']:
+            message = 'Please select one of the options.'
+            update.message.reply_text(
+                message, 
+                reply_markup=reply_markup_config
+            )
+            
         elif update.message.text == '🔍 Check bot status':
             update.message.reply_text(
                 self.__btn_check_status(),
-                reply_markup=reply_markup
+                reply_markup=reply_markup_config
             )
 
         elif update.message.text == '👛 Edit coin list':
@@ -129,21 +147,21 @@ class BTBManagerTelegram:
             else:
                 update.message.reply_text(
                     re[0],
-                    reply_markup=reply_markup,
+                    reply_markup=reply_markup_config,
                     parse_mode='MarkdownV2'
                 )
 
         elif update.message.text == '▶ Start trade bot':
             update.message.reply_text(
                 self.__btn_start_bot(),
-                reply_markup=reply_markup,
+                reply_markup=reply_markup_config,
                 parse_mode='MarkdownV2'
             )
 
         elif update.message.text == '⏹ Stop trade bot':
             update.message.reply_text(
                 self.__btn_stop_bot(),
-                reply_markup=reply_markup
+                reply_markup=reply_markup_config
             )
 
         elif update.message.text == '❌ Delete database':
@@ -159,7 +177,7 @@ class BTBManagerTelegram:
             else:
                 update.message.reply_text(
                     re[0],
-                    reply_markup=reply_markup,
+                    reply_markup=reply_markup_config,
                     parse_mode='MarkdownV2'
                 )
 
@@ -175,19 +193,26 @@ class BTBManagerTelegram:
             else:
                 update.message.reply_text(
                     re[0],
-                    reply_markup=reply_markup,
+                    reply_markup=reply_markup_config,
                     parse_mode='MarkdownV2'
                 )
 
         elif update.message.text == '📜 Read last log lines':
             update.message.reply_text(
                 self.__btn_read_log(),
-                reply_markup=reply_markup,
+                reply_markup=reply_markup_config,
                 parse_mode='MarkdownV2'
             )
 
-        elif update.message.text == '📈 Current stats':
-            for m in self.__btn_current_stats():
+        elif update.message.text == '💵 Current value':
+            for m in self.__btn_current_value():
+                update.message.reply_text(
+                    m,
+                    reply_markup=reply_markup,
+                    parse_mode='MarkdownV2'
+                )
+        elif update.message.text == '📈 Current ratios':
+            for m in self.__btn_current_ratio():
                 update.message.reply_text(
                     m,
                     reply_markup=reply_markup,
@@ -397,8 +422,8 @@ class BTBManagerTelegram:
                 message = f'Last *4000* characters in log file:\n\n```\n{file_content}\n```'
         return message
 
-    def __btn_current_stats(self):
-        self.logger.info('Current stats button pressed.')
+    def __btn_current_value(self):
+        self.logger.info('Current value button pressed.')
 
         db_file_path = f'{self.root_path}data/crypto_trading.db'
         user_cfg_file_path = f'{self.root_path}user.cfg'
@@ -433,7 +458,7 @@ class BTBManagerTelegram:
                     if btc_price is None: btc_price = 0
                 except:
                     con.close()
-                    return [f'❌ Unable to fetch current coin information from database\.', f'⚠ If you tried using the `Current stats` button during a trade please try again after the trade has been completed\.']
+                    return [f'❌ Unable to fetch current coin information from database\.', f'⚠ If you tried using the `Current value` button during a trade please try again after the trade has been completed\.']
 
                 # Get prices and ratios of all alt coins
                 try:
@@ -444,7 +469,61 @@ class BTBManagerTelegram:
                     last_update = datetime.strptime(query[0][0], '%Y-%m-%d %H:%M:%S.%f')
                     query = sorted(query, key=lambda k: k[-1], reverse=True)
 
-                    m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n*Other coins:*\n'.replace('.', '\.')]
+                    m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n'.replace('.', '\.')]
+                    
+                    message = self.__4096_cutter(m_list)
+                    con.close()
+                except:
+                    con.close()
+                    return [f'❌ Something went wrong, unable to generate value at this time\.']
+            except:
+                message = ['❌ Unable to perform actions on the database\.']
+        return message
+                
+    def __btn_current_ratio(self):
+        self.logger.info('Current ratio button pressed.')
+
+        db_file_path = f'{self.root_path}data/crypto_trading.db'
+        user_cfg_file_path = f'{self.root_path}user.cfg'
+        message = [f'⚠ Unable to find database file at `{db_file_path}`\.']
+        if os.path.exists(db_file_path):
+            try:
+                # Get bridge currency symbol
+                with open(user_cfg_file_path) as cfg:
+                    config = ConfigParser()
+                    config.read_file(cfg)
+                    bridge = config.get('binance_user_config', 'bridge')
+
+                con = sqlite3.connect(db_file_path)
+                cur = con.cursor()
+
+                # Get current coin symbol
+                try:
+                    cur.execute('''SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1;''')
+                    current_coin = cur.fetchone()[0]
+                    if current_coin is None:
+                        raise Exception()
+                except:
+                    con.close()
+                    return [f'❌ Unable to fetch current coin from database\.']
+
+                # Get balance, current coin price in USD, current coin price in BTC
+                try:
+                    cur.execute(f'''SELECT balance, usd_price, btc_price FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;''')
+                except:
+                    con.close()
+                    return [f'❌ Unable to fetch current coin information from database\.', f'⚠ If you tried using the `Current ratio` button during a trade please try again after the trade has been completed\.']
+
+                # Get prices and ratios of all alt coins
+                try:
+                    cur.execute(f'''SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ( ( ( current_coin_price / other_coin_price ) - 0.001 * 5 * ( current_coin_price / other_coin_price ) ) - sh.target_ratio ) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs WHERE pairs.from_coin_id='{current_coin}');''')
+                    query = cur.fetchall()
+
+                    # Generate message
+                    last_update = datetime.strptime(query[0][0], '%Y-%m-%d %H:%M:%S.%f')
+                    query = sorted(query, key=lambda k: k[-1], reverse=True)
+
+                    m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Coins Ratio compared to {current_coin}:*\n'.replace('.', '\.')]
                     for coin in query:
                         m_list.append(f'{coin[1]}:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n'.replace('.', '\.'))
                     
@@ -452,11 +531,11 @@ class BTBManagerTelegram:
                     con.close()
                 except:
                     con.close()
-                    return [f'❌ Something went wrong, unable to generate stats at this time\.']
+                    return [f'❌ Something went wrong, unable to generate ratio at this time\.']
             except:
                 message = ['❌ Unable to perform actions on the database\.']
         return message
-                
+
 
     def __cancel(self, update: Update, _: CallbackContext) -> int:
         self.logger.info('Conversation canceled.')
