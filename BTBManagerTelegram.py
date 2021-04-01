@@ -18,7 +18,7 @@ from telegram.ext import (
     CallbackContext
 )
 
-MENU, EDIT_COIN_LIST, EDIT_USER_CONFIG = range(3)
+MENU, EDIT_COIN_LIST, EDIT_USER_CONFIG, DELETE_DB = range(4)
 
 
 class BTBManagerTelegram:
@@ -39,9 +39,10 @@ class BTBManagerTelegram:
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.__start, Filters.user(user_id=eval(user_id)))],
             states={
-                MENU: [MessageHandler(Filters.regex('^(Begin|🔍 Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|📈 Current stats|Go back)$'), self.__menu)],
+                MENU: [MessageHandler(Filters.regex('^(Begin|🔍 Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|📈 Current stats|Go back|OK)$'), self.__menu)],
                 EDIT_COIN_LIST: [MessageHandler(Filters.regex('(.*?)'), self.__edit_coin)],
-                EDIT_USER_CONFIG: [MessageHandler(Filters.regex('(.*?)'), self.__edit_user_config)]
+                EDIT_USER_CONFIG: [MessageHandler(Filters.regex('(.*?)'), self.__edit_user_config)],
+                DELETE_DB: [MessageHandler(Filters.regex('^(⚠ Confirm|Go back)$'), self.__delete_db)]
             },
             fallbacks=[CommandHandler('cancel', self.__cancel)],
             per_user=True
@@ -103,7 +104,7 @@ class BTBManagerTelegram:
             resize_keyboard=True
         )
 
-        if update.message.text in ['Begin', 'Go back']:
+        if update.message.text in ['Begin', 'Go back', 'OK']:
             message = 'Please select one of the options.'
             update.message.reply_text(
                 message, 
@@ -146,11 +147,21 @@ class BTBManagerTelegram:
             )
 
         elif update.message.text == '❌ Delete database':
-            update.message.reply_text(
-                self.__btn_delete_db(),
-                reply_markup=reply_markup,
-                parse_mode='MarkdownV2'
-            )
+            re = self.__btn_delete_db()
+            if re[1]:
+                kb = [['⚠ Confirm', 'Go back']]
+                update.message.reply_text(
+                    re[0],
+                    reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                    parse_mode='MarkdownV2'
+                )
+                return DELETE_DB
+            else:
+                update.message.reply_text(
+                    re[0],
+                    reply_markup=reply_markup,
+                    parse_mode='MarkdownV2'
+                )
 
         elif update.message.text == '⚙ Edit user.cfg':
             re = self.__btn_edit_user_cfg()
@@ -229,6 +240,33 @@ class BTBManagerTelegram:
             message = '👌 Exited without changes\.\nYour `user.cfg` file was *not* modified\.'
 
         keyboard = [['Go back']]
+        reply_markup = ReplyKeyboardMarkup(
+            keyboard,
+            resize_keyboard=True
+        )
+        update.message.reply_text(
+            message, 
+            reply_markup=reply_markup,
+            parse_mode='MarkdownV2'
+        )
+
+        return MENU
+
+    def __delete_db(self, update: Update, _: CallbackContext) -> int:
+        self.logger.info(f'Asking if the user really wants to delete the db. ({update.message.text})')
+
+        if update.message.text != 'Go back':
+            message = '✔ Successfully deleted database file\.'
+            db_file_path = f'{self.root_path}data/crypto_trading.db'
+            try:
+                copyfile(db_file_path, f'{db_file_path}.backup')
+                os.remove(db_file_path)
+            except:
+                message = '❌ Unable to delete database file\.'
+        else:
+            message = '👌 Exited without changes\.\nYour database was *not* deleted\.'
+
+        keyboard = [['OK']]
         reply_markup = ReplyKeyboardMarkup(
             keyboard,
             resize_keyboard=True
@@ -323,18 +361,15 @@ class BTBManagerTelegram:
         self.logger.info('Delete database button pressed.')
 
         message = '⚠ Please stop Binance Trade Bot before deleting the database file\.'
+        delete = False
         db_file_path = f'{self.root_path}data/crypto_trading.db'
         if not self.__find_process():
             if os.path.exists(db_file_path):
-                try:
-                    copyfile(db_file_path, f'{db_file_path}.backup')
-                    os.remove(db_file_path)
-                    message = '✔ Successfully deleted database file\.'
-                except:
-                    message = '❌ Unable to delete database file\.'
+                message = 'Are you sure you want to delete the database file?'
+                delete = True
             else:
                 message = f'⚠ Unable to find database file at `{db_file_path}`.'.replace('.', '\.')
-        return message
+        return [message, delete]
 
     def __btn_edit_user_cfg(self):
         self.logger.info('Edit user configuration button pressed.')
