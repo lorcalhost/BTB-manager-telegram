@@ -39,7 +39,7 @@ class BTBManagerTelegram:
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.__start, Filters.user(user_id=eval(user_id)))],
             states={
-                MENU: [MessageHandler(Filters.regex('^(Begin|⚙️ Configurations|🔍 Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|💵 Current value|📈 Current ratio|⬅️ Back|Go back|OK)$'), self.__menu)],
+                MENU: [MessageHandler(Filters.regex('^(Begin|⚙️ Configurations|🔍 Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|💵 Current value|📈 Current ratios|⬅️ Back|Go back|OK)$'), self.__menu)],
                 EDIT_COIN_LIST: [MessageHandler(Filters.regex('(.*?)'), self.__edit_coin)],
                 EDIT_USER_CONFIG: [MessageHandler(Filters.regex('(.*?)'), self.__edit_user_config)],
                 DELETE_DB: [MessageHandler(Filters.regex('^(⚠ Confirm|Go back)$'), self.__delete_db)]
@@ -94,7 +94,7 @@ class BTBManagerTelegram:
         self.logger.info(f'Menu selector. ({update.message.text})')
 
         keyboard = [
-            ['💵 Current value', '📈 Current ratio'],
+            ['💵 Current value', '📈 Current ratios'],
             ['🔍 Check bot status', '⚙️ Configurations']
         ]
 
@@ -132,7 +132,7 @@ class BTBManagerTelegram:
         elif update.message.text == '🔍 Check bot status':
             update.message.reply_text(
                 self.__btn_check_status(),
-                reply_markup=reply_markup
+                reply_markup=reply_markup_config
             )
 
         elif update.message.text == '👛 Edit coin list':
@@ -154,14 +154,14 @@ class BTBManagerTelegram:
         elif update.message.text == '▶ Start trade bot':
             update.message.reply_text(
                 self.__btn_start_bot(),
-                reply_markup=reply_markup,
+                reply_markup=reply_markup_config,
                 parse_mode='MarkdownV2'
             )
 
         elif update.message.text == '⏹ Stop trade bot':
             update.message.reply_text(
                 self.__btn_stop_bot(),
-                reply_markup=reply_markup
+                reply_markup=reply_markup_config
             )
 
         elif update.message.text == '❌ Delete database':
@@ -211,7 +211,7 @@ class BTBManagerTelegram:
                     reply_markup=reply_markup,
                     parse_mode='MarkdownV2'
                 )
-        elif update.message.text == '📈 Current ratio':
+        elif update.message.text == '📈 Current ratios':
             for m in self.__btn_current_ratio():
                 update.message.reply_text(
                     m,
