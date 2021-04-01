@@ -451,26 +451,19 @@ class BTBManagerTelegram:
 
                 # Get balance, current coin price in USD, current coin price in BTC
                 try:
-                    cur.execute(f'''SELECT balance, usd_price, btc_price FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;''')
-                    balance, usd_price, btc_price = cur.fetchone()
+                    cur.execute(f'''SELECT balance, usd_price, btc_price, datetime FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;''')
+                    balance, usd_price, btc_price, last_update = cur.fetchone()
                     if balance is None: balance = 0
                     if usd_price is None: usd_price = 0
                     if btc_price is None: btc_price = 0
+                    last_update = datetime.strptime(last_update, '%Y-%m-%d %H:%M:%S.%f')
                 except:
                     con.close()
                     return [f'❌ Unable to fetch current coin information from database\.', f'⚠ If you tried using the `Current value` button during a trade please try again after the trade has been completed\.']
 
-                # Get prices and ratios of all alt coins
+                # Generate message
                 try:
-                    cur.execute(f'''SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ( ( ( current_coin_price / other_coin_price ) - 0.001 * 5 * ( current_coin_price / other_coin_price ) ) - sh.target_ratio ) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs WHERE pairs.from_coin_id='{current_coin}');''')
-                    query = cur.fetchall()
-
-                    # Generate message
-                    last_update = datetime.strptime(query[0][0], '%Y-%m-%d %H:%M:%S.%f')
-                    query = sorted(query, key=lambda k: k[-1], reverse=True)
-
                     m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n'.replace('.', '\.')]
-                    
                     message = self.__4096_cutter(m_list)
                     con.close()
                 except:
@@ -506,13 +499,6 @@ class BTBManagerTelegram:
                 except:
                     con.close()
                     return [f'❌ Unable to fetch current coin from database\.']
-
-                # Get balance, current coin price in USD, current coin price in BTC
-                try:
-                    cur.execute(f'''SELECT balance, usd_price, btc_price FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;''')
-                except:
-                    con.close()
-                    return [f'❌ Unable to fetch current coin information from database\.', f'⚠ If you tried using the `Current ratio` button during a trade please try again after the trade has been completed\.']
 
                 # Get prices and ratios of all alt coins
                 try:
