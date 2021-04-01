@@ -132,7 +132,7 @@ class BTBManagerTelegram:
         elif update.message.text == '🔍 Check bot status':
             update.message.reply_text(
                 self.__btn_check_status(),
-                reply_markup=reply_markup_config
+                reply_markup=reply_markup
             )
 
         elif update.message.text == '👛 Edit coin list':
