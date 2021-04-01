@@ -110,9 +110,9 @@ class BTBManagerTelegram:
                 message,
                 reply_markup=reply_markup
             )
-        
+
         elif update.message.text == '🔍 Check bot status':
-          
+
             update.message.reply_text(
                 self.__btn_check_status(),
                 reply_markup=reply_markup
@@ -414,7 +414,7 @@ class BTBManagerTelegram:
                     m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n*Other coins:*\n'.replace('.', '\.')]
                     for coin in query:
                         m_list.append(f'{coin[1]}:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n'.replace('.', '\.'))
-                    
+
                     message = self.__4096_cutter(m_list)
                     con.close()
                 except:
@@ -423,7 +423,7 @@ class BTBManagerTelegram:
             except:
                 message = ['❌ Unable to perform actions on the database\.']
         return message
-                
+
 
     def __cancel(self, update: Update, _: CallbackContext) -> int:
         self.logger.info('Conversation canceled.')
@@ -441,16 +441,11 @@ if __name__ == '__main__':
     parser.add_argument('--docker', help='If this arg is passed in, the script will run in a docker container')
 
     args = parser.parse_args()
-                              
+
     if args.docker:
         os.system("docker build -t py-container .")
         os.system("docker run --rm -it py-container")
         os.system("docker rmi -f py-container")
-<<<<<<< HEAD
+        
     else:
         BTBManagerTelegram()
-=======
-
-    else:
-        BTBManagerTelegram()
->>>>>>> 6b70e916674fecf4d60dbe7b85cda9451b5471c4
