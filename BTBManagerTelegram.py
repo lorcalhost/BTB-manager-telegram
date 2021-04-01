@@ -353,5 +353,5 @@ if __name__ == '__main__':
         os.system("docker build -t py-container .")
         os.system("docker run --rm -it py-container")
         os.system("docker rmi -f py-container")
-
-    BTBManagerTelegram()
+    else:
+        BTBManagerTelegram()
