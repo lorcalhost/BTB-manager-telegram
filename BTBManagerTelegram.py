@@ -212,7 +212,7 @@ class BTBManagerTelegram:
                     parse_mode='MarkdownV2'
                 )
         elif update.message.text == '📈 Current ratios':
-            for m in self.__btn_current_ratio():
+            for m in self.__btn_current_ratios():
                 update.message.reply_text(
                     m,
                     reply_markup=reply_markup,
@@ -473,8 +473,8 @@ class BTBManagerTelegram:
                 message = ['❌ Unable to perform actions on the database\.']
         return message
                 
-    def __btn_current_ratio(self):
-        self.logger.info('Current ratio button pressed.')
+    def __btn_current_ratios(self):
+        self.logger.info('Current ratios button pressed.')
 
         db_file_path = f'{self.root_path}data/crypto_trading.db'
         user_cfg_file_path = f'{self.root_path}user.cfg'
@@ -509,7 +509,7 @@ class BTBManagerTelegram:
                     last_update = datetime.strptime(query[0][0], '%Y-%m-%d %H:%M:%S.%f')
                     query = sorted(query, key=lambda k: k[-1], reverse=True)
 
-                    m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Coins Ratio compared to {current_coin}:*\n'.replace('.', '\.')]
+                    m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Coin ratios compared to {current_coin}:*\n'.replace('.', '\.')]
                     for coin in query:
                         m_list.append(f'{coin[1]}:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n'.replace('.', '\.'))
                     
@@ -517,7 +517,7 @@ class BTBManagerTelegram:
                     con.close()
                 except:
                     con.close()
-                    return [f'❌ Something went wrong, unable to generate ratio at this time\.']
+                    return [f'❌ Something went wrong, unable to generate ratios at this time\.']
             except:
                 message = ['❌ Unable to perform actions on the database\.']
         return message
