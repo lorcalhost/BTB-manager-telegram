@@ -82,7 +82,7 @@ Interaction with **BTBManagerTelegram** can be *started* by sending the command 
 <p align="center">
 
 Usually when this happens it means that you haven't properly setup your `apprise.yml` file.  
-For security reasons the bot is programmed so that it only responds to the person with `user_id` equal to the the one set in the Telegram URL inside the `apprise.yml` file.  
+For security reasons the bot is programmed so that it only responds to the person with `user_id` equal to the one set in the Telegram URL inside the `apprise.yml` file.  
 
 Example of `apprise.yml` file:
 ```yaml
@@ -96,6 +96,22 @@ In this URL:
 - `606743502` is the `user_id`  
 
 You can find your `user_id` by sending a Telegram message to [@userinfobot](https://t.me/userinfobot).
+</p>
+</details>
+</br>
+
+### 2. ERROR: `Make sure that only one bot instance is running`: 
+<details><summary>CLICK ME</summary>
+
+<p align="center">
+
+This means that there are two or more instances of `BTBManagerTelegram` running at the same time on the same Telegram `token`.  
+To fix this error you can kill all `BTBManagerTelegram.py` instances and restart the Telegram bot.  
+You can kill the processes using the following command:
+
+```bash
+kill -9 $(ps ax | grep BTBManagerTelegram | fgrep -v grep | awk '{ print $1 }')
+```
 </p>
 </details>
 </br>
