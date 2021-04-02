@@ -61,13 +61,13 @@ class BTBManagerTelegram:
                 if url.startswith('tgram'):
                     telegram_url = url.split('//')[1]
         if not telegram_url:
-            print('ERROR: No telegram configuration was found in your yaml file.\nAborting.')
+            self.logger.error('ERROR: No telegram configuration was found in your apprise.yml file.\nAborting.')
             exit(-1)
         try:
             tok = telegram_url.split('/')[0]
             uid = telegram_url.split('/')[1]
         except:
-            print('ERROR: No user_id has been set in the yaml configuration, anyone would be able to control your bot.\nAborting.')
+            self.logger.error('ERROR: No user_id has been set in the yaml configuration, anyone would be able to control your bot.\nAborting.')
             exit(-1)
         return tok, uid
 
