@@ -444,6 +444,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.docker:
+        # os.system('git submodule update --init --recursive')
         os.system("docker build --no-cache -t py-container .")
         os.system("docker run --rm -it py-container")
         os.system("docker rmi -f py-container")
