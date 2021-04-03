@@ -395,7 +395,7 @@ class BTBManagerTelegram:
 
         return MENU
 
-    def __update_tg_bot(self, update: Update, _: CallbackContext) -> int:
+    def __update_tg_bot(self, update: Update, _: CallbackContext) -> int: #HOPE
         self.logger.info(f'Updating BTB Manager Telegram. ({update.message.text})')
 
         if update.message.text != 'Cancel update':
