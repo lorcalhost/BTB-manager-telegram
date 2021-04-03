@@ -1,36 +1,50 @@
-# Binance Trade Bot Manager Telegram
+# Binance Trade Bot Manager Telegram ⚠ NEW INSTALLATION METHOD ⚠
 A Telegram bot for remotely managing [Binance Trade Bot].  
 
 **If you have feature requests please open an issue on this repo, developers are also welcome to contribute!**
   
 ## About
-I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn't have to constantly ssh into the VPS, and my non-techy friends could enjoy the benefits of automated trading.  
+I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn't have to constantly ssh into my VPS, and my non-techy friends could enjoy the benefits of automated trading.  
   
 As of now the bot is able to perform the following actions:
 - Check bot status (running / not running)
 - Start *Binance Trade Bot*
 - Stop *Binance Trade Bot*
+- Display current coin stats
+- Display current coin ratios
+- Display last 4000 characters of log file
 - Edit coin list (`supported_coin_list` file)
 - Edit user configuration (`user.cfg` file)
 - Delete database file (`crypto_trading.db` file)
-- Display last 4000 characters of log file
-- Current stats (current coin, balance, ratios & more)
+- Export database file
 
 The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yml` file.  
 Only the Telegram user with `user_id` equal to the one set in the `apprise.yml` file will be able to use the bot.
 
 ⚠ The program is fully compatible with **Linux** and **Windows** through **[WSL]**, further compatibility testing needs to be done for **native Windows** and **MacOS**.  
 ## Installation
-*Python 3* is required.
-1. Install dependencies:
+*Python 3* is required.  
+**BTB-manager-telegram** should be installed in the same parent directory as *Binance Trade Bot*.  
+Your filesystem should look like this:
+```
+.
+└── *parent_dir*
+    ├── BTB-manager-telegram
+    └── binance-trade-bot
+```
+1. Clone this repository:
 ```console
-# install required Python 3 modules
+$ git clone https://github.com/lorcalhost/BTB-manager-telegram.git
+```
+2. Move to `BTB-manager-telegram`'s directory:
+```console
+$ cd BTB-manager-telegram
+```
+3. Install `BTB-manager-telegram`'s dependencies:
+```console
 $ python3 -m pip install -r requirements.txt
 ```
-2. Move `BTBManagerTelegram.py` file into [Binance Trade Bot]'s installation folder (it should be in the same folder as `supported_coin_list` file)
-
 ⚠ Make sure the correct `rwx` permissions are set and the program is run with correct privileges.
-
 ## Usage
 ### **Method 1**: Run directly
 **BTBManagerTelegram** can be run directly by executing the following command:
@@ -41,7 +55,18 @@ $ python3 BTBManagerTelegram.py
 # If the bot is running on a server you may want to keep it running even after ssh connection is closed by using nohup
 $ nohup python3 BTBManagerTelegram.py &
 ```
-Make sure  [Binance Trade Bot]'s `apprise.yml` file is correctly setup before running.
+Make sure  [Binance Trade Bot]'s `apprise.yml` file is correctly setup before running.  
+</br>
+Note:  
+If *Binance Trade Bot* and *BTBManagerTelegram* were **not** installed in the same parent directory or you want to use different `token` and `user_id` from the ones in the `apprise.yml` file, the following optional arguments can be used:
+```console
+optional arguments:
+  -p PATH, --path PATH  (optional) binance-trade-bot installation absolute path
+  -t TOKEN, --token TOKEN
+                        (optional) Telegram bot token
+  -u USER_ID, --user_id USER_ID
+                        (optional) Telegram user id
+```
 ### **Method 2:** Import script
 **BTBManagerTelegram** can be imported in your Python script and used in the following way:
 ```python
@@ -50,27 +75,25 @@ BTBManagerTelegram()
 ```
 The `BTBManagerTelegram()` class takes the following ***optional*** initialization arguments:
 - `root_path`:  
-*Default value*: `'./'`  
-*Description*: Current base directory, to be used in case the bot has not been put inside [Binance Trade Bot]'s installation folder.
-- `from_yaml`:  
-*Default value*: `True`  
-*Description*: Set to `False` if you **don't** want *BTBManagerTelegram* to automatically fetch Telegram `token` and `user_id` from `apprise.yml` file.
+*Default value*: `None`  
+*Description*: [Binance Trade Bot]'s installation directory path.
 - `token`:  
 *Default value*: `None`  
-*Description*: If `from_yaml` is set to `False` this will be used as Telegram `token`.
+*Description*: Telegram `token`, if both this and `user_id` are specified these parameters will be used instead of the ones found in the [Binance Trade Bot]'s `apprise.yml` file.
 - `user_id`:  
 *Default value*: `None`  
-*Description*: If `from_yaml` is set to `False` this will be used as Telegram `user_id`.
+*Description*: Telegram `user_id`, if both this and `token` are specified these parameters will be used instead of the ones found in the [Binance Trade Bot]'s `apprise.yml` file.
 
 ## Interaction
-Interaction with **BTBManagerTelegram** can be *started* by sending the command `/start` in the bot's Telegram chat.  
+Interaction with **BTBManagerTelegram** can be *started* by sending the `/start` command in the bot's Telegram chat.  
+Every time the Telegram bot is restarted the `/start` command should be sent again.
 
 ## Screenshots
 <details><summary>CLICK ME</summary>
 
 <p align="center">
-  	<img height="20%" width="20%" src="https://i.imgur.com/lg9pzGR.jpg" />&nbsp;&nbsp;&nbsp;&nbsp;
-    <img height="20%" width="20%" src="https://i.imgur.com/fSCjYzw.jpg" />
+  	<img height="20%" width="20%" src="https://i.imgur.com/znI3G3H.jpg" />&nbsp;&nbsp;&nbsp;&nbsp;
+    <img height="20%" width="20%" src="https://i.imgur.com/c2m0xuk.jpg" />
 </p>
 </details>
 </br>
@@ -115,6 +138,10 @@ kill -9 $(ps ax | grep BTBManagerTelegram | fgrep -v grep | awk '{ print $1 }')
 </p>
 </details>
 </br>
+
+## Support the Project
+
+<a href="https://www.buymeacoffee.com/lorcalhost"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=lorcalhost&button_colour=FFDD00&font_colour=000000&font_family=Lato&outline_colour=000000&coffee_colour=ffffff"></a>
 
 ## Disclaimer
 

@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+import os
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+import argparse
 import logging
 import yaml
 import psutil
 import subprocess
-import os
 import sqlite3
 from datetime import datetime
 from configparser import ConfigParser
@@ -22,15 +24,23 @@ MENU, EDIT_COIN_LIST, EDIT_USER_CONFIG, DELETE_DB = range(4)
 
 
 class BTBManagerTelegram:
-    def __init__(self, root_path='./', from_yaml=True, token=None, user_id=None):
-        self.root_path = root_path
+    def __init__(self, root_path=None, token=None, user_id=None):
         logging.basicConfig(
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            level=logging.INFO
         )
         self.logger = logging.getLogger(__name__)
 
-        if from_yaml:
+        if root_path is None:
+            self.logger.info('No root_path was specified.\nAborting.')
+            exit(-1)
+        else:
+            self.root_path = root_path if root_path[-1] == '/' else (root_path + '/')
+
+        if token is None or user_id is None:
+            self.logger.info('Retrieving Telegram token and user_id from apprise.yml file.')
             self.token, self.user_id = self.__get_token_from_yaml()
+            self.logger.info(f'Successfully retrieved Telegram configuration. The bot will only respond to user with user_id {self.user_id}')
         else:
             self.token = token
             self.user_id = user_id
@@ -568,4 +578,9 @@ class BTBManagerTelegram:
 
 
 if __name__ == '__main__':
-    BTBManagerTelegram()
+    parser = argparse.ArgumentParser(description='Thanks for using Binance Trade Bot Manager Telegram. By default the program will use "../binance-trade-bot/" as binance-trade-bot installation path.')
+    parser.add_argument('-p', '--path', type=str, help='(optional) binance-trade-bot installation absolute path', default='../binance-trade-bot/')
+    parser.add_argument('-t', '--token', type=str, help='(optional) Telegram bot token', default=None)
+    parser.add_argument('-u', '--user_id', type=str, help='(optional) Telegram user id', default=None)
+    args = parser.parse_args()
+    BTBManagerTelegram(root_path=args.path, token=args.token, user_id=args.user_id)
