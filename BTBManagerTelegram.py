@@ -20,7 +20,7 @@ from telegram.ext import (
     CallbackContext
 )
 
-MENU, EDIT_COIN_LIST, EDIT_USER_CONFIG, DELETE_DB = range(4)
+MENU, EDIT_COIN_LIST, EDIT_USER_CONFIG, DELETE_DB, UPDATE_TG, UPDATE_BTB = range(6)
 
 
 class BTBManagerTelegram:
@@ -52,10 +52,12 @@ class BTBManagerTelegram:
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.__start, Filters.user(user_id=eval(self.user_id)))],
             states={
-                MENU: [MessageHandler(Filters.regex('^(Begin|💵 Current value|📈 Current ratios|🔍 Check bot status|⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|⬅️ Back|Go back|OK)$'), self.__menu)],
+                MENU: [MessageHandler(Filters.regex('^(Begin|💵 Current value|📈 Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|Update Telegram Bot|Update Binance Trade Bot|⬅️ Back|Go back|OK|Cancel update|OK 👌)$'), self.__menu)],
                 EDIT_COIN_LIST: [MessageHandler(Filters.regex('(.*?)'), self.__edit_coin)],
                 EDIT_USER_CONFIG: [MessageHandler(Filters.regex('(.*?)'), self.__edit_user_config)],
-                DELETE_DB: [MessageHandler(Filters.regex('^(⚠ Confirm|Go back)$'), self.__delete_db)]
+                DELETE_DB: [MessageHandler(Filters.regex('^(⚠ Confirm|Go back)$'), self.__delete_db)],
+                UPDATE_TG: [MessageHandler(Filters.regex('^(Update|Cancel update)$'), self.__update_tg_bot)],
+                UPDATE_BTB: [MessageHandler(Filters.regex('^(Update|Cancel update)$'), self.__update_btb)]
             },
             fallbacks=[CommandHandler('cancel', self.__cancel)],
             per_user=True
@@ -108,7 +110,9 @@ class BTBManagerTelegram:
 
         keyboard = [
             ['💵 Current value', '📈 Current ratios'],
-            ['🔍 Check bot status', '⚙️ Configurations']
+            ['🔍 Check bot status'],
+            # ['🔍 Check bot status', '⌛ Trade History'],
+            ['🛠 Maintenance', '⚙️ Configurations']
         ]
 
         config_keyboard = [
@@ -118,6 +122,12 @@ class BTBManagerTelegram:
             ['📤 Export database', '⬅️ Back']
         ]
 
+        maintenance_keyboard = [
+            ['Update Telegram Bot'],
+            ['Update Binance Trade Bot'],
+            ['⬅️ Back']
+        ]
+
         reply_markup = ReplyKeyboardMarkup(
             keyboard,
             resize_keyboard=True
@@ -125,6 +135,11 @@ class BTBManagerTelegram:
 
         reply_markup_config = ReplyKeyboardMarkup(
             config_keyboard,
+            resize_keyboard=True
+        )
+
+        reply_markup_maintenance = ReplyKeyboardMarkup(
+            maintenance_keyboard,
             resize_keyboard=True
         )
 
@@ -140,6 +155,13 @@ class BTBManagerTelegram:
             update.message.reply_text(
                 message, 
                 reply_markup=reply_markup_config
+            )
+
+        elif update.message.text in ['🛠 Maintenance', 'Cancel update', 'OK 👌']:
+            message = 'Please select one of the options.'
+            update.message.reply_text(
+                message, 
+                reply_markup=reply_markup_maintenance
             )
 
         elif update.message.text == '💵 Current value':
@@ -163,6 +185,13 @@ class BTBManagerTelegram:
                 self.__btn_check_status(),
                 reply_markup=reply_markup
             )
+
+        elif update.message.text == '⌛ Trade History':
+            # update.message.reply_text(
+            #     self.__btn_check_status(),
+            #     reply_markup=reply_markup
+            # )
+            pass
 
         elif update.message.text == '▶ Start trade bot':
             update.message.reply_text(
@@ -247,6 +276,40 @@ class BTBManagerTelegram:
                     filename='crypto_trading.db'
             )
 
+        elif update.message.text == 'Update Telegram Bot':
+            re = self.__btn_update_tg_bot()
+            if re[1]:
+                kb = [['Update', 'Cancel update']]
+                update.message.reply_text(
+                    re[0],
+                    reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                    parse_mode='MarkdownV2'
+                )
+                return UPDATE_TG
+            else:
+                update.message.reply_text(
+                    re[0],
+                    reply_markup=reply_markup_maintenance,
+                    parse_mode='MarkdownV2'
+                )
+
+        elif update.message.text == 'Update Binance Trade Bot':
+            re = self.__btn_update_btb()
+            if re[1]:
+                kb = [['Update', 'Cancel update']]
+                update.message.reply_text(
+                    re[0],
+                    reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                    parse_mode='MarkdownV2'
+                )
+                return UPDATE_BTB
+            else:
+                update.message.reply_text(
+                    re[0],
+                    reply_markup=reply_markup_maintenance,
+                    parse_mode='MarkdownV2'
+                )
+
         return MENU
 
     def __edit_user_config(self, update: Update, _: CallbackContext) -> int:
@@ -329,6 +392,81 @@ class BTBManagerTelegram:
             reply_markup=reply_markup,
             parse_mode='MarkdownV2'
         )
+
+        return MENU
+
+    def __update_tg_bot(self, update: Update, _: CallbackContext) -> int:
+        self.logger.info(f'Updating BTB Manager Telegram. ({update.message.text})')
+
+        if update.message.text != 'Cancel update':
+            message = 'The bot is updating\.\nWait a few seconds then start the bot again with /start'
+            keyboard = [['/start']]
+            reply_markup = ReplyKeyboardMarkup(
+                keyboard,
+                resize_keyboard=True
+            )
+            update.message.reply_text(
+                message, 
+                reply_markup=reply_markup,
+                parse_mode='MarkdownV2'
+            )
+            try:
+                subprocess.call("kill -9 $(ps ax | grep BTBManagerTelegram | fgrep -v grep | awk '{ print $1 }') && git pull && $(which python3) -m pip install -r requirements.txt && $(which python3) BTBManagerTelegram.py &", shell=True)
+            except:
+                message = 'Unable to update BTB Manager Telegram'
+                update.message.reply_text(
+                    message, 
+                    reply_markup=reply_markup,
+                    parse_mode='MarkdownV2'
+                )
+        else:
+            message = '👌 Exited without changes\.\nBTB Manager Telegram was *not* updated\.'
+            keyboard = [['OK 👌']]
+            reply_markup = ReplyKeyboardMarkup(
+                keyboard,
+                resize_keyboard=True
+            )
+            update.message.reply_text(
+                message, 
+                reply_markup=reply_markup,
+                parse_mode='MarkdownV2'
+            )
+
+        return MENU
+
+    def __update_btb(self, update: Update, _: CallbackContext) -> int:
+        self.logger.info(f'Updating Binance Trade Bot. ({update.message.text})')
+
+        keyboard = [['OK 👌']]
+        reply_markup = ReplyKeyboardMarkup(
+            keyboard,
+            resize_keyboard=True
+        )
+
+        if update.message.text != 'Cancel update':
+            message = 'The bot is updating\.\nWait a few seconds, the bot will restart automatically\.'
+            update.message.reply_text(
+                message, 
+                reply_markup=reply_markup,
+                parse_mode='MarkdownV2'
+            )
+            try:
+                self.__find_and_kill_process()
+                subprocess.call(f"cd {self.root_path} && git pull && $(which python3) -m pip install -r requirements.txt && $(which python3) -m binance_trade_bot &", shell=True)
+            except:
+                message = 'Unable to update Binance Trade Bot'
+                update.message.reply_text(
+                    message, 
+                    reply_markup=reply_markup,
+                    parse_mode='MarkdownV2'
+                )
+        else:
+            message = '👌 Exited without changes\.\nBinance Trade Bot was *not* updated\.'
+            update.message.reply_text(
+                message, 
+                reply_markup=reply_markup,
+                parse_mode='MarkdownV2'
+            )
 
         return MENU
 
@@ -565,6 +703,35 @@ class BTBManagerTelegram:
             else:
                 message = '❌ Unable to Export the database file\.'
         return [message, fil]
+
+    def __btn_update_tg_bot(self):
+        self.logger.info('Update Telegram bot button pressed.')
+
+        p = subprocess.Popen(['bash', '-c', 'git status -uno'], stdout=subprocess.PIPE)
+        output, _ = p.communicate()
+        upd = False
+        message = 'Your BTB Manager Telegram installation is already up to date\.'
+        if 'Your branch is behind' in str(output):
+            message = 'An update for BTB Manager Telegram is available\.\nWould you like to update now?'
+            upd = True
+        return [message, upd]
+
+    def __btn_update_btb(self):
+        self.logger.info('Update Binance Trade Bot button pressed.')
+
+        upd = False
+        try:
+            p = subprocess.Popen(['bash', '-c', 'cd ../binance-trade-bot && git status -uno'], stdout=subprocess.PIPE)
+            output, _ = p.communicate()
+            
+            message = 'Your Binance Trade Bot installation is already up to date\.'
+            if 'Your branch is behind' in str(output):
+                message = 'An update for Binance Trade Bot is available\.\nWould you like to update now?'
+                upd = True
+        except Exception as e:
+            print(e)
+            message = 'Error while trying to fetch Binance Trade Bot version information\.'
+        return [message, upd]
 
     # STOP CONVERSATION
     def __cancel(self, update: Update, _: CallbackContext) -> int:
