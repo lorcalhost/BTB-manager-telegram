@@ -395,7 +395,7 @@ class BTBManagerTelegram:
 
         return MENU
 
-    def __update_tg_bot(self, update: Update, _: CallbackContext) -> int: #HOPE
+    def __update_tg_bot(self, update: Update, _: CallbackContext) -> int:
         self.logger.info(f'Updating BTB Manager Telegram. ({update.message.text})')
 
         if update.message.text != 'Cancel update':
@@ -728,8 +728,7 @@ class BTBManagerTelegram:
             if 'Your branch is behind' in str(output):
                 message = 'An update for Binance Trade Bot is available\.\nWould you like to update now?'
                 upd = True
-        except Exception as e:
-            print(e)
+        except:
             message = 'Error while trying to fetch Binance Trade Bot version information\.'
         return [message, upd]
 
