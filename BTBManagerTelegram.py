@@ -91,7 +91,7 @@ class BTBManagerTelegram:
         self.logger.info('Started conversation.')
 
         keyboard = [['Begin']]
-        message = f'Hi *{update.message.from_user.first_name}*\!\nWelcome to _Binace Trade Bot Manager Telegram_\.\n\nThis Telegram bot was developed by @lorcalhost\.\nFind out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.'
+        message = f'Hi *{update.message.from_user.first_name}*\!\nWelcome to _Binace Trade Bot Manager Telegram_\.\n\nThis Telegram bot was developed by @lorcalhost\.\nFind out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.\n\nIf you like the bot please [consider supporting the project 🍻](https://www.buymeacoffee.com/lorcalhost)\.'
         reply_markup=ReplyKeyboardMarkup(
             keyboard,
             one_time_keyboard=True,
