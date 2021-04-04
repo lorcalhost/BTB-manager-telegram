@@ -452,7 +452,7 @@ class BTBManagerTelegram:
             )
             try:
                 self.__find_and_kill_process()
-                subprocess.call(f"cd {self.root_path} && git pull && $(which python3) -m pip install -r requirements.txt && $(which python3) -m binance_trade_bot &", shell=True)
+                subprocess.call(f"cd {self.root_path} && git pull && $(which python3) -m pip install -r requirements.txt && $(which python3) -m binance_trade_bot &; gunicorn binance_trade_bot.api_server:app -k eventlet -w 1 --threads 1 -b 0.0.0.0:5123 &", shell=True)
             except:
                 message = 'Unable to update Binance Trade Bot'
                 update.message.reply_text(
@@ -639,6 +639,7 @@ class BTBManagerTelegram:
         if not self.__find_process():
             if os.path.exists(f'{self.root_path}binance_trade_bot/'):
                 subprocess.call(f'cd {self.root_path} && $(which python3) -m binance_trade_bot &', shell=True)
+                subprocess.call(f'cd {self.root_path} && gunicorn binance_trade_bot.api_server:app -k eventlet -w 1 --threads 1 -b 0.0.0.0:5123 &', shell=True)
                 if not self.__find_process():
                     message = '❌ Unable to start Binance Trade Bot\.'
                 else:
