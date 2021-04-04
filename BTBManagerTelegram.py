@@ -509,10 +509,10 @@ class BTBManagerTelegram:
                 con = sqlite3.connect(db_file_path)
                 cur = con.cursor()
 
-                # Get current coin symbol
+                # Get current coin symbol, bridge symbol, initial buying price
                 try:
-                    cur.execute('''SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1;''')
-                    current_coin = cur.fetchone()[0]
+                    cur.execute('''SELECT alt_coin_id, crypto_coin_id, crypto_trade_amount FROM trade_history ORDER BY datetime DESC LIMIT 1;''')
+                    current_coin, bridge, buy_price = cur.fetchone()
                     if current_coin is None:
                         raise Exception()
                 except:
@@ -533,7 +533,7 @@ class BTBManagerTelegram:
 
                 # Generate message
                 try:
-                    m_list = [f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n'.replace('.', '\.')]
+                    m_list = [f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n\t_Initially bought for_ {round(buy_price, 2)} *{bridge}*\n'.replace('.', '\.')]
                     message = self.__4096_cutter(m_list)
                     con.close()
                 except:
