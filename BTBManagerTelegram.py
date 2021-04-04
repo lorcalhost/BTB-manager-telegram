@@ -620,7 +620,7 @@ class BTBManagerTelegram:
                     m_list = [f'Last **{10 if len(query) > 10 else len(query)}** trades:\n\n']
                     for trade in query:
                         d = datetime.strptime(trade[6], '%Y-%m-%d %H:%M:%S.%f')
-                        m = f'`{d.strftime("%H:%M:%S %d/%m/%Y")}`\n*{"Sold" if trade[2] else "Bought"}* `{round(trade[4],6)}` *{trade[0]}* for `{round(trade[5], 2)}` *{trade[1]}*\nStatus: _*{trade[3]}*_\n\n'
+                        m = f'`{d.strftime("%H:%M:%S %d/%m/%Y")}`\n*{"Sold" if trade[2] else "Bought"}* `{round(trade[4], 6)}` *{trade[0]}*{f" for `{round(trade[5], 2)}` *{trade[1]}*" if trade[5] is not None else ""}\nStatus: _*{trade[3]}*_\n\n'
                         m_list.append(m.replace('.', '\.'))
                     
                     message = self.__4096_cutter(m_list)
