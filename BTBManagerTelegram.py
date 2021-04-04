@@ -110,8 +110,7 @@ class BTBManagerTelegram:
 
         keyboard = [
             ['💵 Current value', '📈 Current ratios'],
-            ['🔍 Check bot status'],
-            # ['🔍 Check bot status', '⌛ Trade History'],
+            ['🔍 Check bot status', '⌛ Trade History'],
             ['🛠 Maintenance', '⚙️ Configurations']
         ]
 
@@ -187,11 +186,12 @@ class BTBManagerTelegram:
             )
 
         elif update.message.text == '⌛ Trade History':
-            # update.message.reply_text(
-            #     self.__btn_check_status(),
-            #     reply_markup=reply_markup
-            # )
-            pass
+            for m in self.__btn_trade_history():
+                update.message.reply_text(
+                    m,
+                    reply_markup=reply_markup,
+                    parse_mode='MarkdownV2'
+                )
 
         elif update.message.text == '▶ Start trade bot':
             update.message.reply_text(
@@ -503,16 +503,9 @@ class BTBManagerTelegram:
         self.logger.info('Current value button pressed.')
 
         db_file_path = f'{self.root_path}data/crypto_trading.db'
-        user_cfg_file_path = f'{self.root_path}user.cfg'
         message = [f'⚠ Unable to find database file at `{db_file_path}`\.']
         if os.path.exists(db_file_path):
             try:
-                # Get bridge currency symbol
-                with open(user_cfg_file_path) as cfg:
-                    config = ConfigParser()
-                    config.read_file(cfg)
-                    bridge = config.get('binance_user_config', 'bridge')
-
                 con = sqlite3.connect(db_file_path)
                 cur = con.cursor()
 
@@ -540,7 +533,7 @@ class BTBManagerTelegram:
 
                 # Generate message
                 try:
-                    m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n'.replace('.', '\.')]
+                    m_list = [f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n'.replace('.', '\.')]
                     message = self.__4096_cutter(m_list)
                     con.close()
                 except:
@@ -586,7 +579,7 @@ class BTBManagerTelegram:
                     last_update = datetime.strptime(query[0][0], '%Y-%m-%d %H:%M:%S.%f')
                     query = sorted(query, key=lambda k: k[-1], reverse=True)
 
-                    m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Coin ratios compared to {current_coin}:*\n'.replace('.', '\.')]
+                    m_list = [f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Coin ratios compared to {current_coin}:*\n'.replace('.', '\.')]
                     for coin in query:
                         m_list.append(f'{coin[1]}:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n'.replace('.', '\.'))
                     
@@ -606,6 +599,36 @@ class BTBManagerTelegram:
         if self.__find_process():
             message = '✔ Binance Trade Bot is running.'
         return  message
+
+    def __btn_trade_history(self):
+        self.logger.info('Trade history button pressed.')
+
+        db_file_path = f'{self.root_path}data/crypto_trading.db'
+        message = [f'⚠ Unable to find database file at `{db_file_path}`\.']
+        if os.path.exists(db_file_path):
+            try:
+                con = sqlite3.connect(db_file_path)
+                cur = con.cursor()
+
+                # Get last 10 trades
+                try:
+                    cur.execute('''SELECT alt_coin_id, crypto_coin_id, selling, state, alt_trade_amount, crypto_trade_amount, datetime FROM trade_history ORDER BY datetime DESC LIMIT 10;''')
+                    query = cur.fetchall()
+
+                    m_list = [f'Last **{10 if len(query) > 10 else len(query)}** trades:\n\n']
+                    for trade in query:
+                        d = datetime.strptime(trade[6], '%Y-%m-%d %H:%M:%S.%f')
+                        m = f'`{d.strftime("%H:%M:%S %d/%m/%Y")}`\n*{"Sold" if trade[2] else "Bought"}* `{round(trade[4],6)}` *{trade[0]}* for `{round(trade[5], 2)}` *{trade[1]}*\nStatus: _*{trade[3]}*_\n\n'
+                        m_list.append(m.replace('.', '\.'))
+                    
+                    message = self.__4096_cutter(m_list)
+                    con.close()
+                except:
+                    con.close()
+                    return [f'❌ Something went wrong, unable to generate trade history at this time\.']
+            except:
+                message = ['❌ Unable to perform actions on the database\.']
+        return message
 
     def __btn_start_bot(self):
         self.logger.info('Start bot button pressed.')
