@@ -730,7 +730,7 @@ class BTBManagerTelegram:
     def __btn_update_tg_bot(self):
         self.logger.info('Update Telegram bot button pressed.')
 
-        p = subprocess.Popen(['bash', '-c', 'git status -uno'], stdout=subprocess.PIPE)
+        p = subprocess.Popen(['bash', '-c', 'git remote update && git status -uno'], stdout=subprocess.PIPE)
         output, _ = p.communicate()
         upd = False
         message = 'Your BTB Manager Telegram installation is already up to date\.'
@@ -744,7 +744,7 @@ class BTBManagerTelegram:
 
         upd = False
         try:
-            p = subprocess.Popen(['bash', '-c', 'cd ../binance-trade-bot && git status -uno'], stdout=subprocess.PIPE)
+            p = subprocess.Popen(['bash', '-c', 'cd ../binance-trade-bot && git remote update && git status -uno'], stdout=subprocess.PIPE)
             output, _ = p.communicate()
             
             message = 'Your Binance Trade Bot installation is already up to date\.'
