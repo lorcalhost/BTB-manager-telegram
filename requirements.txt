@@ -1,4 +1,4 @@
 psutil==5.8.0
 python-telegram-bot==13.4.1
-pyyaml==5.3.1
+pyyaml==5.4.1
 configparser==5.0.2
