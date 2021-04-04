@@ -509,12 +509,14 @@ class BTBManagerTelegram:
                 con = sqlite3.connect(db_file_path)
                 cur = con.cursor()
 
-                # Get current coin symbol, bridge symbol, initial buying price
+                # Get current coin symbol, bridge symbol, order state, order size, initial buying price
                 try:
-                    cur.execute('''SELECT alt_coin_id, crypto_coin_id, crypto_trade_amount FROM trade_history ORDER BY datetime DESC LIMIT 1;''')
-                    current_coin, bridge, buy_price = cur.fetchone()
+                    cur.execute('''SELECT alt_coin_id, crypto_coin_id, state, crypto_starting_balance, crypto_trade_amount FROM trade_history ORDER BY datetime DESC LIMIT 1;''')
+                    current_coin, bridge, state, order_size, buy_price = cur.fetchone()
                     if current_coin is None:
                         raise Exception()
+                    if state == 'ORDERED':
+                        return [f'A buy order of `{round(order_size, 2)}` *{bridge}* is currently placed on coin *{current_coin}*.\n\n_Waiting for buy order to complete_.'.replace('.', '\.')]
                 except:
                     con.close()
                     return [f'❌ Unable to fetch current coin from database\.']
