@@ -547,7 +547,7 @@ class BTBManagerTelegram:
                 # Generate message
                 try:
                     m_list = [
-                        f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` *USD*\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n\t_Initially bought for_ {round(buy_price, 2)} *{bridge}*\n'.replace(
+                        f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` *{current_coin}*\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` *USD*\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` *BTC*\n\n\t_Initially bought for_ {round(buy_price, 2)} *{bridge}*\n'.replace(
                             ".", "\."
                         )
                     ]
@@ -648,7 +648,7 @@ class BTBManagerTelegram:
                     ]
                     for coin in query:
                         m_list.append(
-                            f"*{coin[1]}*:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n".replace(
+                            f"*{coin[1]}*:\n\t\- Price: `{coin[2]}` *{bridge}*\n\t\- Ratio: `{round(coin[3], 6)}`\n\n".replace(
                                 ".", "\."
                             )
                         )
