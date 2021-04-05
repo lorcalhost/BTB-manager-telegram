@@ -31,7 +31,7 @@ class BTBManagerTelegram:
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
             level=logging.INFO,
         )
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger("btb_manager_telegram_logger")
 
         if root_path is None:
             self.logger.info("No root_path was specified.\nAborting.")
