@@ -60,7 +60,7 @@ class BTBManagerTelegram:
         self.btb_update_broadcasted_before = False
         self.scheduler = sched.scheduler(time.time, time.sleep)
         self.scheduler.enter(1, 1, self.__update_checker)
-        self.scheduler.run()
+        self.scheduler.run(blocking=False)
 
         updater = Updater(self.token)
         dispatcher = updater.dispatcher
