@@ -511,8 +511,10 @@ class BTBManagerTelegram:
         self.logger.info('Current value button pressed.')
 
         if self.api_server_available():
+            self.logger.info('Using database API server.')
             query_handler = APIQuery()
         else:
+            self.logger.info('Directly operating on database file.')
             query_handler = SQLiteQuery(self.root_path)
         return self.__4096_cutter(query_handler.get_current_value_message())
                 
