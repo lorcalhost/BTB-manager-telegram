@@ -65,7 +65,7 @@ class BTBManagerTelegram:
                 MENU: [
                     MessageHandler(
                         Filters.regex(
-                            "^(Begin|💵 Current value|📈 Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|Update Telegram Bot|Update Binance Trade Bot|⬅️ Back|Go back|OK|Cancel update|OK 👌)$"
+                            "^(Begin|💵 Current value|📈 Progress|➗ Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|Update Telegram Bot|Update Binance Trade Bot|⬅️ Back|Go back|OK|Cancel update|OK 👌)$"
                         ),
                         self.__menu,
                     )
@@ -143,7 +143,8 @@ class BTBManagerTelegram:
         self.logger.info(f"Menu selector. ({update.message.text})")
 
         keyboard = [
-            ["💵 Current value", "📈 Current ratios"],
+            ["💵 Current value"],
+            ["📈 Progress", "➗ Current ratios"],
             ["🔍 Check bot status", "⌛ Trade History"],
             ["🛠 Maintenance", "⚙️ Configurations"],
         ]
@@ -187,7 +188,13 @@ class BTBManagerTelegram:
                     m, reply_markup=reply_markup, parse_mode="MarkdownV2"
                 )
 
-        elif update.message.text == "📈 Current ratios":
+        elif update.message.text == "📈 Progress":
+            for m in self.__btn_check_progress():
+                update.message.reply_text(
+                    m, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                )
+
+        elif update.message.text == "➗ Current ratios":
             for m in self.__btn_current_ratios():
                 update.message.reply_text(
                     m, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -516,7 +523,13 @@ class BTBManagerTelegram:
                     cur.execute(
                         f"""SELECT balance, usd_price, btc_price, datetime FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;"""
                     )
-                    balance, usd_price, btc_price, last_update = cur.fetchone()
+                    query = cur.fetchone()
+                    if query is None:
+                        return [
+                            f"❌ No information about *{current_coin}* available in the database\.",
+                            f"⚠ If you tried using the `Current value` button during a trade please try again after the trade has been completed\.",
+                        ]
+                    balance, usd_price, btc_price, last_update = query
                     if balance is None:
                         balance = 0
                     if usd_price is None:
@@ -534,7 +547,7 @@ class BTBManagerTelegram:
                 # Generate message
                 try:
                     m_list = [
-                        f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n\t_Initially bought for_ {round(buy_price, 2)} *{bridge}*\n'.replace(
+                        f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` *USD*\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n\t_Initially bought for_ {round(buy_price, 2)} *{bridge}*\n'.replace(
                             ".", "\."
                         )
                     ]
@@ -545,6 +558,45 @@ class BTBManagerTelegram:
                     return [
                         f"❌ Something went wrong, unable to generate value at this time\."
                     ]
+            except:
+                message = ["❌ Unable to perform actions on the database\."]
+        return message
+
+    def __btn_check_progress(self):
+        self.logger.info("Progress button pressed.")
+
+        db_file_path = f"{self.root_path}data/crypto_trading.db"
+        user_cfg_file_path = f"{self.root_path}user.cfg"
+        message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
+        if os.path.exists(db_file_path):
+            try:
+                con = sqlite3.connect(db_file_path)
+                cur = con.cursor()
+
+                # Get progress information
+                try:
+                    cur.execute(
+                        """SELECT th1.alt_coin_id AS coin, th1.alt_trade_amount AS amount, th1.crypto_trade_amount AS priceInUSD,(th1.alt_trade_amount - ( SELECT th2.alt_trade_amount FROM trade_history th2 WHERE th2.alt_coin_id = th1.alt_coin_id AND th1.datetime > th2.datetime AND th2.selling = 0 ORDER BY th2.datetime DESC LIMIT 1)) AS change, datetime FROM trade_history th1 WHERE th1.state = 'COMPLETE' AND th1.selling = 0 ORDER BY th1.datetime DESC LIMIT 15"""
+                    )
+                    query = cur.fetchall()
+
+                    # Generate message
+                    m_list = [f"Current coin amount progress:\n\n"]
+                    for coin in query:
+                        last_trade_date = datetime.strptime(
+                            coin[4], "%Y-%m-%d %H:%M:%S.%f"
+                        ).strftime("%H:%M:%S %d/%m/%Y")
+                        m_list.append(
+                            f'*{coin[0]}*\n\t\- Amount: `{round(coin[1], 6)}` *{coin[0]}*\n\t\- Price: `{round(coin[2], 2)}` *USD*\n\t\- Change: {f"`{round(coin[3], 2)}` *{coin[0]}*" if coin[3] is not None else f"`{coin[3]}`"}\n\t\- Last trade: `{last_trade_date}`\n\n'.replace(
+                                ".", "\."
+                            )
+                        )
+
+                    message = self.__4096_cutter(m_list)
+                    con.close()
+                except:
+                    con.close()
+                    return [f"❌ Unable to fetch progress information from database\."]
             except:
                 message = ["❌ Unable to perform actions on the database\."]
         return message
@@ -596,7 +648,7 @@ class BTBManagerTelegram:
                     ]
                     for coin in query:
                         m_list.append(
-                            f"{coin[1]}:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n".replace(
+                            f"*{coin[1]}*:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n".replace(
                                 ".", "\."
                             )
                         )
