@@ -14,8 +14,13 @@ import psutil
 import yaml
 from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
-    CallbackContext, CommandHandler, ConversationHandler, Filters,
-    MessageHandler, Updater)
+    CallbackContext,
+    CommandHandler,
+    ConversationHandler,
+    Filters,
+    MessageHandler,
+    Updater,
+)
 
 MENU, EDIT_COIN_LIST, EDIT_USER_CONFIG, DELETE_DB, UPDATE_TG, UPDATE_BTB = range(6)
 
