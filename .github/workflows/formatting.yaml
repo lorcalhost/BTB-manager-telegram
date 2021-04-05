@@ -16,4 +16,4 @@ jobs:
       - name: Install isort
         run: pip install isort
       - name: Run isort --check .
-        run: isort . --check
+        run: isort . --check --settings-path ./.isort.cfg
