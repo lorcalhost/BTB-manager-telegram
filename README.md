@@ -1,4 +1,4 @@
-# Binance Trade Bot Manager Telegram ⚠ NEW INSTALLATION METHOD ⚠
+# Binance Trade Bot Manager Telegram
 A Telegram bot for remotely managing [Binance Trade Bot].  
 
 **If you have feature requests please open an issue on this repo, developers are also welcome to contribute!**
