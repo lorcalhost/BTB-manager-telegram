@@ -73,10 +73,11 @@ def current_value():
                     f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
                     f"*Current coin {current_coin}:*\n"
                     f"\t\- Balance: `{round(balance, 6)}` *{current_coin}*\n"
-                    f"\t\- Current coin exchange ratio: `{round(usd_price, 2)}` *USD/{current_coin}*\n"
-                    f"\t\- Value in *USD*: `{round((balance * usd_price), 4)}` *USD*\n"
+                    f"\t\- Current coin exchange ratio: `{round(usd_price, 4)}` *USD*/*{current_coin}*\n"
+                    f"\t\- Value in *USD*: `{round((balance * usd_price), 2)}` *USD*\n"
                     f"\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` *BTC*\n\n"
-                    f"\t_Initially bought for_ {round(buy_price, 2)} *{bridge}* \(`{round((buy_price / balance), 6)}` *{bridge}/{current_coin}*\)\n".replace(
+                    f"_Initially bought for_ {round(buy_price, 2)} *{bridge}*\n"
+                    f"_Exchange ratio when purchased:_ `{round((buy_price / balance), 6)}` *{bridge}*/*{current_coin}*".replace(
                         ".", "\."
                     )
                 ]
@@ -226,6 +227,8 @@ def trade_history():
                     f"Last **{10 if len(query) > 10 else len(query)}** trades:\n\n"
                 ]
                 for trade in query:
+                    if trade[4] is None:
+                        continue
                     date = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
                     m_list.append(
                         f"`{date.strftime('%H:%M:%S %d/%m/%Y')}`\n"
