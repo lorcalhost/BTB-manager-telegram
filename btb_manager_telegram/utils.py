@@ -6,16 +6,13 @@ import yaml
 from btb_manager_telegram import logger, settings
 
 
-def find_and_kill_process():
-    try:
-        for proc in psutil.process_iter():
-            if "binance_trade_bot" in proc.name() or "binance_trade_bot" in " ".join(
-                proc.cmdline()
-            ):
-                proc.terminate()
-                proc.wait()
-    except Exception as e:
-        logger.info(f"ERROR: {e}")
+def setup_root_path_constant():
+    if settings.ROOT_PATH is None:
+        logger.info("No root_path was specified.\nAborting.")
+        exit(-1)
+    else:
+        if settings.ROOT_PATH[-1] != "/":
+            settings.ROOT_PATH += "/"
 
 
 def setup_telegram_constants():
@@ -65,6 +62,18 @@ def find_process():
         or "binance_trade_bot" in " ".join(proc.cmdline())
         for proc in psutil.process_iter()
     )
+
+
+def find_and_kill_process():
+    try:
+        for proc in psutil.process_iter():
+            if "binance_trade_bot" in proc.name() or "binance_trade_bot" in " ".join(
+                proc.cmdline()
+            ):
+                proc.terminate()
+                proc.wait()
+    except Exception as e:
+        logger.info(f"ERROR: {e}")
 
 
 def is_tg_bot_update_available():

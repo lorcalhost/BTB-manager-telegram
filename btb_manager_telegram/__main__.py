@@ -9,10 +9,12 @@ from btb_manager_telegram import (
     MENU,
     UPDATE_BTB,
     UPDATE_TG,
-    logger,
     settings,
 )
-from btb_manager_telegram.utils import setup_telegram_constants
+from btb_manager_telegram.utils import (
+    setup_root_path_constant,
+    setup_telegram_constants,
+)
 
 
 def pre_run_main() -> None:
@@ -38,15 +40,7 @@ def pre_run_main() -> None:
     settings.TOKEN = args.token
     settings.USER_ID = args.user_id
 
-    if settings.ROOT_PATH is None:
-        logger.info("No root_path was specified.\nAborting.")
-        exit(-1)
-    else:
-        settings.ROOT_PATH = (
-            settings.ROOT_PATH
-            if settings.ROOT_PATH[-1] == "/"
-            else (settings.ROOT_PATH + "/")
-        )
+    setup_root_path_constant()
 
     if settings.TOKEN is None or settings.USER_ID is None:
         setup_telegram_constants()
