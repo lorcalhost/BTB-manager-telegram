@@ -4,8 +4,10 @@ import os
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 import argparse
 import logging
+import sched
 import sqlite3
 import subprocess
+import time
 from configparser import ConfigParser
 from datetime import datetime
 from shutil import copyfile
@@ -51,8 +53,9 @@ class BTBManagerTelegram:
             self.token = token
             self.user_id = user_id
 
-        updater = Updater(self.token)
         self.bot = Bot(self.token)
+
+        updater = Updater(self.token)
         dispatcher = updater.dispatcher
 
         conv_handler = ConversationHandler(
@@ -98,6 +101,15 @@ class BTBManagerTelegram:
 
         dispatcher.add_handler(conv_handler)
         updater.start_polling()
+
+        # Update checker setup
+        self.tg_update_broadcasted_before = False
+        self.btb_update_broadcasted_before = False
+        self.scheduler = sched.scheduler(time.time, time.sleep)
+        self.scheduler.enter(1, 1, self.__update_checker)
+        time.sleep(1)  # needed to prevent thrash
+        self.scheduler.run(blocking=False)
+
         updater.idle()
 
     def __get_token_from_yaml(self):
@@ -122,6 +134,85 @@ class BTBManagerTelegram:
             )
             exit(-1)
         return tok, uid
+
+    def __update_checker(self):
+        self.logger.info("Checking for updates.")
+
+        if not self.tg_update_broadcasted_before:
+            if self.is_tg_bot_update_available():
+                self.logger.info("BTB Manager Telegram update found.")
+
+                message = "⚠ An update for _BTB Manager Telegram_ is available\.\n\nPlease update by going to *🛠 Maintenance* and pressing the *Update Telegram Bot* button\."
+                self.tg_update_broadcasted_before = True
+                self.bot.send_message(self.user_id, message, parse_mode="MarkdownV2")
+                self.scheduler.enter(
+                    60 * 60 * 12,
+                    1,
+                    self.__update_reminder,
+                    ("_*Reminder*_:\n\n" + message,),
+                )
+
+        if not self.btb_update_broadcasted_before:
+            if self.is_btb_bot_update_available():
+                self.logger.info("Binance Trade Bot update found.")
+
+                message = "⚠ An update for _Binance Trade Bot_ is available\.\n\nPlease update by going to *🛠 Maintenance* and pressing the *Update Binance Trade Bot* button\."
+                self.btb_update_broadcasted_before = True
+                self.bot.send_message(self.user_id, message, parse_mode="MarkdownV2")
+                self.scheduler.enter(
+                    60 * 60 * 12,
+                    1,
+                    self.__update_reminder,
+                    ("_*Reminder*_:\n\n" + message,),
+                )
+
+        if (
+            self.tg_update_broadcasted_before is False
+            or self.btb_update_broadcasted_before is False
+        ):
+            self.scheduler.enter(
+                60 * 60,
+                1,
+                self.__update_checker,
+            )
+
+    def __update_reminder(self, message):
+        self.logger.info(f"Reminding user: {message}")
+
+        self.bot.send_message(self.user_id, message, parse_mode="MarkdownV2")
+        self.scheduler.enter(
+            60 * 60 * 12,
+            1,
+            self.__update_reminder,
+        )
+
+    def is_tg_bot_update_available(self):
+        try:
+            p = subprocess.Popen(
+                ["bash", "-c", "git remote update && git status -uno"],
+                stdout=subprocess.PIPE,
+            )
+            output, _ = p.communicate()
+            re = "Your branch is behind" in str(output)
+        except:
+            re = None
+        return re
+
+    def is_btb_bot_update_available(self):
+        try:
+            p = subprocess.Popen(
+                [
+                    "bash",
+                    "-c",
+                    "cd ../binance-trade-bot && git remote update && git status -uno",
+                ],
+                stdout=subprocess.PIPE,
+            )
+            output, _ = p.communicate()
+            re = "Your branch is behind" in str(output)
+        except:
+            re = None
+        return re
 
     def __start(self, update: Update, _: CallbackContext) -> int:
         self.logger.info("Started conversation.")
@@ -829,38 +920,30 @@ class BTBManagerTelegram:
     def __btn_update_tg_bot(self):
         self.logger.info("Update Telegram bot button pressed.")
 
-        p = subprocess.Popen(
-            ["bash", "-c", "git remote update && git status -uno"],
-            stdout=subprocess.PIPE,
-        )
-        output, _ = p.communicate()
-        upd = False
         message = "Your BTB Manager Telegram installation is already up to date\."
-        if "Your branch is behind" in str(output):
-            message = "An update for BTB Manager Telegram is available\.\nWould you like to update now?"
-            upd = True
+        upd = False
+        to_update = is_tg_bot_update_available()
+        if to_update is not None:
+            if to_update:
+                message = "An update for BTB Manager Telegram is available\.\nWould you like to update now?"
+                upd = True
+        else:
+            message = (
+                "Error while trying to fetch BTB Manager Telegram version information\."
+            )
         return [message, upd]
 
     def __btn_update_btb(self):
         self.logger.info("Update Binance Trade Bot button pressed.")
 
+        message = "Your Binance Trade Bot installation is already up to date\."
         upd = False
-        try:
-            p = subprocess.Popen(
-                [
-                    "bash",
-                    "-c",
-                    "cd ../binance-trade-bot && git remote update && git status -uno",
-                ],
-                stdout=subprocess.PIPE,
-            )
-            output, _ = p.communicate()
-
-            message = "Your Binance Trade Bot installation is already up to date\."
-            if "Your branch is behind" in str(output):
-                message = "An update for Binance Trade Bot is available\.\nWould you like to update now?"
+        to_update = is_btb_bot_update_available()
+        if to_update is not None:
+            if to_update:
                 upd = True
-        except:
+                message = "An update for Binance Trade Bot is available\.\nWould you like to update now?"
+        else:
             message = (
                 "Error while trying to fetch Binance Trade Bot version information\."
             )
