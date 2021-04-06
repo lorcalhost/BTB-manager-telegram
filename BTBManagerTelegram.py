@@ -922,7 +922,7 @@ class BTBManagerTelegram:
 
         message = "Your BTB Manager Telegram installation is already up to date\."
         upd = False
-        to_update = is_tg_bot_update_available()
+        to_update = self.is_tg_bot_update_available()
         if to_update is not None:
             if to_update:
                 message = "An update for BTB Manager Telegram is available\.\nWould you like to update now?"
@@ -938,7 +938,7 @@ class BTBManagerTelegram:
 
         message = "Your Binance Trade Bot installation is already up to date\."
         upd = False
-        to_update = is_btb_bot_update_available()
+        to_update = self.is_btb_bot_update_available()
         if to_update is not None:
             if to_update:
                 upd = True
