@@ -55,13 +55,6 @@ class BTBManagerTelegram:
 
         self.bot = Bot(self.token)
 
-        # Update checker setup
-        self.tg_update_broadcasted_before = False
-        self.btb_update_broadcasted_before = False
-        self.scheduler = sched.scheduler(time.time, time.sleep)
-        self.scheduler.enter(1, 1, self.__update_checker)
-        self.scheduler.run(blocking=False)
-
         updater = Updater(self.token)
         dispatcher = updater.dispatcher
 
@@ -108,6 +101,15 @@ class BTBManagerTelegram:
 
         dispatcher.add_handler(conv_handler)
         updater.start_polling()
+
+        # Update checker setup
+        self.tg_update_broadcasted_before = False
+        self.btb_update_broadcasted_before = False
+        self.scheduler = sched.scheduler(time.time, time.sleep)
+        self.scheduler.enter(1, 1, self.__update_checker)
+        time.sleep(1)  # needed to prevent thrash
+        self.scheduler.run(blocking=False)
+
         updater.idle()
 
     def __get_token_from_yaml(self):
