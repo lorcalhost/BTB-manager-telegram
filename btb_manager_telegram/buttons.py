@@ -40,7 +40,7 @@ def current_value():
                     ]
             except Exception:
                 con.close()
-                return [f"❌ Unable to fetch current coin from database\."]
+                return ["❌ Unable to fetch current coin from database\."]
 
             # Get balance, current coin price in USD, current coin price in BTC
             try:
@@ -51,7 +51,7 @@ def current_value():
                 if query is None:
                     return [
                         f"❌ No information about *{current_coin}* available in the database\.",
-                        f"⚠ If you tried using the `Current value` button during a trade please try again after the trade has been completed\.",
+                        "⚠ If you tried using the `Current value` button during a trade please try again after the trade has been completed\.",
                     ]
                 balance, usd_price, btc_price, last_update = query
                 if balance is None:
@@ -64,8 +64,8 @@ def current_value():
             except Exception:
                 con.close()
                 return [
-                    f"❌ Unable to fetch current coin information from database\.",
-                    f"⚠ If you tried using the `Current value` button during a trade please try again after the trade has been completed\.",
+                    "❌ Unable to fetch current coin information from database\.",
+                    "⚠ If you tried using the `Current value` button during a trade please try again after the trade has been completed\.",
                 ]
 
             # Generate message
@@ -80,7 +80,7 @@ def current_value():
             except Exception:
                 con.close()
                 return [
-                    f"❌ Something went wrong, unable to generate value at this time\."
+                    "❌ Something went wrong, unable to generate value at this time\."
                 ]
         except Exception:
             message = ["❌ Unable to perform actions on the database\."]
@@ -105,7 +105,7 @@ def check_progress():
                 query = cur.fetchall()
 
                 # Generate message
-                m_list = [f"Current coin amount progress:\n\n"]
+                m_list = ["Current coin amount progress:\n\n"]
                 for coin in query:
                     last_trade_date = datetime.strptime(
                         coin[4], "%Y-%m-%d %H:%M:%S.%f"
@@ -120,7 +120,7 @@ def check_progress():
                 con.close()
             except Exception:
                 con.close()
-                return [f"❌ Unable to fetch progress information from database\."]
+                return ["❌ Unable to fetch progress information from database\."]
         except Exception:
             message = ["❌ Unable to perform actions on the database\."]
     return message
@@ -153,7 +153,7 @@ def current_ratios():
                     raise Exception()
             except Exception:
                 con.close()
-                return [f"❌ Unable to fetch current coin from database\."]
+                return ["❌ Unable to fetch current coin from database\."]
 
             # Get prices and ratios of all alt coins
             try:
@@ -183,7 +183,7 @@ def current_ratios():
             except Exception:
                 con.close()
                 return [
-                    f"❌ Something went wrong, unable to generate ratios at this time\."
+                    "❌ Something went wrong, unable to generate ratios at this time\."
                 ]
         except Exception:
             message = ["❌ Unable to perform actions on the database\."]
@@ -229,7 +229,7 @@ def trade_history():
             except Exception:
                 con.close()
                 return [
-                    f"❌ Something went wrong, unable to generate trade history at this time\."
+                    "❌ Something went wrong, unable to generate trade history at this time\."
                 ]
         except Exception:
             message = ["❌ Unable to perform actions on the database\."]
