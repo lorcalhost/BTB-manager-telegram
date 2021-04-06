@@ -1,5 +1,4 @@
 import argparse
-import sched
 import time
 
 from telegram.ext import ConversationHandler, Updater
@@ -11,12 +10,13 @@ from btb_manager_telegram import (
     MENU,
     UPDATE_BTB,
     UPDATE_TG,
+    scheduler,
     settings,
 )
-from btb_manager_telegram import update_notifications as notify
 from btb_manager_telegram.utils import (
     setup_root_path_constant,
     setup_telegram_constants,
+    update_checker,
 )
 
 
@@ -48,12 +48,11 @@ def pre_run_main() -> None:
     if settings.TOKEN is None or settings.USER_ID is None:
         setup_telegram_constants()
 
-    notify.TG_UPDATE_BROADCASTED_BEFORE = False
-    notify.BTB_UPDATE_BROADCASTED_BEFORE = False
-    notify.SCHEDULER = sched.scheduler(time.time, time.sleep)
-    notify.SCHEDULER.enter(1, 1, notify.update_checker)
+    settings.TG_UPDATE_BROADCASTED_BEFORE = False
+    settings.BTB_UPDATE_BROADCASTED_BEFORE = False
+    scheduler.enter(1, 1, update_checker)
     time.sleep(1)
-    notify.SCHEDULER.run(blocking=False)
+    scheduler.run(blocking=False)
 
 
 def main() -> None:
