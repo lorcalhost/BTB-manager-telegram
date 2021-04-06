@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 import psutil
@@ -20,14 +21,20 @@ def setup_telegram_constants():
     logger.info("Retrieving Telegram token and user_id from apprise.yml file.")
     telegram_url = None
     yaml_file_path = f"{settings.ROOT_PATH}config/apprise.yml"
-    with open(yaml_file_path) as f:
-        parsed_urls = yaml.load(f, Loader=yaml.FullLoader)["urls"]
-        for url in parsed_urls:
-            if url.startswith("tgram"):
-                telegram_url = url.split("//")[1]
-    if not telegram_url:
+    if os.path.exists(yaml_file_path):
+        with open(yaml_file_path) as f:
+            parsed_urls = yaml.load(f, Loader=yaml.FullLoader)["urls"]
+            for url in parsed_urls:
+                if url.startswith("tgram"):
+                    telegram_url = url.split("//")[1]
+        if not telegram_url:
+            logger.error(
+                "ERROR: No telegram configuration was found in your apprise.yml file.\nAborting."
+            )
+            exit(-1)
+    else:
         logger.error(
-            "ERROR: No telegram configuration was found in your apprise.yml file.\nAborting."
+            f'ERROR: Unable to find apprise.yml file at "{settings.ROOT_PATH}".\nAborting.'
         )
         exit(-1)
     try:
