@@ -10,11 +10,10 @@ from btb_manager_telegram import logger, scheduler, settings
 
 def setup_root_path_constant():
     if settings.ROOT_PATH is None:
-        logger.info("No root_path was specified.\nAborting.")
+        logger.info("No root_path was specified. Aborting.")
         exit(-1)
     else:
-        if settings.ROOT_PATH[-1] != "/":
-            settings.ROOT_PATH += "/"
+        settings.ROOT_PATH = os.path.join(settings.ROOT_PATH, "")
 
 
 def setup_telegram_constants():
@@ -29,12 +28,12 @@ def setup_telegram_constants():
                     telegram_url = url.split("//")[1]
         if not telegram_url:
             logger.error(
-                "ERROR: No telegram configuration was found in your apprise.yml file.\nAborting."
+                "No telegram configuration was found in your apprise.yml file. Aborting."
             )
             exit(-1)
     else:
         logger.error(
-            f'ERROR: Unable to find apprise.yml file at "{settings.ROOT_PATH}".\nAborting.'
+            f'Unable to find apprise.yml file at "{yaml_file_path}". Aborting.'
         )
         exit(-1)
     try:
@@ -46,8 +45,7 @@ def setup_telegram_constants():
         )
     except Exception:
         logger.error(
-            "ERROR: No user_id has been set in the yaml configuration, anyone would be able to control your bot.\n"
-            "Aborting."
+            "No user_id has been set in the yaml configuration, anyone would be able to control your bot. Aborting."
         )
         exit(-1)
 
