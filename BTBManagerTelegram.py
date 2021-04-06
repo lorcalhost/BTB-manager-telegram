@@ -134,11 +134,10 @@ class BTBManagerTelegram:
         return tok, uid
 
     def __update_checker(self):
+        self.logger.info("Checking for updates.")
         if not self.tg_update_broadcasted_before:
-            if (
-                self.tg_update_broadcasted_before is False
-                and self.is_tg_bot_update_available()
-            ):
+            if self.is_tg_bot_update_available():
+                self.logger.info("BTB Manager Telegram update found.")
                 message = "⚠ An update for _BTB Manager Telegram_ is available\.\n\nPlease update by going to *🛠 Maintenance* and pressing the *Update Telegram Bot* button\."
                 self.tg_update_broadcasted_before = True
                 self.bot.send_message(self.user_id, message, parse_mode="MarkdownV2")
@@ -149,12 +148,11 @@ class BTBManagerTelegram:
                     ("_*Reminder*_:\n\n" + message,),
                 )
 
-            if (
-                self.btb_update_broadcasted_before is False
-                and self.is_tg_bot_update_available()
-            ):
+        if not self.btb_update_broadcasted_before:
+            if self.is_btb_bot_update_available():
+                self.logger.info("Binance Trade Bot update found.")
                 message = "⚠ An update for _Binance Trade Bot_ is available\.\n\nPlease update by going to *🛠 Maintenance* and pressing the *Update Binance Trade Bot* button\."
-                self.tg_update_broadcasted_before = True
+                self.btb_update_broadcasted_before = True
                 self.bot.send_message(self.user_id, message, parse_mode="MarkdownV2")
                 self.scheduler.enter(
                     60 * 60 * 12,
@@ -163,17 +161,18 @@ class BTBManagerTelegram:
                     ("_*Reminder*_:\n\n" + message,),
                 )
 
-            if (
-                self.tg_update_broadcasted_before is False
-                or self.btb_update_broadcasted_before is False
-            ):
-                self.scheduler.enter(
-                    60 * 60,
-                    1,
-                    self.__update_checker,
-                )
+        if (
+            self.tg_update_broadcasted_before is False
+            or self.btb_update_broadcasted_before is False
+        ):
+            self.scheduler.enter(
+                60 * 60,
+                1,
+                self.__update_checker,
+            )
 
     def __update_reminder(self, message):
+        self.logger.info(f"Reminding user: {message}")
         self.bot.send_message(self.user_id, message, parse_mode="MarkdownV2")
         self.scheduler.enter(
             60 * 60 * 12,
