@@ -4,8 +4,10 @@ import os
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 import argparse
 import logging
+import sched
 import sqlite3
 import subprocess
+import time
 from configparser import ConfigParser
 from datetime import datetime
 from shutil import copyfile
@@ -31,7 +33,7 @@ class BTBManagerTelegram:
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
             level=logging.INFO,
         )
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger("btb_manager_telegram_logger")
 
         if root_path is None:
             self.logger.info("No root_path was specified.\nAborting.")
@@ -51,8 +53,9 @@ class BTBManagerTelegram:
             self.token = token
             self.user_id = user_id
 
-        updater = Updater(self.token)
         self.bot = Bot(self.token)
+
+        updater = Updater(self.token)
         dispatcher = updater.dispatcher
 
         conv_handler = ConversationHandler(
@@ -65,7 +68,7 @@ class BTBManagerTelegram:
                 MENU: [
                     MessageHandler(
                         Filters.regex(
-                            "^(Begin|💵 Current value|📈 Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|Update Telegram Bot|Update Binance Trade Bot|⬅️ Back|Go back|OK|Cancel update|OK 👌)$"
+                            "^(Begin|💵 Current value|📈 Progress|➗ Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|Update Telegram Bot|Update Binance Trade Bot|⬅️ Back|Go back|OK|Cancel update|OK 👌)$"
                         ),
                         self.__menu,
                     )
@@ -98,6 +101,15 @@ class BTBManagerTelegram:
 
         dispatcher.add_handler(conv_handler)
         updater.start_polling()
+
+        # Update checker setup
+        self.tg_update_broadcasted_before = False
+        self.btb_update_broadcasted_before = False
+        self.scheduler = sched.scheduler(time.time, time.sleep)
+        self.scheduler.enter(1, 1, self.__update_checker)
+        time.sleep(1)  # needed to prevent thrash
+        self.scheduler.run(blocking=False)
+
         updater.idle()
 
     def __get_token_from_yaml(self):
@@ -123,6 +135,85 @@ class BTBManagerTelegram:
             exit(-1)
         return tok, uid
 
+    def __update_checker(self):
+        self.logger.info("Checking for updates.")
+
+        if not self.tg_update_broadcasted_before:
+            if self.is_tg_bot_update_available():
+                self.logger.info("BTB Manager Telegram update found.")
+
+                message = "⚠ An update for _BTB Manager Telegram_ is available\.\n\nPlease update by going to *🛠 Maintenance* and pressing the *Update Telegram Bot* button\."
+                self.tg_update_broadcasted_before = True
+                self.bot.send_message(self.user_id, message, parse_mode="MarkdownV2")
+                self.scheduler.enter(
+                    60 * 60 * 12,
+                    1,
+                    self.__update_reminder,
+                    ("_*Reminder*_:\n\n" + message,),
+                )
+
+        if not self.btb_update_broadcasted_before:
+            if self.is_btb_bot_update_available():
+                self.logger.info("Binance Trade Bot update found.")
+
+                message = "⚠ An update for _Binance Trade Bot_ is available\.\n\nPlease update by going to *🛠 Maintenance* and pressing the *Update Binance Trade Bot* button\."
+                self.btb_update_broadcasted_before = True
+                self.bot.send_message(self.user_id, message, parse_mode="MarkdownV2")
+                self.scheduler.enter(
+                    60 * 60 * 12,
+                    1,
+                    self.__update_reminder,
+                    ("_*Reminder*_:\n\n" + message,),
+                )
+
+        if (
+            self.tg_update_broadcasted_before is False
+            or self.btb_update_broadcasted_before is False
+        ):
+            self.scheduler.enter(
+                60 * 60,
+                1,
+                self.__update_checker,
+            )
+
+    def __update_reminder(self, message):
+        self.logger.info(f"Reminding user: {message}")
+
+        self.bot.send_message(self.user_id, message, parse_mode="MarkdownV2")
+        self.scheduler.enter(
+            60 * 60 * 12,
+            1,
+            self.__update_reminder,
+        )
+
+    def is_tg_bot_update_available(self):
+        try:
+            p = subprocess.Popen(
+                ["bash", "-c", "git remote update && git status -uno"],
+                stdout=subprocess.PIPE,
+            )
+            output, _ = p.communicate()
+            re = "Your branch is behind" in str(output)
+        except:
+            re = None
+        return re
+
+    def is_btb_bot_update_available(self):
+        try:
+            p = subprocess.Popen(
+                [
+                    "bash",
+                    "-c",
+                    "cd ../binance-trade-bot && git remote update && git status -uno",
+                ],
+                stdout=subprocess.PIPE,
+            )
+            output, _ = p.communicate()
+            re = "Your branch is behind" in str(output)
+        except:
+            re = None
+        return re
+
     def __start(self, update: Update, _: CallbackContext) -> int:
         self.logger.info("Started conversation.")
 
@@ -143,7 +234,8 @@ class BTBManagerTelegram:
         self.logger.info(f"Menu selector. ({update.message.text})")
 
         keyboard = [
-            ["💵 Current value", "📈 Current ratios"],
+            ["💵 Current value"],
+            ["📈 Progress", "➗ Current ratios"],
             ["🔍 Check bot status", "⌛ Trade History"],
             ["🛠 Maintenance", "⚙️ Configurations"],
         ]
@@ -187,7 +279,13 @@ class BTBManagerTelegram:
                     m, reply_markup=reply_markup, parse_mode="MarkdownV2"
                 )
 
-        elif update.message.text == "📈 Current ratios":
+        elif update.message.text == "📈 Progress":
+            for m in self.__btn_check_progress():
+                update.message.reply_text(
+                    m, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                )
+
+        elif update.message.text == "➗ Current ratios":
             for m in self.__btn_current_ratios():
                 update.message.reply_text(
                     m, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -516,7 +614,13 @@ class BTBManagerTelegram:
                     cur.execute(
                         f"""SELECT balance, usd_price, btc_price, datetime FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;"""
                     )
-                    balance, usd_price, btc_price, last_update = cur.fetchone()
+                    query = cur.fetchone()
+                    if query is None:
+                        return [
+                            f"❌ No information about *{current_coin}* available in the database\.",
+                            f"⚠ If you tried using the `Current value` button during a trade please try again after the trade has been completed\.",
+                        ]
+                    balance, usd_price, btc_price, last_update = query
                     if balance is None:
                         balance = 0
                     if usd_price is None:
@@ -534,7 +638,7 @@ class BTBManagerTelegram:
                 # Generate message
                 try:
                     m_list = [
-                        f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Current Price in *{bridge}*: `{round(((balance * usd_price) / balance), 6)}`\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n\t_Initially bought for_ {round(buy_price, 2)} *{bridge}*\n\n\t_Exchange ratio_ {round((buy_price / balance), 6)}  *{bridge}/{current_coin}* \n'.replace(
+                        f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` *{current_coin}*\n\t\- Current coin exchange ratio: `{round((buy_price / balance), 6)}` *{bridge}/{current_coin}*\n\t\- Current coin price: `{round(usd_price, 2)}` *USD/{bridge}*\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` *USD*\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` *BTC*\n\n\t_Initially bought for_ {round(buy_price, 2)} *{bridge}* (`{round((buy_price / balance), 6)}` *{bridge}/{current_coin}*)\n'.replace(
                             ".", "\."
                         )
                     ]
@@ -545,6 +649,45 @@ class BTBManagerTelegram:
                     return [
                         f"❌ Something went wrong, unable to generate value at this time\."
                     ]
+            except:
+                message = ["❌ Unable to perform actions on the database\."]
+        return message
+
+    def __btn_check_progress(self):
+        self.logger.info("Progress button pressed.")
+
+        db_file_path = f"{self.root_path}data/crypto_trading.db"
+        user_cfg_file_path = f"{self.root_path}user.cfg"
+        message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
+        if os.path.exists(db_file_path):
+            try:
+                con = sqlite3.connect(db_file_path)
+                cur = con.cursor()
+
+                # Get progress information
+                try:
+                    cur.execute(
+                        """SELECT th1.alt_coin_id AS coin, th1.alt_trade_amount AS amount, th1.crypto_trade_amount AS priceInUSD,(th1.alt_trade_amount - ( SELECT th2.alt_trade_amount FROM trade_history th2 WHERE th2.alt_coin_id = th1.alt_coin_id AND th1.datetime > th2.datetime AND th2.selling = 0 ORDER BY th2.datetime DESC LIMIT 1)) AS change, datetime FROM trade_history th1 WHERE th1.state = 'COMPLETE' AND th1.selling = 0 ORDER BY th1.datetime DESC LIMIT 15"""
+                    )
+                    query = cur.fetchall()
+
+                    # Generate message
+                    m_list = [f"Current coin amount progress:\n\n"]
+                    for coin in query:
+                        last_trade_date = datetime.strptime(
+                            coin[4], "%Y-%m-%d %H:%M:%S.%f"
+                        ).strftime("%H:%M:%S %d/%m/%Y")
+                        m_list.append(
+                            f'*{coin[0]}*\n\t\- Amount: `{round(coin[1], 6)}` *{coin[0]}*\n\t\- Price: `{round(coin[2], 2)}` *USD*\n\t\- Change: {f"`{round(coin[3], 2)}` *{coin[0]}*" if coin[3] is not None else f"`{coin[3]}`"}\n\t\- Last trade: `{last_trade_date}`\n\n'.replace(
+                                ".", "\."
+                            )
+                        )
+
+                    message = self.__4096_cutter(m_list)
+                    con.close()
+                except:
+                    con.close()
+                    return [f"❌ Unable to fetch progress information from database\."]
             except:
                 message = ["❌ Unable to perform actions on the database\."]
         return message
@@ -596,7 +739,7 @@ class BTBManagerTelegram:
                     ]
                     for coin in query:
                         m_list.append(
-                            f"{coin[1]}:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n".replace(
+                            f"*{coin[1]}*:\n\t\- Price: `{coin[2]}` *{bridge}*\n\t\- Ratio: `{round(coin[3], 6)}`\n\n".replace(
                                 ".", "\."
                             )
                         )
@@ -777,38 +920,30 @@ class BTBManagerTelegram:
     def __btn_update_tg_bot(self):
         self.logger.info("Update Telegram bot button pressed.")
 
-        p = subprocess.Popen(
-            ["bash", "-c", "git remote update && git status -uno"],
-            stdout=subprocess.PIPE,
-        )
-        output, _ = p.communicate()
-        upd = False
         message = "Your BTB Manager Telegram installation is already up to date\."
-        if "Your branch is behind" in str(output):
-            message = "An update for BTB Manager Telegram is available\.\nWould you like to update now?"
-            upd = True
+        upd = False
+        to_update = is_tg_bot_update_available()
+        if to_update is not None:
+            if to_update:
+                message = "An update for BTB Manager Telegram is available\.\nWould you like to update now?"
+                upd = True
+        else:
+            message = (
+                "Error while trying to fetch BTB Manager Telegram version information\."
+            )
         return [message, upd]
 
     def __btn_update_btb(self):
         self.logger.info("Update Binance Trade Bot button pressed.")
 
+        message = "Your Binance Trade Bot installation is already up to date\."
         upd = False
-        try:
-            p = subprocess.Popen(
-                [
-                    "bash",
-                    "-c",
-                    "cd ../binance-trade-bot && git remote update && git status -uno",
-                ],
-                stdout=subprocess.PIPE,
-            )
-            output, _ = p.communicate()
-
-            message = "Your Binance Trade Bot installation is already up to date\."
-            if "Your branch is behind" in str(output):
-                message = "An update for Binance Trade Bot is available\.\nWould you like to update now?"
+        to_update = is_btb_bot_update_available()
+        if to_update is not None:
+            if to_update:
                 upd = True
-        except:
+                message = "An update for Binance Trade Bot is available\.\nWould you like to update now?"
+        else:
             message = (
                 "Error while trying to fetch Binance Trade Bot version information\."
             )
