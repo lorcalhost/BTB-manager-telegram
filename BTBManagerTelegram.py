@@ -2,7 +2,7 @@
 import logging
 import yaml
 import psutil
-import subprocess
+import subprocess, sys
 import os, pathlib
 import argparse
 import sqlite3
@@ -21,8 +21,10 @@ from telegram.ext import (
 
 MENU, EDIT_COIN_LIST, EDIT_USER_CONFIG = range(3)
 
+################################################################################
 PATH = pathlib.Path(__file__).parent.absolute()
 os.chdir(PATH)
+################################################################################
 
 class BTBManagerTelegram:
     def __init__(self, from_yaml=True, token=None, user_id=None):
@@ -55,7 +57,7 @@ class BTBManagerTelegram:
 
     def __get_token_from_yaml(self):
         telegram_url = None
-        yaml_file_path = 'binance_trade_bot/config/apprise.yml' ######################################
+        yaml_file_path = 'config/apprise.yml'
         with open(yaml_file_path) as f:
             parsed_urls = yaml.load(f, Loader=yaml.FullLoader)['urls']
             for url in parsed_urls:
@@ -193,7 +195,7 @@ class BTBManagerTelegram:
 
         if update.message.text != '/stop':
             message = f'✔ Successfully edited coin list file to:\n\n```\n{update.message.text}\n```'.replace('.', '\.')
-            coin_file_path = 'binance_trade_bot/supported_coin_list' ######################################
+            coin_file_path = 'config/supported_coin_list'
             try:
                 copyfile(coin_file_path, f'{coin_file_path}.backup')
                 with open(coin_file_path, 'w') as f:
@@ -221,7 +223,7 @@ class BTBManagerTelegram:
 
         if update.message.text != '/stop':
             message = f'✔ Successfully edited user configuration file to:\n\n```\n{update.message.text}\n```'.replace('.', '\.')
-            user_cfg_file_path = 'binance_trade_bot/user.cfg' ######################################
+            user_cfg_file_path = 'config/user.cfg'
             try:
                 copyfile(user_cfg_file_path, f'{user_cfg_file_path}.backup')
                 with open(user_cfg_file_path, 'w') as f:
@@ -285,7 +287,7 @@ class BTBManagerTelegram:
 
         message = '⚠ Please stop Binance Trade Bot before editing the coin list\.'
         edit = False
-        coin_file_path = 'binance_trade_bot/supported_coin_list' ######################################
+        coin_file_path = 'config/supported_coin_list'
         if not self.__find_process():
             if os.path.exists(coin_file_path):
                 with open(coin_file_path) as f:
@@ -300,7 +302,7 @@ class BTBManagerTelegram:
 
         message = '⚠ Binance Trade Bot is already running\.'
         if not self.__find_process():
-            if os.path.exists('binance_trade_bot/'): ######################################
+            if os.path.exists('binance_trade_bot/'):
                 subprocess.call('$(which python3) -m binance_trade_bot &', shell=True)
                 if not self.__find_process():
                     message = '❌ Unable to start Binance Trade Bot\.'
@@ -326,7 +328,7 @@ class BTBManagerTelegram:
         self.logger.info('Delete database button pressed.')
 
         message = '⚠ Please stop Binance Trade Bot before deleting the database file\.'
-        db_file_path = 'binance_trade_bot/data/crypto_trading.db' ######################################
+        db_file_path = 'binance_trade_bot/data/crypto_trading.db'
         if not self.__find_process():
             if os.path.exists(db_file_path):
                 try:
@@ -368,8 +370,8 @@ class BTBManagerTelegram:
     def __btn_current_stats(self):
         self.logger.info('Current stats button pressed.')
 
-        db_file_path = 'binance_trade_bot/data/crypto_trading.db' ######################################
-        user_cfg_file_path = 'binance_trade_bot/user.cfg' ######################################
+        db_file_path = 'binance_trade_bot/data/crypto_trading.db'
+        user_cfg_file_path = 'config/user.cfg'
         message = [f'⚠ Unable to find database file at `{db_file_path}`\.']
         if os.path.exists(db_file_path):
             try:
@@ -438,13 +440,22 @@ class BTBManagerTelegram:
 
 if __name__ == '__main__':
 
+    ################################################################################
+    conf_files = os.listdir("config")
+
+    if not all([True for i in conf_files if i in ['apprise.yml', 'supported_coin_list', 'user.cfg']]):
+        logging.fatal("[-] Couldn't find config files\n Exiting program...")
+        sys.exit(-1)
+    ################################################################################
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--docker', action='store_true', help='If this arg is passed in, the script will run in a docker container')
+    parser.add_argument('-d', '--docker',
+                        action='store_true',
+                        help='If this arg is passed in, the script will run in a docker container')
 
     args = parser.parse_args()
 
     if args.docker:
-        # os.system('git submodule update --init --recursive')
         os.system("docker build --no-cache -t py-container .")
         os.system("docker run --rm -it py-container")
         os.system("docker rmi -f py-container")
