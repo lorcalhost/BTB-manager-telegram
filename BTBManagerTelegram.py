@@ -6,20 +6,24 @@ import subprocess, sys
 import os, pathlib
 import argparse
 import sqlite3
-from datetime import datetime
+import subprocess
 from configparser import ConfigParser
+from datetime import datetime
 from shutil import copyfile
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+
+import psutil
+import yaml
+from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
-    Updater,
+    CallbackContext,
     CommandHandler,
-    MessageHandler,
-    Filters,
     ConversationHandler,
-    CallbackContext
+    Filters,
+    MessageHandler,
+    Updater,
 )
 
-MENU, EDIT_COIN_LIST, EDIT_USER_CONFIG = range(3)
+MENU, EDIT_COIN_LIST, EDIT_USER_CONFIG, DELETE_DB, UPDATE_TG, UPDATE_BTB = range(6)
 
 ################################################################################
 PATH = pathlib.Path(__file__).parent.absolute()
@@ -29,26 +33,58 @@ os.chdir(PATH)
 class BTBManagerTelegram:
     def __init__(self, from_yaml=True, token=None, user_id=None):
         logging.basicConfig(
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            level=logging.INFO,
         )
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger("btb_manager_telegram_logger")
 
         if from_yaml:
             token, user_id = self.__get_token_from_yaml()
 
 
-        updater = Updater(token)
+        updater = Updater(self.token)
+        self.bot = Bot(self.token)
         dispatcher = updater.dispatcher
 
         conv_handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.__start, Filters.user(user_id=eval(user_id)))],
+            entry_points=[
+                CommandHandler(
+                    "start", self.__start, Filters.user(user_id=eval(self.user_id))
+                )
+            ],
             states={
-                MENU: [MessageHandler(Filters.regex('^(Begin|🔍 Check bot status|👛 Edit coin list|▶ Start trade bot|⏹ Stop trade bot|❌ Delete database|⚙ Edit user.cfg|📜 Read last log lines|📈 Current stats|Go back)$'), self.__menu)],
-                EDIT_COIN_LIST: [MessageHandler(Filters.regex('(.*?)'), self.__edit_coin)],
-                EDIT_USER_CONFIG: [MessageHandler(Filters.regex('(.*?)'), self.__edit_user_config)]
+                MENU: [
+                    MessageHandler(
+                        Filters.regex(
+                            "^(Begin|💵 Current value|📈 Progress|➗ Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|Update Telegram Bot|Update Binance Trade Bot|⬅️ Back|Go back|OK|Cancel update|OK 👌)$"
+                        ),
+                        self.__menu,
+                    )
+                ],
+                EDIT_COIN_LIST: [
+                    MessageHandler(Filters.regex("(.*?)"), self.__edit_coin)
+                ],
+                EDIT_USER_CONFIG: [
+                    MessageHandler(Filters.regex("(.*?)"), self.__edit_user_config)
+                ],
+                DELETE_DB: [
+                    MessageHandler(
+                        Filters.regex("^(⚠ Confirm|Go back)$"), self.__delete_db
+                    )
+                ],
+                UPDATE_TG: [
+                    MessageHandler(
+                        Filters.regex("^(Update|Cancel update)$"), self.__update_tg_bot
+                    )
+                ],
+                UPDATE_BTB: [
+                    MessageHandler(
+                        Filters.regex("^(Update|Cancel update)$"), self.__update_btb
+                    )
+                ],
             },
-            fallbacks=[CommandHandler('cancel', self.__cancel)],
-            per_user=True
+            fallbacks=[CommandHandler("cancel", self.__cancel)],
+            per_user=True,
         )
 
         dispatcher.add_handler(conv_handler)
@@ -59,212 +95,382 @@ class BTBManagerTelegram:
         telegram_url = None
         yaml_file_path = 'config/apprise.yml'
         with open(yaml_file_path) as f:
-            parsed_urls = yaml.load(f, Loader=yaml.FullLoader)['urls']
+            parsed_urls = yaml.load(f, Loader=yaml.FullLoader)["urls"]
             for url in parsed_urls:
-                if url.startswith('tgram'):
-                    telegram_url = url.split('//')[1]
+                if url.startswith("tgram"):
+                    telegram_url = url.split("//")[1]
         if not telegram_url:
-            print('ERROR: No telegram configuration was found in your yaml file.\nAborting.')
+            self.logger.error(
+                "ERROR: No telegram configuration was found in your apprise.yml file.\nAborting."
+            )
             exit(-1)
         try:
-            tok = telegram_url.split('/')[0]
-            uid = telegram_url.split('/')[1]
+            tok = telegram_url.split("/")[0]
+            uid = telegram_url.split("/")[1]
         except:
-            print('ERROR: No user_id has been set in the yaml configuration, anyone would be able to control your bot.\nAborting.')
+            self.logger.error(
+                "ERROR: No user_id has been set in the yaml configuration, anyone would be able to control your bot.\nAborting."
+            )
             exit(-1)
         return tok, uid
 
-
     def __start(self, update: Update, _: CallbackContext) -> int:
-        self.logger.info('Started conversation.')
+        self.logger.info("Started conversation.")
 
-        keyboard = [['Begin']]
-        message = f'Hi *{update.message.from_user.first_name}*\!\nWelcome to _Binace Trade Bot Manager Telegram_\.\n\nThis Telegram bot was developed by @lorcalhost\.\nFind out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.'
-        reply_markup=ReplyKeyboardMarkup(
-            keyboard,
-            one_time_keyboard=True,
-            resize_keyboard=True
+        keyboard = [["Begin"]]
+        message = f"Hi *{update.message.from_user.first_name}*\!\nWelcome to _Binace Trade Bot Manager Telegram_\.\n\nThis Telegram bot was developed by @lorcalhost\.\nFind out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.\n\nIf you like the bot please [consider supporting the project 🍻](https://www.buymeacoffee.com/lorcalhost)\."
+        reply_markup = ReplyKeyboardMarkup(
+            keyboard, one_time_keyboard=True, resize_keyboard=True
         )
         update.message.reply_text(
             message,
             reply_markup=reply_markup,
-            parse_mode='MarkdownV2',
-            disable_web_page_preview=True
+            parse_mode="MarkdownV2",
+            disable_web_page_preview=True,
         )
         return MENU
 
     def __menu(self, update: Update, _: CallbackContext) -> int:
-        self.logger.info(f'Menu selector. ({update.message.text})')
+        self.logger.info(f"Menu selector. ({update.message.text})")
 
         keyboard = [
-            ['📈 Current stats', '🔍 Check bot status'],
-            ['▶ Start trade bot', '⏹ Stop trade bot'],
-            ['📜 Read last log lines', '❌ Delete database'],
-            ['⚙ Edit user.cfg', '👛 Edit coin list']
+            ["💵 Current value"],
+            ["📈 Progress", "➗ Current ratios"],
+            ["🔍 Check bot status", "⌛ Trade History"],
+            ["🛠 Maintenance", "⚙️ Configurations"],
         ]
-        reply_markup = ReplyKeyboardMarkup(
-            keyboard,
-            resize_keyboard=True
+
+        config_keyboard = [
+            ["▶ Start trade bot", "⏹ Stop trade bot"],
+            ["📜 Read last log lines", "❌ Delete database"],
+            ["⚙ Edit user.cfg", "👛 Edit coin list"],
+            ["📤 Export database", "⬅️ Back"],
+        ]
+
+        maintenance_keyboard = [
+            ["Update Telegram Bot"],
+            ["Update Binance Trade Bot"],
+            ["⬅️ Back"],
+        ]
+
+        reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+
+        reply_markup_config = ReplyKeyboardMarkup(config_keyboard, resize_keyboard=True)
+
+        reply_markup_maintenance = ReplyKeyboardMarkup(
+            maintenance_keyboard, resize_keyboard=True
         )
 
-        if update.message.text in ['Begin', 'Go back']:
-            message = 'Please select one of the options.'
-            update.message.reply_text(
-                message,
-                reply_markup=reply_markup
-            )
+        if update.message.text in ["Begin", "⬅️ Back"]:
+            message = "Please select one of the options."
+            update.message.reply_text(message, reply_markup=reply_markup)
 
-        elif update.message.text == '🔍 Check bot status':
+        elif update.message.text in ["Go back", "OK", "⚙️ Configurations"]:
+            message = "Please select one of the options."
+            update.message.reply_text(message, reply_markup=reply_markup_config)
 
-            update.message.reply_text(
-                self.__btn_check_status(),
-                reply_markup=reply_markup
-            )
+        elif update.message.text in ["🛠 Maintenance", "Cancel update", "OK 👌"]:
+            message = "Please select one of the options."
+            update.message.reply_text(message, reply_markup=reply_markup_maintenance)
 
-        elif update.message.text == '👛 Edit coin list':
-            re = self.__btn_edit_coin()
-            if re[1]:
+        elif update.message.text == "💵 Current value":
+            for m in self.__btn_current_value():
                 update.message.reply_text(
-                    re[0],
-                    reply_markup=ReplyKeyboardRemove(),
-                    parse_mode='MarkdownV2'
-                )
-                return EDIT_COIN_LIST
-            else:
-                update.message.reply_text(
-                    re[0],
-                    reply_markup=reply_markup,
-                    parse_mode='MarkdownV2'
+                    m, reply_markup=reply_markup, parse_mode="MarkdownV2"
                 )
 
-        elif update.message.text == '▶ Start trade bot':
+        elif update.message.text == "📈 Progress":
+            for m in self.__btn_check_progress():
+                update.message.reply_text(
+                    m, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                )
+
+        elif update.message.text == "➗ Current ratios":
+            for m in self.__btn_current_ratios():
+                update.message.reply_text(
+                    m, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                )
+
+        elif update.message.text == "🔍 Check bot status":
+            update.message.reply_text(
+                self.__btn_check_status(), reply_markup=reply_markup
+            )
+
+        elif update.message.text == "⌛ Trade History":
+            for m in self.__btn_trade_history():
+                update.message.reply_text(
+                    m, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                )
+
+        elif update.message.text == "▶ Start trade bot":
             update.message.reply_text(
                 self.__btn_start_bot(),
-                reply_markup=reply_markup,
-                parse_mode='MarkdownV2'
+                reply_markup=reply_markup_config,
+                parse_mode="MarkdownV2",
             )
 
-        elif update.message.text == '⏹ Stop trade bot':
+        elif update.message.text == "⏹ Stop trade bot":
             update.message.reply_text(
-                self.__btn_stop_bot(),
-                reply_markup=reply_markup
+                self.__btn_stop_bot(), reply_markup=reply_markup_config
             )
 
-        elif update.message.text == '❌ Delete database':
+        elif update.message.text == "📜 Read last log lines":
             update.message.reply_text(
-                self.__btn_delete_db(),
-                reply_markup=reply_markup,
-                parse_mode='MarkdownV2'
+                self.__btn_read_log(),
+                reply_markup=reply_markup_config,
+                parse_mode="MarkdownV2",
             )
 
-        elif update.message.text == '⚙ Edit user.cfg':
+        elif update.message.text == "❌ Delete database":
+            re = self.__btn_delete_db()
+            if re[1]:
+                kb = [["⚠ Confirm", "Go back"]]
+                update.message.reply_text(
+                    re[0],
+                    reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                    parse_mode="MarkdownV2",
+                )
+                return DELETE_DB
+            else:
+                update.message.reply_text(
+                    re[0], reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                )
+
+        elif update.message.text == "⚙ Edit user.cfg":
             re = self.__btn_edit_user_cfg()
             if re[1]:
                 update.message.reply_text(
-                    re[0],
-                    reply_markup=ReplyKeyboardRemove(),
-                    parse_mode='MarkdownV2'
+                    re[0], reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
                 )
                 return EDIT_USER_CONFIG
             else:
                 update.message.reply_text(
-                    re[0],
-                    reply_markup=reply_markup,
-                    parse_mode='MarkdownV2'
+                    re[0], reply_markup=reply_markup_config, parse_mode="MarkdownV2"
                 )
 
-        elif update.message.text == '📜 Read last log lines':
-            update.message.reply_text(
-                self.__btn_read_log(),
-                reply_markup=reply_markup,
-                parse_mode='MarkdownV2'
-            )
-
-        elif update.message.text == '📈 Current stats':
-            for m in self.__btn_current_stats():
+        elif update.message.text == "👛 Edit coin list":
+            re = self.__btn_edit_coin()
+            if re[1]:
                 update.message.reply_text(
-                    m,
-                    reply_markup=reply_markup,
-                    parse_mode='MarkdownV2'
+                    re[0], reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
+                )
+                return EDIT_COIN_LIST
+            else:
+                update.message.reply_text(
+                    re[0], reply_markup=reply_markup_config, parse_mode="MarkdownV2"
                 )
 
-        return MENU
+        elif update.message.text == "📤 Export database":
+            re = self.__btn_export_db()
+            update.message.reply_text(
+                re[0], reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+            )
+            if re[1] is not None:
+                self.bot.send_document(
+                    chat_id=update.message.chat_id,
+                    document=re[1],
+                    filename="crypto_trading.db",
+                )
 
-    def __edit_coin(self, update: Update, _: CallbackContext) -> int:
-        self.logger.info(f'Editing coin list. ({update.message.text})')
+        elif update.message.text == "Update Telegram Bot":
+            re = self.__btn_update_tg_bot()
+            if re[1]:
+                kb = [["Update", "Cancel update"]]
+                update.message.reply_text(
+                    re[0],
+                    reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                    parse_mode="MarkdownV2",
+                )
+                return UPDATE_TG
+            else:
+                update.message.reply_text(
+                    re[0],
+                    reply_markup=reply_markup_maintenance,
+                    parse_mode="MarkdownV2",
+                )
 
-        if update.message.text != '/stop':
-            message = f'✔ Successfully edited coin list file to:\n\n```\n{update.message.text}\n```'.replace('.', '\.')
-            coin_file_path = 'config/supported_coin_list'
-            try:
-                copyfile(coin_file_path, f'{coin_file_path}.backup')
-                with open(coin_file_path, 'w') as f:
-                    f.write(update.message.text + '\n')
-            except:
-                message = '❌ Unable to edit coin list file\.'
-        else:
-            message = '👌 Exited without changes\.\nYour `supported_coin_list` file was *not* modified\.'
-
-        keyboard = [['Go back']]
-        reply_markup = ReplyKeyboardMarkup(
-            keyboard,
-            resize_keyboard=True
-        )
-        update.message.reply_text(
-            message,
-            reply_markup=reply_markup,
-            parse_mode='MarkdownV2'
-        )
+        elif update.message.text == "Update Binance Trade Bot":
+            re = self.__btn_update_btb()
+            if re[1]:
+                kb = [["Update", "Cancel update"]]
+                update.message.reply_text(
+                    re[0],
+                    reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                    parse_mode="MarkdownV2",
+                )
+                return UPDATE_BTB
+            else:
+                update.message.reply_text(
+                    re[0],
+                    reply_markup=reply_markup_maintenance,
+                    parse_mode="MarkdownV2",
+                )
 
         return MENU
 
     def __edit_user_config(self, update: Update, _: CallbackContext) -> int:
-        self.logger.info(f'Editing user configuration. ({update.message.text})')
+        self.logger.info(f"Editing user configuration. ({update.message.text})")
 
-        if update.message.text != '/stop':
-            message = f'✔ Successfully edited user configuration file to:\n\n```\n{update.message.text}\n```'.replace('.', '\.')
-            user_cfg_file_path = 'config/user.cfg'
+        if update.message.text != "/stop":
+            message = f"✔ Successfully edited user configuration file to:\n\n```\n{update.message.text}\n```".replace(
+                ".", "\."
+            )
+            user_cfg_file_path = f"config/user.cfg"
             try:
-                copyfile(user_cfg_file_path, f'{user_cfg_file_path}.backup')
-                with open(user_cfg_file_path, 'w') as f:
-                    f.write(update.message.text + '\n\n\n')
+                copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
+                with open(user_cfg_file_path, "w") as f:
+                    f.write(update.message.text + "\n\n\n")
             except:
-                message = '❌ Unable to edit user configuration file\.'
+                message = "❌ Unable to edit user configuration file\."
         else:
-            message = '👌 Exited without changes\.\nYour `user.cfg` file was *not* modified\.'
+            message = (
+                "👌 Exited without changes\.\nYour `user.cfg` file was *not* modified\."
+            )
 
-        keyboard = [['Go back']]
-        reply_markup = ReplyKeyboardMarkup(
-            keyboard,
-            resize_keyboard=True
-        )
+        keyboard = [["Go back"]]
+        reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         update.message.reply_text(
-            message,
-            reply_markup=reply_markup,
-            parse_mode='MarkdownV2'
+            message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
+
+        return MENU
+
+    def __edit_coin(self, update: Update, _: CallbackContext) -> int:
+        self.logger.info(f"Editing coin list. ({update.message.text})")
+
+        if update.message.text != "/stop":
+            message = f"✔ Successfully edited coin list file to:\n\n```\n{update.message.text}\n```".replace(
+                ".", "\."
+            )
+            coin_file_path = f"config/supported_coin_list"
+            try:
+                copyfile(coin_file_path, f"{coin_file_path}.backup")
+                with open(coin_file_path, "w") as f:
+                    f.write(update.message.text + "\n")
+            except:
+                message = "❌ Unable to edit coin list file\."
+        else:
+            message = "👌 Exited without changes\.\nYour `supported_coin_list` file was *not* modified\."
+
+        keyboard = [["Go back"]]
+        reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+        update.message.reply_text(
+            message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+        )
+
+        return MENU
+
+    def __delete_db(self, update: Update, _: CallbackContext) -> int:
+        self.logger.info(
+            f"Asking if the user really wants to delete the db. ({update.message.text})"
+        )
+
+        if update.message.text != "Go back":
+            message = "✔ Successfully deleted database file\."
+            db_file_path = f"binance-trade-bot/data/crypto_trading.db"
+            try:
+                copyfile(db_file_path, f"{db_file_path}.backup")
+                os.remove(db_file_path)
+            except:
+                message = "❌ Unable to delete database file\."
+        else:
+            message = "👌 Exited without changes\.\nYour database was *not* deleted\."
+
+        keyboard = [["OK"]]
+        reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+        update.message.reply_text(
+            message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+        )
+
+        return MENU
+
+    def __update_tg_bot(self, update: Update, _: CallbackContext) -> int:
+        self.logger.info(f"Updating BTB Manager Telegram. ({update.message.text})")
+
+        if update.message.text != "Cancel update":
+            message = "The bot is updating\.\nWait a few seconds then start the bot again with /start"
+            keyboard = [["/start"]]
+            reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+            update.message.reply_text(
+                message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            )
+            try:
+                subprocess.call(
+                    "kill -9 $(ps ax | grep BTBManagerTelegram | fgrep -v grep | awk '{ print $1 }') && git pull && $(which python3) -m pip install -r requirements.txt && $(which python3) BTBManagerTelegram.py &",
+                    shell=True,
+                )
+            except:
+                message = "Unable to update BTB Manager Telegram"
+                update.message.reply_text(
+                    message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                )
+        else:
+            message = (
+                "👌 Exited without changes\.\nBTB Manager Telegram was *not* updated\."
+            )
+            keyboard = [["OK 👌"]]
+            reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+            update.message.reply_text(
+                message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            )
+
+        return MENU
+
+    def __update_btb(self, update: Update, _: CallbackContext) -> int:
+        self.logger.info(f"Updating Binance Trade Bot. ({update.message.text})")
+
+        keyboard = [["OK 👌"]]
+        reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+
+        if update.message.text != "Cancel update":
+            message = "The bot is updating\.\nWait a few seconds, the bot will restart automatically\."
+            update.message.reply_text(
+                message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            )
+            try:
+                self.__find_and_kill_process()
+                subprocess.call(
+                    f"git pull && $(which python3) -m pip install -r requirements.txt && $(which python3) -m binance_trade_bot &",
+                    shell=True,
+                )
+            except:
+                message = "Unable to update Binance Trade Bot"
+                update.message.reply_text(
+                    message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                )
+        else:
+            message = (
+                "👌 Exited without changes\.\nBinance Trade Bot was *not* updated\."
+            )
+            update.message.reply_text(
+                message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            )
 
         return MENU
 
     @staticmethod
     def __find_process():
         for p in psutil.process_iter():
-            if 'binance_trade_bot' in p.name() or 'binance_trade_bot' in ' '.join(p.cmdline()):
+            if "binance_trade_bot" in p.name() or "binance_trade_bot" in " ".join(
+                p.cmdline()
+            ):
                 return True
         return False
 
     def __find_and_kill_process(self):
         try:
             for p in psutil.process_iter():
-                if 'binance_trade_bot' in p.name() or 'binance_trade_bot' in ' '.join(p.cmdline()):
+                if "binance_trade_bot" in p.name() or "binance_trade_bot" in " ".join(
+                    p.cmdline()
+                ):
                     p.terminate()
                     p.wait()
         except Exception as e:
-            self.logger.info(f'ERROR: {e}')
+            self.logger.info(f"ERROR: {e}")
 
     @staticmethod
     def __4096_cutter(m_list):
-        message = ['']
+        message = [""]
         index = 0
         for m in m_list:
             if len(message[index]) + len(m) <= 4096:
@@ -274,101 +480,120 @@ class BTBManagerTelegram:
                 index += 1
         return message
 
-    def __btn_check_status(self):
-        self.logger.info('Check status button pressed.')
+    # BUTTONS
+    def __btn_current_value(self):
+        self.logger.info("Current value button pressed.")
 
-        message = '⚠ Binance Trade Bot is not running.'
-        if self.__find_process():
-            message = '✔ Binance Trade Bot is running.'
-        return  message
+        db_file_path = f"binance-trade-bot/data/crypto_trading.db"
+        message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
+        if os.path.exists(db_file_path):
+            try:
+                con = sqlite3.connect(db_file_path)
+                cur = con.cursor()
 
-    def __btn_edit_coin(self):
-        self.logger.info('Edit coin list button pressed.')
-
-        message = '⚠ Please stop Binance Trade Bot before editing the coin list\.'
-        edit = False
-        coin_file_path = 'config/supported_coin_list'
-        if not self.__find_process():
-            if os.path.exists(coin_file_path):
-                with open(coin_file_path) as f:
-                    message = f'Current coin list is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated coin list*_.\n\nWrite /stop to stop editing and exit without changes.'.replace('.', '\.')
-                    edit = True
-            else:
-                message = f'❌ Unable to find coin list file at `{coin_file_path}`.'.replace('.', '\.')
-        return [message, edit]
-
-    def __btn_start_bot(self):
-        self.logger.info('Start bot button pressed.')
-
-        message = '⚠ Binance Trade Bot is already running\.'
-        if not self.__find_process():
-            if os.path.exists('binance_trade_bot/'):
-                subprocess.call('$(which python3) -m binance_trade_bot &', shell=True)
-                if not self.__find_process():
-                    message = '❌ Unable to start Binance Trade Bot\.'
-                else:
-                    message = '✔ Binance Trade Bot successfully started\.'
-            else:
-                message = '❌ Unable to find _Binance Trade Bot_ installation in this directory\.\nMake sure the `BTBManagerTelegram.py` file is in the _Binance Trade Bot_ installation folder\.'
-        return message
-
-    def __btn_stop_bot(self):
-        self.logger.info('Stop bot button pressed.')
-
-        message = '⚠ Binance Trade Bot is not running.'
-        if self.__find_process():
-            self.__find_and_kill_process()
-            if not self.__find_process():
-                message = '✔ Successfully stopped the bot.'
-            else:
-                message = '❌ Unable to stop Binance Trade Bot.\n\nIf you are running the telegram bot on Windows make sure to run with administrator privileges.'
-        return message
-
-    def __btn_delete_db(self):
-        self.logger.info('Delete database button pressed.')
-
-        message = '⚠ Please stop Binance Trade Bot before deleting the database file\.'
-        db_file_path = 'binance_trade_bot/data/crypto_trading.db'
-        if not self.__find_process():
-            if os.path.exists(db_file_path):
+                # Get current coin symbol, bridge symbol, order state, order size, initial buying price
                 try:
-                    copyfile(db_file_path, f'{db_file_path}.backup')
-                    os.remove(db_file_path)
-                    message = '✔ Successfully deleted database file\.'
+                    cur.execute(
+                        """SELECT alt_coin_id, crypto_coin_id, state, crypto_starting_balance, crypto_trade_amount FROM trade_history ORDER BY datetime DESC LIMIT 1;"""
+                    )
+                    current_coin, bridge, state, order_size, buy_price = cur.fetchone()
+                    if current_coin is None:
+                        raise Exception()
+                    if state == "ORDERED":
+                        return [
+                            f"A buy order of `{round(order_size, 2)}` *{bridge}* is currently placed on coin *{current_coin}*.\n\n_Waiting for buy order to complete_.".replace(
+                                ".", "\."
+                            )
+                        ]
                 except:
-                    message = '❌ Unable to delete database file\.'
-            else:
-                message = f'⚠ Unable to find database file at `{db_file_path}`.'.replace('.', '\.')
+                    con.close()
+                    return [f"❌ Unable to fetch current coin from database\."]
+
+                # Get balance, current coin price in USD, current coin price in BTC
+                try:
+                    cur.execute(
+                        f"""SELECT balance, usd_price, btc_price, datetime FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;"""
+                    )
+                    query = cur.fetchone()
+                    if query is None:
+                        return [
+                            f"❌ No information about *{current_coin}* available in the database\.",
+                            f"⚠ If you tried using the `Current value` button during a trade please try again after the trade has been completed\.",
+                        ]
+                    balance, usd_price, btc_price, last_update = query
+                    if balance is None:
+                        balance = 0
+                    if usd_price is None:
+                        usd_price = 0
+                    if btc_price is None:
+                        btc_price = 0
+                    last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
+                except:
+                    con.close()
+                    return [
+                        f"❌ Unable to fetch current coin information from database\.",
+                        f"⚠ If you tried using the `Current value` button during a trade please try again after the trade has been completed\.",
+                    ]
+
+                # Generate message
+                try:
+                    m_list = [
+                        f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` *{current_coin}*\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` *USD*\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` *BTC*\n\n\t_Initially bought for_ {round(buy_price, 2)} *{bridge}*\n'.replace(
+                            ".", "\."
+                        )
+                    ]
+                    message = self.__4096_cutter(m_list)
+                    con.close()
+                except:
+                    con.close()
+                    return [
+                        f"❌ Something went wrong, unable to generate value at this time\."
+                    ]
+            except:
+                message = ["❌ Unable to perform actions on the database\."]
         return message
 
-    def __btn_edit_user_cfg(self):
-        self.logger.info('Edit user configuration button pressed.')
+    def __btn_check_progress(self):
+        self.logger.info("Progress button pressed.")
 
-        message = '⚠ Please stop Binance Trade Bot before editing user configuration file\.'
-        edit = False
-        user_cfg_file_path = f'{self.root_path}user.cfg'
-        if not self.__find_process():
-            if os.path.exists(user_cfg_file_path):
-                with open(user_cfg_file_path) as f:
-                    message = f'Current configuration file is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated configuration*_.\n\nWrite /stop to stop editing and exit without changes.'.replace('.', '\.')
-                    edit = True
-            else:
-                message = f'❌ Unable to find user configuration file at `{user_cfg_file_path}`.'.replace('.', '\.')
-        return [message, edit]
+        db_file_path = f"binance-trade-bot/data/crypto_trading.db"
+        user_cfg_file_path = f"config/user.cfg"
+        message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
+        if os.path.exists(db_file_path):
+            try:
+                con = sqlite3.connect(db_file_path)
+                cur = con.cursor()
 
-    def __btn_read_log(self):
-        self.logger.info('Read log button pressed.')
+                # Get progress information
+                try:
+                    cur.execute(
+                        """SELECT th1.alt_coin_id AS coin, th1.alt_trade_amount AS amount, th1.crypto_trade_amount AS priceInUSD,(th1.alt_trade_amount - ( SELECT th2.alt_trade_amount FROM trade_history th2 WHERE th2.alt_coin_id = th1.alt_coin_id AND th1.datetime > th2.datetime AND th2.selling = 0 ORDER BY th2.datetime DESC LIMIT 1)) AS change, datetime FROM trade_history th1 WHERE th1.state = 'COMPLETE' AND th1.selling = 0 ORDER BY th1.datetime DESC LIMIT 15"""
+                    )
+                    query = cur.fetchall()
 
-        log_file_path = f'{self.root_path}logs/crypto_trading.log'
-        message = f'❌ Unable to find log file at `{log_file_path}`.'.replace('.', '\.')
-        if os.path.exists(log_file_path):
-            with open(log_file_path) as f:
-                file_content = f.read().replace('.', '\.')[-4000:]
-                message = f'Last *4000* characters in log file:\n\n```\n{file_content}\n```'
+                    # Generate message
+                    m_list = [f"Current coin amount progress:\n\n"]
+                    for coin in query:
+                        last_trade_date = datetime.strptime(
+                            coin[4], "%Y-%m-%d %H:%M:%S.%f"
+                        ).strftime("%H:%M:%S %d/%m/%Y")
+                        m_list.append(
+                            f'*{coin[0]}*\n\t\- Amount: `{round(coin[1], 6)}` *{coin[0]}*\n\t\- Price: `{round(coin[2], 2)}` *USD*\n\t\- Change: {f"`{round(coin[3], 2)}` *{coin[0]}*" if coin[3] is not None else f"`{coin[3]}`"}\n\t\- Last trade: `{last_trade_date}`\n\n'.replace(
+                                ".", "\."
+                            )
+                        )
+
+                    message = self.__4096_cutter(m_list)
+                    con.close()
+                except:
+                    con.close()
+                    return [f"❌ Unable to fetch progress information from database\."]
+            except:
+                message = ["❌ Unable to perform actions on the database\."]
         return message
 
-    def __btn_current_stats(self):
-        self.logger.info('Current stats button pressed.')
+    def __btn_current_ratios(self):
+        self.logger.info("Current ratios button pressed.")
 
         db_file_path = 'binance_trade_bot/data/crypto_trading.db'
         user_cfg_file_path = 'config/user.cfg'
@@ -379,61 +604,266 @@ class BTBManagerTelegram:
                 with open(user_cfg_file_path) as cfg:
                     config = ConfigParser()
                     config.read_file(cfg)
-                    bridge = config.get('binance_user_config', 'bridge')
+                    bridge = config.get("binance_user_config", "bridge")
 
                 con = sqlite3.connect(db_file_path)
                 cur = con.cursor()
 
                 # Get current coin symbol
                 try:
-                    cur.execute('''SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1;''')
+                    cur.execute(
+                        """SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1;"""
+                    )
                     current_coin = cur.fetchone()[0]
                     if current_coin is None:
                         raise Exception()
                 except:
                     con.close()
-                    return [f'❌ Unable to fetch current coin from database\.']
-
-                # Get balance, current coin price in USD, current coin price in BTC
-                try:
-                    cur.execute(f'''SELECT balance, usd_price, btc_price FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;''')
-                    balance, usd_price, btc_price = cur.fetchone()
-                    if balance is None: balance = 0
-                    if usd_price is None: usd_price = 0
-                    if btc_price is None: btc_price = 0
-                except:
-                    con.close()
-                    return [f'❌ Unable to fetch current coin information from database\.', f'⚠ If you tried using the `Current stats` button during a trade please try again after the trade has been completed\.']
+                    return [f"❌ Unable to fetch current coin from database\."]
 
                 # Get prices and ratios of all alt coins
                 try:
-                    cur.execute(f'''SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ( ( ( current_coin_price / other_coin_price ) - 0.001 * 5 * ( current_coin_price / other_coin_price ) ) - sh.target_ratio ) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs WHERE pairs.from_coin_id='{current_coin}');''')
+                    cur.execute(
+                        f"""SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ( ( ( current_coin_price / other_coin_price ) - 0.001 * 5 * ( current_coin_price / other_coin_price ) ) - sh.target_ratio ) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs WHERE pairs.from_coin_id='{current_coin}');"""
+                    )
                     query = cur.fetchall()
 
                     # Generate message
-                    last_update = datetime.strptime(query[0][0], '%Y-%m-%d %H:%M:%S.%f')
+                    last_update = datetime.strptime(query[0][0], "%Y-%m-%d %H:%M:%S.%f")
                     query = sorted(query, key=lambda k: k[-1], reverse=True)
 
-                    m_list = [f'\nLast update: `{last_update.strftime("%d/%m/%Y %H:%M:%S")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` $\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n*Other coins:*\n'.replace('.', '\.')]
+                    m_list = [
+                        f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Coin ratios compared to {current_coin}:*\n'.replace(
+                            ".", "\."
+                        )
+                    ]
                     for coin in query:
-                        m_list.append(f'{coin[1]}:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n'.replace('.', '\.'))
+                        m_list.append(
+                            f"*{coin[1]}*:\n\t\- Price: `{coin[2]}` *{bridge}*\n\t\- Ratio: `{round(coin[3], 6)}`\n\n".replace(
+                                ".", "\."
+                            )
+                        )
 
                     message = self.__4096_cutter(m_list)
                     con.close()
                 except:
                     con.close()
-                    return [f'❌ Something went wrong, unable to generate stats at this time\.']
+                    return [
+                        f"❌ Something went wrong, unable to generate ratios at this time\."
+                    ]
             except:
-                message = ['❌ Unable to perform actions on the database\.']
+                message = ["❌ Unable to perform actions on the database\."]
         return message
 
+    def __btn_check_status(self):
+        self.logger.info("Check status button pressed.")
 
+        message = "⚠ Binance Trade Bot is not running."
+        if self.__find_process():
+            message = "✔ Binance Trade Bot is running."
+        return message
+
+    def __btn_trade_history(self):
+        self.logger.info("Trade history button pressed.")
+
+        db_file_path = f"binance-trade-bot/data/crypto_trading.db"
+        message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
+        if os.path.exists(db_file_path):
+            try:
+                con = sqlite3.connect(db_file_path)
+                cur = con.cursor()
+
+                # Get last 10 trades
+                try:
+                    cur.execute(
+                        """SELECT alt_coin_id, crypto_coin_id, selling, state, alt_trade_amount, crypto_trade_amount, datetime FROM trade_history ORDER BY datetime DESC LIMIT 10;"""
+                    )
+                    query = cur.fetchall()
+
+                    m_list = [
+                        f"Last **{10 if len(query) > 10 else len(query)}** trades:\n\n"
+                    ]
+                    for trade in query:
+                        d = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
+                        m = f'`{d.strftime("%H:%M:%S %d/%m/%Y")}`\n*{"Sold" if trade[2] else "Bought"}* `{round(trade[4], 6)}` *{trade[0]}*{f" for `{round(trade[5], 2)}` *{trade[1]}*" if trade[5] is not None else ""}\nStatus: _*{trade[3]}*_\n\n'
+                        m_list.append(m.replace(".", "\."))
+
+                    message = self.__4096_cutter(m_list)
+                    con.close()
+                except:
+                    con.close()
+                    return [
+                        f"❌ Something went wrong, unable to generate trade history at this time\."
+                    ]
+            except:
+                message = ["❌ Unable to perform actions on the database\."]
+        return message
+
+    def __btn_start_bot(self):
+        self.logger.info("Start bot button pressed.")
+
+        message = "⚠ Binance Trade Bot is already running\."
+        if not self.__find_process():
+            if os.path.exists(f"binance_trade_bot/"):
+                subprocess.call(
+                    f"$(which python3) -m binance_trade_bot &",
+                    shell=True,
+                )
+                if not self.__find_process():
+                    message = "❌ Unable to start Binance Trade Bot\."
+                else:
+                    message = "✔ Binance Trade Bot successfully started\."
+            else:
+                message = "❌ Unable to find _Binance Trade Bot_ installation in this directory\.\nMake sure the `BTBManagerTelegram.py` file is in the _Binance Trade Bot_ installation folder\."
+        return message
+
+    def __btn_stop_bot(self):
+        self.logger.info("Stop bot button pressed.")
+
+        message = "⚠ Binance Trade Bot is not running."
+        if self.__find_process():
+            self.__find_and_kill_process()
+            if not self.__find_process():
+                message = "✔ Successfully stopped the bot."
+            else:
+                message = "❌ Unable to stop Binance Trade Bot.\n\nIf you are running the telegram bot on Windows make sure to run with administrator privileges."
+        return message
+
+    def __btn_read_log(self):
+        self.logger.info("Read log button pressed.")
+
+        log_file_path = f"logs/crypto_trading.log"
+        message = f"❌ Unable to find log file at `{log_file_path}`.".replace(".", "\.")
+        if os.path.exists(log_file_path):
+            with open(log_file_path) as f:
+                file_content = f.read().replace(".", "\.")[-4000:]
+                message = (
+                    f"Last *4000* characters in log file:\n\n```\n{file_content}\n```"
+                )
+        return message
+
+    def __btn_delete_db(self):
+        self.logger.info("Delete database button pressed.")
+
+        message = "⚠ Please stop Binance Trade Bot before deleting the database file\."
+        delete = False
+        db_file_path = f"binance-trade-bot/data/crypto_trading.db"
+        if not self.__find_process():
+            if os.path.exists(db_file_path):
+                message = "Are you sure you want to delete the database file?"
+                delete = True
+            else:
+                message = (
+                    f"⚠ Unable to find database file at `{db_file_path}`.".replace(
+                        ".", "\."
+                    )
+                )
+        return [message, delete]
+
+    def __btn_edit_user_cfg(self):
+        self.logger.info("Edit user configuration button pressed.")
+
+        message = (
+            "⚠ Please stop Binance Trade Bot before editing user configuration file\."
+        )
+        edit = False
+        user_cfg_file_path = f"config/user.cfg"
+        if not self.__find_process():
+            if os.path.exists(user_cfg_file_path):
+                with open(user_cfg_file_path) as f:
+                    message = f"Current configuration file is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated configuration*_.\n\nWrite /stop to stop editing and exit without changes.".replace(
+                        ".", "\."
+                    )
+                    edit = True
+            else:
+                message = f"❌ Unable to find user configuration file at `{user_cfg_file_path}`.".replace(
+                    ".", "\."
+                )
+        return [message, edit]
+
+    def __btn_edit_coin(self):
+        self.logger.info("Edit coin list button pressed.")
+
+        message = "⚠ Please stop Binance Trade Bot before editing the coin list\."
+        edit = False
+        coin_file_path = f"config/supported_coin_list"
+        if not self.__find_process():
+            if os.path.exists(coin_file_path):
+                with open(coin_file_path) as f:
+                    message = f"Current coin list is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated coin list*_.\n\nWrite /stop to stop editing and exit without changes.".replace(
+                        ".", "\."
+                    )
+                    edit = True
+            else:
+                message = (
+                    f"❌ Unable to find coin list file at `{coin_file_path}`.".replace(
+                        ".", "\."
+                    )
+                )
+        return [message, edit]
+
+    def __btn_export_db(self):
+        self.logger.info("Export database button pressed.")
+
+        message = "⚠ Please stop Binance Trade Bot before exporting the database file\."
+        db_file_path = f"binance-trade-bot/data/crypto_trading.db"
+        fil = None
+        if not self.__find_process():
+            if os.path.exists(db_file_path):
+                with open(db_file_path, "rb") as db:
+                    fil = db.read()
+                message = "Here is your database file:"
+            else:
+                message = "❌ Unable to Export the database file\."
+        return [message, fil]
+
+    def __btn_update_tg_bot(self):
+        self.logger.info("Update Telegram bot button pressed.")
+
+        p = subprocess.Popen(
+            ["bash", "-c", "git remote update && git status -uno"],
+            stdout=subprocess.PIPE,
+        )
+        output, _ = p.communicate()
+        upd = False
+        message = "Your BTB Manager Telegram installation is already up to date\."
+        if "Your branch is behind" in str(output):
+            message = "An update for BTB Manager Telegram is available\.\nWould you like to update now?"
+            upd = True
+        return [message, upd]
+
+    def __btn_update_btb(self):
+        self.logger.info("Update Binance Trade Bot button pressed.")
+
+        upd = False
+        try:
+            p = subprocess.Popen(
+                [
+                    "bash",
+                    "-c",
+                    "cd ../binance-trade-bot && git remote update && git status -uno",
+                ],
+                stdout=subprocess.PIPE,
+            )
+            output, _ = p.communicate()
+
+            message = "Your Binance Trade Bot installation is already up to date\."
+            if "Your branch is behind" in str(output):
+                message = "An update for Binance Trade Bot is available\.\nWould you like to update now?"
+                upd = True
+        except:
+            message = (
+                "Error while trying to fetch Binance Trade Bot version information\."
+            )
+        return [message, upd]
+
+    # STOP CONVERSATION
     def __cancel(self, update: Update, _: CallbackContext) -> int:
-        self.logger.info('Conversation canceled.')
+        self.logger.info("Conversation canceled.")
 
         update.message.reply_text(
-            'Bye! I hope we can talk again some day.',
-            reply_markup=ReplyKeyboardRemove()
+            "Bye! I hope we can talk again some day.",
+            reply_markup=ReplyKeyboardRemove(),
         )
         return ConversationHandler.END
 
