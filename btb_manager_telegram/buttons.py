@@ -251,7 +251,7 @@ def start_bot():
             else:
                 message = "✔ Binance Trade Bot successfully started\."
         else:
-            message = "❌ Unable to find _Binance Trade Bot_ installation in this directory\.\nMake sure the `BTBManagerTelegram.py` file is in the _Binance Trade Bot_ installation folder\."
+            message = f"❌ Unable to find _Binance Trade Bot_ installation at {settings.ROOT_PATH}\.\nMake sure the `binance-trade-bot` and `BTB-manager-telegram` are in the same parent directory\."
     return message
 
 

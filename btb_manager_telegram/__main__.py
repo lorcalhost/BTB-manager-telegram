@@ -48,8 +48,7 @@ def pre_run_main() -> None:
     if settings.TOKEN is None or settings.USER_ID is None:
         setup_telegram_constants()
 
-    settings.TG_UPDATE_BROADCASTED_BEFORE = False
-    settings.BTB_UPDATE_BROADCASTED_BEFORE = False
+    # Setup update notifications scheduler
     scheduler.enter(1, 1, update_checker)
     time.sleep(1)
     scheduler.run(blocking=False)
