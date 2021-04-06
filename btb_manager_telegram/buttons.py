@@ -38,7 +38,7 @@ def current_value():
                             ".", "\."
                         )
                     ]
-            except:
+            except Exception:
                 con.close()
                 return [f"❌ Unable to fetch current coin from database\."]
 
@@ -61,7 +61,7 @@ def current_value():
                 if btc_price is None:
                     btc_price = 0
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
-            except:
+            except Exception:
                 con.close()
                 return [
                     f"❌ Unable to fetch current coin information from database\.",
@@ -77,12 +77,12 @@ def current_value():
                 ]
                 message = text_4096_cutter(m_list)
                 con.close()
-            except:
+            except Exception:
                 con.close()
                 return [
                     f"❌ Something went wrong, unable to generate value at this time\."
                 ]
-        except:
+        except Exception:
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -91,7 +91,6 @@ def check_progress():
     logger.info("Progress button pressed.")
 
     db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
-    user_cfg_file_path = f"{settings.ROOT_PATH}user.cfg"
     message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
     if os.path.exists(db_file_path):
         try:
@@ -119,10 +118,10 @@ def check_progress():
 
                 message = text_4096_cutter(m_list)
                 con.close()
-            except:
+            except Exception:
                 con.close()
                 return [f"❌ Unable to fetch progress information from database\."]
-        except:
+        except Exception:
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -152,7 +151,7 @@ def current_ratios():
                 current_coin = cur.fetchone()[0]
                 if current_coin is None:
                     raise Exception()
-            except:
+            except Exception:
                 con.close()
                 return [f"❌ Unable to fetch current coin from database\."]
 
@@ -181,12 +180,12 @@ def current_ratios():
 
                 message = text_4096_cutter(m_list)
                 con.close()
-            except:
+            except Exception:
                 con.close()
                 return [
                     f"❌ Something went wrong, unable to generate ratios at this time\."
                 ]
-        except:
+        except Exception:
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -221,18 +220,18 @@ def trade_history():
                     f"Last **{10 if len(query) > 10 else len(query)}** trades:\n\n"
                 ]
                 for trade in query:
-                    d = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
-                    m = f'`{d.strftime("%H:%M:%S %d/%m/%Y")}`\n*{"Sold" if trade[2] else "Bought"}* `{round(trade[4], 6)}` *{trade[0]}*{f" for `{round(trade[5], 2)}` *{trade[1]}*" if trade[5] is not None else ""}\nStatus: _*{trade[3]}*_\n\n'
-                    m_list.append(m.replace(".", "\."))
+                    date = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
+                    mes = f'`{date.strftime("%H:%M:%S %d/%m/%Y")}`\n*{"Sold" if trade[2] else "Bought"}* `{round(trade[4], 6)}` *{trade[0]}*{f" for `{round(trade[5], 2)}` *{trade[1]}*" if trade[5] is not None else ""}\nStatus: _*{trade[3]}*_\n\n'
+                    m_list.append(mes.replace(".", "\."))
 
                 message = text_4096_cutter(m_list)
                 con.close()
-            except:
+            except Exception:
                 con.close()
                 return [
                     f"❌ Something went wrong, unable to generate trade history at this time\."
                 ]
-        except:
+        except Exception:
             message = ["❌ Unable to perform actions on the database\."]
     return message
 

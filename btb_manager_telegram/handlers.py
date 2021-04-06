@@ -71,30 +71,30 @@ def menu(update: Update, _: CallbackContext) -> int:
         update.message.reply_text(message, reply_markup=reply_markup_maintenance)
 
     elif update.message.text == "💵 Current value":
-        for m in buttons.current_value():
+        for mes in buttons.current_value():
             update.message.reply_text(
-                m, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == "📈 Progress":
-        for m in buttons.check_progress():
+        for mes in buttons.check_progress():
             update.message.reply_text(
-                m, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == "➗ Current ratios":
-        for m in buttons.current_ratios():
+        for mes in buttons.current_ratios():
             update.message.reply_text(
-                m, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == "🔍 Check bot status":
         update.message.reply_text(buttons.check_status(), reply_markup=reply_markup)
 
     elif update.message.text == "⌛ Trade History":
-        for m in buttons.trade_history():
+        for mes in buttons.trade_history():
             update.message.reply_text(
-                m, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == "▶ Start trade bot":
@@ -238,7 +238,7 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
             copyfile(coin_file_path, f"{coin_file_path}.backup")
             with open(coin_file_path, "w") as f:
                 f.write(update.message.text + "\n")
-        except:
+        except Exception:
             message = "❌ Unable to edit coin list file\."
     else:
         message = "👌 Exited without changes\.\nYour `supported_coin_list` file was *not* modified\."
@@ -264,7 +264,7 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
             copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
             with open(user_cfg_file_path, "w") as f:
                 f.write(update.message.text + "\n\n\n")
-        except:
+        except Exception:
             message = "❌ Unable to edit user configuration file\."
     else:
         message = (
@@ -291,7 +291,7 @@ def delete_db(update: Update, _: CallbackContext) -> int:
         try:
             copyfile(db_file_path, f"{db_file_path}.backup")
             os.remove(db_file_path)
-        except:
+        except Exception:
             message = "❌ Unable to delete database file\."
     else:
         message = "👌 Exited without changes\.\nYour database was *not* deleted\."
@@ -322,7 +322,7 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
                 "$(which python3) BTBManagerTelegram.py &",
                 shell=True,
             )
-        except:
+        except Exception:
             message = "Unable to update BTB Manager Telegram"
             update.message.reply_text(
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -360,7 +360,7 @@ def update_btb(update: Update, _: CallbackContext) -> int:
                 f"$(which python3) -m binance_trade_bot &",
                 shell=True,
             )
-        except:
+        except Exception:
             message = "Unable to update Binance Trade Bot"
             update.message.reply_text(
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"

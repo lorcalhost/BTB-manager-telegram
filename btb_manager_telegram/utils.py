@@ -39,7 +39,7 @@ def setup_telegram_constants():
             f"Successfully retrieved Telegram configuration. "
             f"The bot will only respond to user with user_id {settings.USER_ID}"
         )
-    except:
+    except Exception:
         logger.error(
             "ERROR: No user_id has been set in the yaml configuration, anyone would be able to control your bot.\n"
             "Aborting."
@@ -50,40 +50,39 @@ def setup_telegram_constants():
 def text_4096_cutter(m_list):
     message = [""]
     index = 0
-    for m in m_list:
-        if len(message[index]) + len(m) <= 4096:
-            message[index] += m
+    for mes in m_list:
+        if len(message[index]) + len(mes) <= 4096:
+            message[index] += mes
         else:
-            message.append(m)
+            message.append(mes)
             index += 1
     return message
 
 
 def find_process():
-    for proc in psutil.process_iter():
-        if "binance_trade_bot" in proc.name() or "binance_trade_bot" in " ".join(
-            proc.cmdline()
-        ):
-            return True
-    return False
+    return any(
+        "binance_trade_bot" in proc.name()
+        or "binance_trade_bot" in " ".join(proc.cmdline())
+        for proc in psutil.process_iter()
+    )
 
 
 def is_tg_bot_update_available():
     try:
-        p = subprocess.Popen(
+        proc = subprocess.Popen(
             ["bash", "-c", "git remote update && git status -uno"],
             stdout=subprocess.PIPE,
         )
-        output, _ = p.communicate()
+        output, _ = proc.communicate()
         re = "Your branch is behind" in str(output)
-    except:
+    except Exception:
         re = None
     return re
 
 
 def is_btb_bot_update_available():
     try:
-        p = subprocess.Popen(
+        proc = subprocess.Popen(
             [
                 "bash",
                 "-c",
@@ -91,8 +90,8 @@ def is_btb_bot_update_available():
             ],
             stdout=subprocess.PIPE,
         )
-        output, _ = p.communicate()
+        output, _ = proc.communicate()
         re = "Your branch is behind" in str(output)
-    except:
+    except Exception:
         re = None
     return re
