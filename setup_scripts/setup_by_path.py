@@ -12,7 +12,9 @@ os.chdir(PATH)
 if not os.path.isdir('config'):
     os.mkdir('config', 0o755)
 
-os.system('git submodule update --init --recursive')
+# os.system('git submodule update --init --recursive')
+if not os.isdir("binance-trade-bot"):
+    os.system('git clone https://github.com/edeng23/binance-trade-bot')
 
 
 def input_copy_file(dest: str, message: str):
