@@ -8,8 +8,9 @@ PATH = pathlib.Path(__file__).parent.absolute()
 os.chdir(PATH)
 ################################################################################
 
-parser = argparse.ArgumentParser()
+subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
 
+parser = argparse.ArgumentParser()
 parser.add_argument("--paths", action="store_true",
                     help="To specify if you want to run the setup process using paths to the config files.")
 

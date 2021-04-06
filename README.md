@@ -2,10 +2,10 @@
 A Telegram bot for remotely managing [Binance Trade Bot].  
 
 **If you have feature requests please open an issue on this repo, developers are also welcome to contribute!**
-  
+
 ## About
 I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn't have to constantly ssh into my VPS, and my non-techy friends could enjoy the benefits of automated trading.  
-  
+
 As of now the bot is able to perform the following actions:
 - Check bot status (running / not running)
 - Start *Binance Trade Bot*
@@ -22,7 +22,7 @@ As of now the bot is able to perform the following actions:
 - **Update** *Binance Trade Bot*
 - **Update** *Binance Trade Bot Manager Telegram*
 
-The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yml` file.  
+The program's default behaviour fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yml` file.  
 Only the Telegram user with `user_id` equal to the one set in the `apprise.yml` file will be able to use the bot.
 
 ⚠ The program is fully compatible with **Linux** and **Windows** through **[WSL]**, further compatibility testing needs to be done for **native Windows** and **MacOS**.  
@@ -44,9 +44,9 @@ $ git clone https://github.com/lorcalhost/BTB-manager-telegram.git
 ```console
 $ cd BTB-manager-telegram
 ```
-3. Install `BTB-manager-telegram`'s dependencies:
+3. Run the setup script
 ```console
-$ python3 -m pip install -r requirements.txt
+$ python3 setup.py
 ```
 ⚠ Make sure the correct `rwx` permissions are set and the program is run with correct privileges.
 ## Usage
@@ -127,7 +127,7 @@ You can find your `user_id` by sending a Telegram message to [@userinfobot](http
 </details>
 </br>
 
-### 2. ERROR: `Make sure that only one bot instance is running`: 
+### 2. ERROR: `Make sure that only one bot instance is running`:
 <details><summary>CLICK ME</summary>
 
 <p align="center">
