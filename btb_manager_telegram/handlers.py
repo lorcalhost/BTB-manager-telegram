@@ -226,14 +226,14 @@ def start(update: Update, _: CallbackContext) -> int:
     return MENU
 
 
-def edit_coin(self, update: Update, _: CallbackContext) -> int:
-    self.logger.info(f"Editing coin list. ({update.message.text})")
+def edit_coin(update: Update, _: CallbackContext) -> int:
+    logger.info(f"Editing coin list. ({update.message.text})")
 
     if update.message.text != "/stop":
         message = f"✔ Successfully edited coin list file to:\n\n```\n{update.message.text}\n```".replace(
             ".", "\."
         )
-        coin_file_path = f"{self.root_path}supported_coin_list"
+        coin_file_path = f"{settings.ROOT_PATH}supported_coin_list"
         try:
             copyfile(coin_file_path, f"{coin_file_path}.backup")
             with open(coin_file_path, "w") as f:
@@ -252,14 +252,14 @@ def edit_coin(self, update: Update, _: CallbackContext) -> int:
     return MENU
 
 
-def edit_user_config(self, update: Update, _: CallbackContext) -> int:
+def edit_user_config(update: Update, _: CallbackContext) -> int:
     logger.info(f"Editing user configuration. ({update.message.text})")
 
     if update.message.text != "/stop":
         message = f"✔ Successfully edited user configuration file to:\n\n```\n{update.message.text}\n```".replace(
             ".", "\."
         )
-        user_cfg_file_path = f"{self.root_path}user.cfg"
+        user_cfg_file_path = f"{settings.ROOT_PATH}user.cfg"
         try:
             copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
             with open(user_cfg_file_path, "w") as f:

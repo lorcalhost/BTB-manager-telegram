@@ -5,7 +5,11 @@ from configparser import ConfigParser
 from datetime import datetime
 
 from btb_manager_telegram import logger, settings
-from btb_manager_telegram.utils import find_process, text_4096_cutter
+from btb_manager_telegram.utils import (
+    find_and_kill_process,
+    find_process,
+    text_4096_cutter,
+)
 
 
 def current_value():
@@ -250,12 +254,12 @@ def start_bot():
     return message
 
 
-def stop_bot(self):
-    self.logger.info("Stop bot button pressed.")
+def stop_bot():
+    logger.info("Stop bot button pressed.")
 
     message = "⚠ Binance Trade Bot is not running."
     if find_process():
-        self.__find_and_kill_process()
+        find_and_kill_process()
         if not find_process():
             message = "✔ Successfully stopped the bot."
         else:
@@ -332,8 +336,8 @@ def edit_coin():
     return [message, edit]
 
 
-def export_db(self):
-    self.logger.info("Export database button pressed.")
+def export_db():
+    logger.info("Export database button pressed.")
 
     message = "⚠ Please stop Binance Trade Bot before exporting the database file\."
     db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
