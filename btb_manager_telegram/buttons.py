@@ -8,6 +8,8 @@ from btb_manager_telegram import logger, settings
 from btb_manager_telegram.utils import (
     find_and_kill_process,
     find_process,
+    is_btb_bot_update_available,
+    is_tg_bot_update_available,
     text_4096_cutter,
 )
 
@@ -355,38 +357,30 @@ def export_db():
 def update_tg_bot():
     logger.info("Update Telegram bot button pressed.")
 
-    p = subprocess.Popen(
-        ["bash", "-c", "git remote update && git status -uno"],
-        stdout=subprocess.PIPE,
-    )
-    output, _ = p.communicate()
-    upd = False
     message = "Your BTB Manager Telegram installation is already up to date\."
-    if "Your branch is behind" in str(output):
-        message = "An update for BTB Manager Telegram is available\.\nWould you like to update now?"
-        upd = True
+    upd = False
+    to_update = is_tg_bot_update_available()
+    if to_update is not None:
+        if to_update:
+            message = "An update for BTB Manager Telegram is available\.\nWould you like to update now?"
+            upd = True
+    else:
+        message = (
+            "Error while trying to fetch BTB Manager Telegram version information\."
+        )
     return [message, upd]
 
 
 def update_btb():
     logger.info("Update Binance Trade Bot button pressed.")
 
+    message = "Your Binance Trade Bot installation is already up to date\."
     upd = False
-    try:
-        p = subprocess.Popen(
-            [
-                "bash",
-                "-c",
-                "cd ../binance-trade-bot && git remote update && git status -uno",
-            ],
-            stdout=subprocess.PIPE,
-        )
-        output, _ = p.communicate()
-
-        message = "Your Binance Trade Bot installation is already up to date\."
-        if "Your branch is behind" in str(output):
-            message = "An update for Binance Trade Bot is available\.\nWould you like to update now?"
+    to_update = is_btb_bot_update_available()
+    if to_update is not None:
+        if to_update:
             upd = True
-    except:
+            message = "An update for Binance Trade Bot is available\.\nWould you like to update now?"
+    else:
         message = "Error while trying to fetch Binance Trade Bot version information\."
     return [message, upd]

@@ -1,3 +1,5 @@
+import subprocess
+
 import psutil
 import yaml
 
@@ -64,3 +66,33 @@ def find_process():
         ):
             return True
     return False
+
+
+def is_tg_bot_update_available():
+    try:
+        p = subprocess.Popen(
+            ["bash", "-c", "git remote update && git status -uno"],
+            stdout=subprocess.PIPE,
+        )
+        output, _ = p.communicate()
+        re = "Your branch is behind" in str(output)
+    except:
+        re = None
+    return re
+
+
+def is_btb_bot_update_available():
+    try:
+        p = subprocess.Popen(
+            [
+                "bash",
+                "-c",
+                f"cd {settings.ROOT_PATH} && git remote update && git status -uno",
+            ],
+            stdout=subprocess.PIPE,
+        )
+        output, _ = p.communicate()
+        re = "Your branch is behind" in str(output)
+    except:
+        re = None
+    return re

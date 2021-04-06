@@ -19,8 +19,8 @@ As of now the bot is able to perform the following actions:
 - Edit user configuration (`user.cfg` file)
 - Delete database file (`crypto_trading.db` file)
 - Export database file
-- **Update** *Binance Trade Bot*
-- **Update** *Binance Trade Bot Manager Telegram*
+- **Update** *Binance Trade Bot* (and notify when new update is available)
+- **Update** *Binance Trade Bot Manager Telegram* (and notify when new update is available)
 
 The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yml` file.  
 Only the Telegram user with `user_id` equal to the one set in the `apprise.yml` file will be able to use the bot.
@@ -123,6 +123,9 @@ In this URL:
 - `606743502` is the `user_id`  
 
 You can find your `user_id` by sending a Telegram message to [@userinfobot](https://t.me/userinfobot).
+
+Note:  
+If the bot is not responsive after using the *Update Telegram Bot* function something might have gone wrong and you need to manually restart *BTB Manager Telegram*.
 </p>
 </details>
 </br>
