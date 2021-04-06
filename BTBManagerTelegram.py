@@ -165,7 +165,7 @@ class BTBManagerTelegram:
 
             if (
                 self.tg_update_broadcasted_before is False
-                and self.btb_update_broadcasted_before is False
+                or self.btb_update_broadcasted_before is False
             ):
                 self.scheduler.enter(
                     60 * 60,
@@ -188,7 +188,7 @@ class BTBManagerTelegram:
                 stdout=subprocess.PIPE,
             )
             output, _ = p.communicate()
-            re = True if "Your branch is behind" in str(output) else False
+            re = "Your branch is behind" in str(output)
         except:
             re = None
         return re
@@ -204,7 +204,7 @@ class BTBManagerTelegram:
                 stdout=subprocess.PIPE,
             )
             output, _ = p.communicate()
-            re = True if "Your branch is behind" in str(output) else False
+            re = "Your branch is behind" in str(output)
         except:
             re = None
         return re
