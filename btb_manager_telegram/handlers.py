@@ -326,7 +326,7 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
         )
         try:
             subprocess.call(
-                "kill -9 $(ps ax | grep BTBManagerTelegram | fgrep -v grep | awk '{ print $1 }') && "
+                "kill -9 $(ps ax | grep btb_manager_telegram | fgrep -v grep | awk '{ print $1 }') && "
                 "git pull && $(which python3) -m pip install -r requirements.txt && "
                 "$(which python3) -m btb_manager_telegram &",
                 shell=True,
