@@ -230,8 +230,11 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
     logger.info(f"Editing coin list. ({update.message.text})")
 
     if update.message.text != "/stop":
-        message = f"✔ Successfully edited coin list file to:\n\n```\n{update.message.text}\n```".replace(
-            ".", "\."
+        message = (
+            f"✔ Successfully edited coin list file to:\n\n"
+            f"```\n"
+            f"{update.message.text}\n"
+            f"```".replace(".", "\.")
         )
         coin_file_path = f"{settings.ROOT_PATH}supported_coin_list"
         try:
@@ -256,8 +259,11 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
     logger.info(f"Editing user configuration. ({update.message.text})")
 
     if update.message.text != "/stop":
-        message = f"✔ Successfully edited user configuration file to:\n\n```\n{update.message.text}\n```".replace(
-            ".", "\."
+        message = (
+            f"✔ Successfully edited user configuration file to:\n\n"
+            f"```\n"
+            f"{update.message.text}\n"
+            f"```".replace(".", "\.")
         )
         user_cfg_file_path = f"{settings.ROOT_PATH}user.cfg"
         try:
@@ -294,7 +300,7 @@ def delete_db(update: Update, _: CallbackContext) -> int:
         except Exception:
             message = "❌ Unable to delete database file\."
     else:
-        message = "👌 Exited without changes\.\nYour database was *not* deleted\."
+        message = "👌 Exited without changes\.\n" "Your database was *not* deleted\."
 
     keyboard = [["OK"]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
@@ -309,7 +315,10 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
     logger.info(f"Updating BTB Manager Telegram. ({update.message.text})")
 
     if update.message.text != "Cancel update":
-        message = "The bot is updating\.\nWait a few seconds then start the bot again with /start"
+        message = (
+            "The bot is updating\.\n"
+            "Wait a few seconds then start the bot again with /start"
+        )
         keyboard = [["/start"]]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         update.message.reply_text(
@@ -347,7 +356,10 @@ def update_btb(update: Update, _: CallbackContext) -> int:
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
     if update.message.text != "Cancel update":
-        message = "The bot is updating\.\nWait a few seconds, the bot will restart automatically\."
+        message = (
+            "The bot is updating\.\n"
+            "Wait a few seconds, the bot will restart automatically\."
+        )
         update.message.reply_text(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
@@ -366,7 +378,7 @@ def update_btb(update: Update, _: CallbackContext) -> int:
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
     else:
-        message = "👌 Exited without changes\.\nBinance Trade Bot was *not* updated\."
+        message = "👌 Exited without changes\.\n" "Binance Trade Bot was *not* updated\."
         update.message.reply_text(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )

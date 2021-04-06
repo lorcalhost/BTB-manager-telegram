@@ -34,9 +34,8 @@ def current_value():
                     raise Exception()
                 if state == "ORDERED":
                     return [
-                        f"A buy order of `{round(order_size, 2)}` *{bridge}* is currently placed on coin *{current_coin}*.\n\n_Waiting for buy order to complete_.".replace(
-                            ".", "\."
-                        )
+                        f"A buy order of `{round(order_size, 2)}` *{bridge}* is currently placed on coin *{current_coin}*.\n\n"
+                        f"_Waiting for buy order to complete_.".replace(".", "\.")
                     ]
             except Exception:
                 con.close()
@@ -71,7 +70,13 @@ def current_value():
             # Generate message
             try:
                 m_list = [
-                    f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Current coin {current_coin}:*\n\t\- Balance: `{round(balance, 6)}` {current_coin}\n\t\- Value in *USD*: `{round((balance * usd_price), 2)}` *USD*\n\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` BTC\n\n\t_Initially bought for_ {round(buy_price, 2)} *{bridge}*\n'.replace(
+                    f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
+                    f"*Current coin {current_coin}:*\n"
+                    f"\t\- Balance: `{round(balance, 6)}` *{current_coin}*\n"
+                    f"\t\- Current coin exchange ratio: `{round(usd_price, 2)}` *USD/{current_coin}*\n"
+                    f"\t\- Value in *USD*: `{round((balance * usd_price), 4)}` *USD*\n"
+                    f"\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` *BTC*\n\n"
+                    f"\t_Initially bought for_ {round(buy_price, 2)} *{bridge}* \(`{round((buy_price / balance), 6)}` *{bridge}/{current_coin}*\)\n".replace(
                         ".", "\."
                     )
                 ]
@@ -111,9 +116,11 @@ def check_progress():
                         coin[4], "%Y-%m-%d %H:%M:%S.%f"
                     ).strftime("%H:%M:%S %d/%m/%Y")
                     m_list.append(
-                        f'*{coin[0]}*\n\t\- Amount: `{round(coin[1], 6)}` *{coin[0]}*\n\t\- Price: `{round(coin[2], 2)}` *USD*\n\t\- Change: {f"`{round(coin[3], 2)}` *{coin[0]}*" if coin[3] is not None else f"`{coin[3]}`"}\n\t\- Last trade: `{last_trade_date}`\n\n'.replace(
-                            ".", "\."
-                        )
+                        f"*{coin[0]}*\n"
+                        f"\t\- Amount: `{round(coin[1], 6)}` *{coin[0]}*\n"
+                        f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
+                        f"\t\- Change: {f'`{round(coin[3], 2)}` *{coin[0]}*' if coin[3] is not None else f'`{coin[3]}`'}\n"
+                        f"\t\- Last trade: `{last_trade_date}`\n\n".replace(".", "\.")
                     )
 
                 message = text_4096_cutter(m_list)
@@ -167,15 +174,14 @@ def current_ratios():
                 query = sorted(query, key=lambda k: k[-1], reverse=True)
 
                 m_list = [
-                    f'\nLast update: `{last_update.strftime("%H:%M:%S %d/%m/%Y")}`\n\n*Coin ratios compared to {current_coin}:*\n'.replace(
-                        ".", "\."
-                    )
+                    f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
+                    f"*Coin ratios compared to {current_coin}:*\n".replace(".", "\.")
                 ]
                 for coin in query:
                     m_list.append(
-                        f"*{coin[1]}*:\n\t\- Price: `{coin[2]}` {bridge}\n\t\- Ratio: `{round(coin[3], 6)}`\n\n".replace(
-                            ".", "\."
-                        )
+                        f"*{coin[1]}*:\n"
+                        f"\t\- Price: `{coin[2]}` {bridge}\n"
+                        f"\t\- Ratio: `{round(coin[3], 6)}`\n\n".replace(".", "\.")
                     )
 
                 message = text_4096_cutter(m_list)
@@ -221,8 +227,11 @@ def trade_history():
                 ]
                 for trade in query:
                     date = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
-                    mes = f'`{date.strftime("%H:%M:%S %d/%m/%Y")}`\n*{"Sold" if trade[2] else "Bought"}* `{round(trade[4], 6)}` *{trade[0]}*{f" for `{round(trade[5], 2)}` *{trade[1]}*" if trade[5] is not None else ""}\nStatus: _*{trade[3]}*_\n\n'
-                    m_list.append(mes.replace(".", "\."))
+                    m_list.append(
+                        f"`{date.strftime('%H:%M:%S %d/%m/%Y')}`\n"
+                        f"*{'Sold' if trade[2] else 'Bought'}* `{round(trade[4], 6)}` *{trade[0]}*{f' for `{round(trade[5], 2)}` *{trade[1]}*' if trade[5] is not None else ''}\n"
+                        f"Status: _*{trade[3]}*_\n\n".replace(".", "\.")
+                    )
 
                 message = text_4096_cutter(m_list)
                 con.close()
@@ -251,7 +260,10 @@ def start_bot():
             else:
                 message = "✔ Binance Trade Bot successfully started\."
         else:
-            message = f"❌ Unable to find _Binance Trade Bot_ installation at {settings.ROOT_PATH}\.\nMake sure the `binance-trade-bot` and `BTB-manager-telegram` are in the same parent directory\."
+            message = (
+                f"❌ Unable to find _Binance Trade Bot_ installation at {settings.ROOT_PATH}\.\n"
+                f"Make sure the `binance-trade-bot` and `BTB-manager-telegram` are in the same parent directory\."
+            )
     return message
 
 
@@ -264,7 +276,10 @@ def stop_bot():
         if not find_process():
             message = "✔ Successfully stopped the bot."
         else:
-            message = "❌ Unable to stop Binance Trade Bot.\n\nIf you are running the telegram bot on Windows make sure to run with administrator privileges."
+            message = (
+                "❌ Unable to stop Binance Trade Bot.\n\n"
+                "If you are running the telegram bot on Windows make sure to run with administrator privileges."
+            )
     return message
 
 
@@ -276,7 +291,12 @@ def read_log():
     if os.path.exists(log_file_path):
         with open(log_file_path) as f:
             file_content = f.read().replace(".", "\.")[-4000:]
-            message = f"Last *4000* characters in log file:\n\n```\n{file_content}\n```"
+            message = (
+                f"Last *4000* characters in log file:\n\n"
+                f"```\n"
+                f"{file_content}\n"
+                f"```"
+            )
     return message
 
 
@@ -306,8 +326,15 @@ def edit_user_cfg():
     if not find_process():
         if os.path.exists(user_cfg_file_path):
             with open(user_cfg_file_path) as f:
-                message = f"Current configuration file is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated configuration*_.\n\nWrite /stop to stop editing and exit without changes.".replace(
-                    ".", "\."
+                message = (
+                    f"Current configuration file is:\n\n"
+                    f"```\n"
+                    f"{f.read()}\n"
+                    f"```\n\n"
+                    f"_*Please reply with a message containing the updated configuration*_.\n\n"
+                    f"Write /stop to stop editing and exit without changes.".replace(
+                        ".", "\."
+                    )
                 )
                 edit = True
         else:
@@ -326,8 +353,13 @@ def edit_coin():
     if not find_process():
         if os.path.exists(coin_file_path):
             with open(coin_file_path) as f:
-                message = f"Current coin list is:\n\n```\n{f.read()}\n```\n\n_*Please reply with a message containing the updated coin list*_.\n\nWrite /stop to stop editing and exit without changes.".replace(
-                    ".", "\."
+                message = (
+                    f"Current coin list is:\n\n"
+                    f"```\n{f.read()}\n```\n\n"
+                    f"_*Please reply with a message containing the updated coin list*_.\n\n"
+                    f"Write /stop to stop editing and exit without changes.".replace(
+                        ".", "\."
+                    )
                 )
                 edit = True
         else:
@@ -361,7 +393,10 @@ def update_tg_bot():
     to_update = is_tg_bot_update_available()
     if to_update is not None:
         if to_update:
-            message = "An update for BTB Manager Telegram is available\.\nWould you like to update now?"
+            message = (
+                "An update for BTB Manager Telegram is available\.\n"
+                "Would you like to update now?"
+            )
             upd = True
     else:
         message = (
@@ -379,7 +414,10 @@ def update_btb():
     if to_update is not None:
         if to_update:
             upd = True
-            message = "An update for Binance Trade Bot is available\.\nWould you like to update now?"
+            message = (
+                "An update for Binance Trade Bot is available\.\n"
+                "Would you like to update now?"
+            )
     else:
         message = "Error while trying to fetch Binance Trade Bot version information\."
     return [message, upd]

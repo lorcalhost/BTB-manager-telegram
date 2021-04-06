@@ -119,7 +119,10 @@ def update_checker():
         if is_tg_bot_update_available():
             logger.info("BTB Manager Telegram update found.")
 
-            message = "⚠ An update for _BTB Manager Telegram_ is available\.\n\nPlease update by going to *🛠 Maintenance* and pressing the *Update Telegram Bot* button\."
+            message = (
+                "⚠ An update for _BTB Manager Telegram_ is available\.\n\n"
+                "Please update by going to *🛠 Maintenance* and pressing the *Update Telegram Bot* button\."
+            )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
             bot.send_message(settings.USER_ID, message, parse_mode="MarkdownV2")
@@ -134,7 +137,10 @@ def update_checker():
         if is_btb_bot_update_available():
             logger.info("Binance Trade Bot update found.")
 
-            message = "⚠ An update for _Binance Trade Bot_ is available\.\n\nPlease update by going to *🛠 Maintenance* and pressing the *Update Binance Trade Bot* button\."
+            message = (
+                "⚠ An update for _Binance Trade Bot_ is available\.\n\n"
+                "Please update by going to *🛠 Maintenance* and pressing the *Update Binance Trade Bot* button\."
+            )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
             bot.send_message(settings.USER_ID, message, parse_mode="MarkdownV2")
