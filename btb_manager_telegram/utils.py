@@ -22,7 +22,11 @@ def setup_telegram_constants():
     yaml_file_path = f"{settings.ROOT_PATH}config/apprise.yml"
     if os.path.exists(yaml_file_path):
         with open(yaml_file_path) as f:
-            parsed_urls = yaml.load(f, Loader=yaml.FullLoader)["urls"]
+            try:
+                parsed_urls = yaml.load(f, Loader=yaml.FullLoader)["urls"]
+            except Exception:
+                logger.error("Unable to correctly read apprise.yml file. Make sure it is correctly set up. Aborting.")
+                exit(-1)
             for url in parsed_urls:
                 if url.startswith("tgram"):
                     telegram_url = url.split("//")[1]
