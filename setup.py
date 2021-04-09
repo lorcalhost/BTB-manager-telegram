@@ -29,18 +29,6 @@ def input_copy_file(dest: str, message: str):
         logging.error(f"{COLORS['R']}[-] Couldn't find the file: {src}"
                       f"Please set it up.{COLORS['RESET']}")
 
-def set_docker_up():
-    docker = input(f"{COLORS['Y']}[*] Would you like to perform a setup for docker as well(y/n)?: ")
-    if docker in ['y', 'Y']:
-        token = input(f"{COLORS['G']}[+] Enter token: ")
-        usr_id = input(f"{COLORS['G']}[+] Enter User ID: ")
-        subprocess.run(f"$(which python3) docker_setup.py -t=\"{token}\ -u=\"{usr_id}\"")
-
-    elif docker in ['n', 'N']:
-        print(f"{COLORS['Y']}[*] Skipping docker setup...\nPlease refer to the project docs"
-              "for instructions to setup for running the bot in a docker container"
-        )
-
 def main():
     if not os.isdir("binance-trade-bot"):
         os.system('git clone https://github.com/edeng23/binance-trade-bot')
@@ -67,8 +55,6 @@ def main():
 
     else:
         sys.exit(-1)
-
-    set_docker_up()
 
     print(f"[*] All set!{COLORS['RESET']}")
 
