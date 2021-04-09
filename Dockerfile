@@ -1,3 +1,4 @@
+
 ###################################################################
 # Dockerfile to build container image of:
 #   - BTB-manager-telegram
@@ -16,4 +17,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 ################## Running the main python Script #################
-CMD [ "python", "./BTBManagerTelegram.py" ]
+CMD [ "python", "-m", "btb_manager_telegram" ]
