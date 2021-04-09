@@ -1,0 +1,3 @@
+[flake8]
+ignore = E501, W605, B902, N999, W503, SIM102
+inline-quotes = "

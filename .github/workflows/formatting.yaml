@@ -1,0 +1,19 @@
+name: Contributions formatting checker
+on: [pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install Black
+        run: pip install black
+      - name: Run black --check .
+        run: black --check .
+      - name: Install isort
+        run: pip install isort
+      - name: Run isort --check .
+        run: isort . --check --settings-path ./.isort.cfg
