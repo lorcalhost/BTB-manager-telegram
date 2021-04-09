@@ -27,9 +27,16 @@ def current_value():
             # Get current coin symbol, bridge symbol, order state, order size, initial buying price
             try:
                 cur.execute(
-                    """SELECT alt_coin_id, crypto_coin_id, state, crypto_starting_balance, crypto_trade_amount FROM trade_history ORDER BY datetime DESC LIMIT 1;"""
+                    """SELECT alt_coin_id, crypto_coin_id, state, alt_trade_amount, crypto_starting_balance, crypto_trade_amount FROM trade_history ORDER BY datetime DESC LIMIT 1;"""
                 )
-                current_coin, bridge, state, order_size, buy_price = cur.fetchone()
+                (
+                    current_coin,
+                    bridge,
+                    state,
+                    alt_amount,
+                    order_size,
+                    buy_price,
+                ) = cur.fetchone()
                 if current_coin is None:
                     raise Exception()
                 if state == "ORDERED":
@@ -73,11 +80,11 @@ def current_value():
                     f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
                     f"*Current coin {current_coin}:*\n"
                     f"\t\- Balance: `{round(balance, 6)}` *{current_coin}*\n"
-                    f"\t\- Current coin exchange ratio: `{round(usd_price, 4)}` *USD*/*{current_coin}*\n"
+                    f"\t\- Current coin exchange ratio: `{round(usd_price, 6)}` *USD*/*{current_coin}*\n"
                     f"\t\- Value in *USD*: `{round((balance * usd_price), 2)}` *USD*\n"
                     f"\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` *BTC*\n\n"
                     f"_Initially bought for_ {round(buy_price, 2)} *{bridge}*\n"
-                    f"_Exchange ratio when purchased:_ `{round((buy_price / balance), 6)}` *{bridge}*/*{current_coin}*".replace(
+                    f"_Exchange ratio when purchased:_ `{round((buy_price / alt_amount), 6)}` *{bridge}*/*{current_coin}*".replace(
                         ".", "\."
                     )
                 ]
