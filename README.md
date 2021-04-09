@@ -71,6 +71,9 @@ $ python3 -m pip install -r requirements.txt
 # Run normally
 $ python3 -m btb_manager_telegram
 
+# Run inside a docker container
+$ python3 -m btb_manager_telegram --docker
+
 # If the bot is running on a server you may want to keep it running even after ssh connection is closed by using nohup
 $ nohup python3 -m btb_manager_telegram &
 ```
@@ -87,6 +90,9 @@ optional arguments:
                         (optional) Telegram bot token
   -u USER_ID, --user_id USER_ID
                         (optional) Telegram user id
+  -d DOCKER, --docker DOCKER
+                        (optional) Run the script in a docker container.
+                        NOTE: Run the 'docker_setup.py' file before passing this flag.
 ```
 
 ## Interaction
