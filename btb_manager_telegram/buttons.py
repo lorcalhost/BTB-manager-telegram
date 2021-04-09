@@ -190,7 +190,8 @@ def current_ratios():
             except Exception:
                 con.close()
                 return [
-                    "❌ Something went wrong, unable to generate ratios at this time\."
+                    "❌ Something went wrong, unable to generate ratios at this time\.",
+                    "⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.",
                 ]
         except Exception:
             message = ["❌ Unable to perform actions on the database\."]
