@@ -1,7 +1,7 @@
 import argparse
-import time
-import sys
 import os
+import sys
+import time
 
 from telegram.ext import ConversationHandler, Updater
 
@@ -41,9 +41,11 @@ def pre_run_main() -> bool:
         "-u", "--user_id", type=str, help="(optional) Telegram user id", default=None
     )
     parser.add_argument(
-        "-d", "--docker", action="store_true",
+        "-d",
+        "--docker",
+        action="store_true",
         help="(optional) Run the script in a docker container."
-        "NOTE: Run the 'docker_setup.py' file before passing this flag."
+        "NOTE: Run the 'docker_setup.py' file before passing this flag.",
     )
 
     args = parser.parse_args()
@@ -108,8 +110,10 @@ if __name__ == "__main__":
     on_docker = pre_run_main()
     if on_docker:
         os.system("docker build --no-cache -t py-container .")
-        try: os.system("docker run --rm -it py-container")
-        except Exception: pass
+        try:
+            os.system("docker run --rm -it py-container")
+        except Exception:
+            pass
         os.system("docker rmi -f py-container")
         sys.exit(-1)
 

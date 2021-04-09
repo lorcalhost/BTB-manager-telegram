@@ -25,7 +25,9 @@ def setup_telegram_constants():
             try:
                 parsed_urls = yaml.load(f, Loader=yaml.FullLoader)["urls"]
             except Exception:
-                logger.error("Unable to correctly read apprise.yml file. Make sure it is correctly set up. Aborting.")
+                logger.error(
+                    "Unable to correctly read apprise.yml file. Make sure it is correctly set up. Aborting."
+                )
                 exit(-1)
             for url in parsed_urls:
                 if url.startswith("tgram"):
