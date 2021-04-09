@@ -112,7 +112,7 @@ For quickly setting up the filesystem as intended you can run the `docker_setup.
 $ python3 docker_setup.py
 ```
 
-To finally run *Binance Trade Bot Manager Telegram* you can run the following command.
+To finally run *Binance Trade Bot Manager Telegram* you can do the following:
 
 ```console
 $ python3 -m btb_manager_telegram --docker
@@ -130,8 +130,9 @@ Every time the Telegram bot is restarted the `/start` command should be sent aga
 <details><summary>CLICK ME</summary>
 
 <p align="center">
-  	<img height="20%" width="20%" src="https://i.imgur.com/znI3G3H.jpg" />&nbsp;&nbsp;&nbsp;&nbsp;
-    <img height="20%" width="20%" src="https://i.imgur.com/c2m0xuk.jpg" />
+  	<img height="20%" width="20%" src="https://i.imgur.com/9JUN2G7.jpg" />&nbsp;&nbsp;&nbsp;&nbsp;
+    <img height="20%" width="20%" src="https://i.imgur.com/FBSNURs.jpg" />&nbsp;&nbsp;&nbsp;&nbsp;
+    <img height="20%" width="20%" src="https://i.imgur.com/UKyREe9.jpg" />
 </p>
 </details>
 </br>
