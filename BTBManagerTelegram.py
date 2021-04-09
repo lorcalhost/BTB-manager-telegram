@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 import logging
 import yaml
@@ -356,3 +357,10 @@ if __name__ == '__main__':
 
     else:
         BTBManagerTelegram()
+=======
+from btb_manager_telegram.__main__ import main, pre_run_main
+
+if __name__ == "__main__":
+    pre_run_main()
+    main()
+>>>>>>> 1f9f0974e8da4647c3db359f3a75436f9251cdb7
