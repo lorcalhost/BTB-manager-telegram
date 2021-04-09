@@ -65,14 +65,13 @@ $ python3 -m pip install -r requirements.txt
 
 ## Usage
 
+### Run normally
+
 **BTBManagerTelegram** can be run directly by executing the following command:
 
 ```console
 # Run normally
 $ python3 -m btb_manager_telegram
-
-# Run inside a docker container
-$ python3 -m btb_manager_telegram --docker
 
 # If the bot is running on a server you may want to keep it running even after ssh connection is closed by using nohup
 $ nohup python3 -m btb_manager_telegram &
@@ -94,6 +93,32 @@ optional arguments:
                         (optional) Run the script in a docker container.
                         NOTE: Run the 'docker_setup.py' file before passing this flag.
 ```
+
+### Run inside a Docker container
+
+To run _Binance Trade Bot Manager Telegram_ inside a Docker container you must first make sure to have your _binance-trade-bot_ installation directory inside the _BTB-manager-telegram_ one.  
+Your filesystem should look like this:
+
+```
+.
+└── *parent_dir*
+    └── BTB-manager-telegram
+        └── binance-trade-bot
+```
+
+For quickly setting up the filesystem as intended you can run the `docker_setup.py` script:
+
+```console
+$ python3 docker_setup.py
+```
+
+To finally run *Binance Trade Bot Manager Telegram* you can run the following command.
+
+```console
+$ python3 -m btb_manager_telegram --docker
+```
+
+⚠ Due to the nature of Docker containers, whenever you use the *Update Telegram Bot* feature, only the repository inside the container will be updated while the one on your filesystem will remain untouched.
 
 ## Interaction
 
