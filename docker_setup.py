@@ -1,4 +1,3 @@
-import logging
 import os
 import pathlib
 import shutil
@@ -79,7 +78,7 @@ def main():
     else:
         sys.exit(-1)
 
-    logging.info(f"[*] All set!{COLORS['RESET']}")
+    print(f"{COLORS['G']}[*] All set!{COLORS['RESET']}")
 
 
 if __name__ == "__main__":
