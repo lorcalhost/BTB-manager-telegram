@@ -33,7 +33,7 @@ def main():
     if not os.isdir("binance-trade-bot"):
         os.system('git clone https://github.com/edeng23/binance-trade-bot')
 
-    isBTB = input(f'{COLORS['Y']}[*] Is there a BTB installation on your filesystem (y/n)?: ')
+    isBTB = input(f"{COLORS['Y']}[*] Is there a BTB installation on your filesystem (y/n)?: ")
     if isBTB in ['y', 'Y']:
 
         input_copy_file("binance-trade-bot/user.cfg",
@@ -48,10 +48,10 @@ def main():
 
     elif isBTB in ['n', 'N']:
 
-        print(f'''{COLORS['Y']}[*] Please manually create the files:
+        print(f"""{COLORS['Y']}[*] Please manually create the files:
               binance-trade-bot/user.cfg
               binance-trade-bot/supported_coin_list
-              binance-trade-bot/config/apprise.yml''')
+              binance-trade-bot/config/apprise.yml""")
 
     else:
         sys.exit(-1)
