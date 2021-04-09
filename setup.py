@@ -10,7 +10,7 @@ import sys
 import os
 
 
-PATH = pathlib.Path(__file__).parent.parent.absolute()
+PATH = pathlib.Path(__file__).parent.absolute()
 os.chdir(PATH)
 
 COLORS = {
