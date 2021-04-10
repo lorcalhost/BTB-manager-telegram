@@ -16,10 +16,10 @@ COLORS = {
 
 
 def make_image() -> None:
-    subprocess.run('docker' args=['build', '--no-cache', '-t', 'BTBMT', '.'], shell=True)
+    subprocess.run('docker', args=['build', '--no-cache', '-t', 'BTBMT', '.'], shell=True)
 
 def delete_image() -> None:
-    subprocess.run('docker' args=['rmi', '-f', 'BTBMT'], shell=True)
+    subprocess.run('docker', args=['rmi', '-f', 'BTBMT'], shell=True)
 
 def update_image() -> None:
     delete_image()
