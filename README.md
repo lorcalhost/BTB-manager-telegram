@@ -63,7 +63,40 @@ $ python3 -m pip install -r requirements.txt
 
 ⚠ Make sure the correct `rwx` permissions are set and the program is run with correct privileges.
 
+## (Optional) Setup Docker image
+
+<details><summary>CLICK ME</summary>
+To run _Binance Trade Bot Manager Telegram_ inside a Docker container you must first make sure to have your _binance-trade-bot_ installation directory inside the _BTB-manager-telegram_ one.  
+Your filesystem should look like this:
+
+```
+.
+└── *parent_dir*
+    └── BTB-manager-telegram
+        └── binance-trade-bot
+```
+
+For quickly setting up the filesystem as intended you can run the `docker_setup.py` script:
+
+```console
+$ python3 docker_setup.py
+```
+
+`docker_setup.py` also takes the following optional arguments:
+
+```console
+optional arguments:
+  -m, --make-image    Create a docker image for the bot.
+  -u, --update-image  Update the docker image for the bot.
+  -D, --delete-image  Delete the docker image for the bot.
+```
+
+</details>
+</br>
+
 ## Usage
+
+### Run normally
 
 **BTBManagerTelegram** can be run directly by executing the following command:
 
@@ -87,7 +120,20 @@ optional arguments:
                         (optional) Telegram bot token
   -u USER_ID, --user_id USER_ID
                         (optional) Telegram user id
+  -d DOCKER, --docker DOCKER
+                        (optional) Run the script in a docker container.
+                        NOTE: Run the 'docker_setup.py' file before passing this flag.
 ```
+
+### Run inside a Docker container
+
+To run _Binance Trade Bot Manager Telegram_ in a Docker container you can do the following **after setting up the image**:
+
+```console
+$ python3 -m btb_manager_telegram --docker
+```
+
+⚠ Due to the nature of Docker containers, whenever you use the _Update Telegram Bot_ feature, only the repository inside the container will be updated while the one on your filesystem will remain untouched.
 
 ## Interaction
 
@@ -99,8 +145,9 @@ Every time the Telegram bot is restarted the `/start` command should be sent aga
 <details><summary>CLICK ME</summary>
 
 <p align="center">
-  	<img height="20%" width="20%" src="https://i.imgur.com/znI3G3H.jpg" />&nbsp;&nbsp;&nbsp;&nbsp;
-    <img height="20%" width="20%" src="https://i.imgur.com/c2m0xuk.jpg" />
+  	<img height="20%" width="20%" src="https://i.imgur.com/9JUN2G7.jpg" />&nbsp;&nbsp;&nbsp;&nbsp;
+    <img height="20%" width="20%" src="https://i.imgur.com/FBSNURs.jpg" />&nbsp;&nbsp;&nbsp;&nbsp;
+    <img height="20%" width="20%" src="https://i.imgur.com/UKyREe9.jpg" />
 </p>
 </details>
 </br>

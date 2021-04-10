@@ -1,6 +1,8 @@
 import argparse
 import time
+from subprocess import PIPE, run
 
+import colorama
 from telegram.ext import ConversationHandler, Updater
 
 from btb_manager_telegram import (
@@ -38,7 +40,20 @@ def pre_run_main() -> None:
     parser.add_argument(
         "-u", "--user_id", type=str, help="(optional) Telegram user id", default=None
     )
+    parser.add_argument(
+        "-d",
+        "--docker",
+        action="store_true",
+        help="(optional) Run the script in a docker container."
+        "NOTE: Run the 'docker_setup.py' file before passing this flag.",
+    )
+
     args = parser.parse_args()
+
+    if args.docker:
+        run_on_docker()
+        exit(1)
+
     settings.ROOT_PATH = args.path
     settings.TOKEN = args.token
     settings.USER_ID = args.user_id
@@ -52,6 +67,8 @@ def pre_run_main() -> None:
     scheduler.enter(1, 1, update_checker)
     time.sleep(1)
     scheduler.run(blocking=False)
+
+    return False
 
 
 def main() -> None:
@@ -88,6 +105,19 @@ def main() -> None:
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
+
+
+def run_on_docker() -> None:
+    try:
+        run("docker image inspect btbmt", shell=True, check=True, stdout=PIPE)
+        run("docker run --rm -it btbmt", shell=True)
+
+    except Exception as e:
+        print(
+            f"{colorama.Fore.RED}[-] Error: {e}{colorama.Fore.RESET}"
+            f"{colorama.Fore.YELLOW}[*] Please run the docker_setup.py script "
+            f"before running the bot in a container.{colorama.Fore.RESET}"
+        )
 
 
 if __name__ == "__main__":
