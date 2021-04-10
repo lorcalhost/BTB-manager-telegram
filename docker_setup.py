@@ -1,4 +1,6 @@
 import subprocess
+import colorama
+import argparse
 import pathlib
 import sys
 import os
@@ -53,7 +55,7 @@ def main() -> None:
         help="Delete the docker image for the bot.", action="store_true"
     )
 
-    args.parse_args()
+    args = parser.parse_args()
 
     if not any([args.update_image, args.delete_image, args.make_image]):
         auto_run()
