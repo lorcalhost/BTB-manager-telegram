@@ -1,9 +1,8 @@
 import subprocess
 import argparse
-import os
-import sys
 import time
 import shlex
+import subprocess
 
 import colorama
 
@@ -26,7 +25,7 @@ from btb_manager_telegram.utils import (
 )
 
 
-def pre_run_main() -> bool:
+def pre_run_main() -> None:
     parser = argparse.ArgumentParser(
         description="Thanks for using Binance Trade Bot Manager Telegram. "
         'By default the program will use "../binance-trade-bot/" as binance-trade-bot installation path.'
@@ -55,7 +54,8 @@ def pre_run_main() -> bool:
     args = parser.parse_args()
 
     if args.docker:
-        return True
+        run_on_docker()
+        exit(1)
 
     settings.ROOT_PATH = args.path
     settings.TOKEN = args.token
@@ -117,7 +117,6 @@ def run_on_docker() -> None:
     process = subprocess.Popen(command, stdout=SUBPIPE)
 
     out = process.communicate()
-    print(out)
 
     if out == b'[]\n':
         print(f"{colorama.Fore.RED}[-] E: Docker image not found{colorama.Fore.RESET}")
@@ -135,8 +134,6 @@ def run_on_docker() -> None:
         except KeyboardInterrupt:
             process.kill()
 
-        except:
-
 
 if __name__ == "__main__":
     on_docker = pre_run_main()
@@ -144,4 +141,5 @@ if __name__ == "__main__":
         run_on_docker()
         sys.exit(-1)
 
+    pre_run_main()
     main()
