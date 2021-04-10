@@ -114,10 +114,9 @@ def run_on_docker() -> None:
     SUBPIPE = subprocess.PIPE
 
     command = shlex.split('docker image inspect btbmt')
-    process = subprocess.Popen(command, stdout=SUBPIPE,
-                               stderr=SUBPIPE, stdin=SUBPIPE)
+    process = subprocess.Popen(command, stdout=SUBPIPE)
 
-    out, err = process.communicate()
+    out = process.communicate()
 
     if out == b'[]\n':
         print(f"{colorama.Fore.RED}[-] E: Docker image not found{colorama.Fore.RESET}")
