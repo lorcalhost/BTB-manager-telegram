@@ -26,7 +26,7 @@ def color_copy_file(src: str, dest: str):
             f"{COLORS['R']}[-] Couldn't find the file: {src}\n"
             f"\tPlease manually create it at {dest}{COLORS['RESET']}"
         )
-        
+
 def main():
     if not os.path.exists("binance-trade-bot"):
         subprocess.call(
@@ -75,6 +75,28 @@ def main():
     else:
         sys.exit(-1)
 
+
+    docker = input(f"[*] Would you like to run the setup script for"
+                   " running the bot in a docker container (y/n)?")
+
+    if docker in ['y', 'Y']:
+        command = shlex.split('python3 docker_setup.py')
+        try:
+            process = subprocess.Popen(command, stdin=subprocess.PIPE)
+            process.communicate()
+
+        except KeyboardInterrupt:
+            process.kill()
+
+        except Exception as e:
+            print(f"{COLORS['R']}[-] {e} {COLORS['RESET']}")
+
+    else:
+        print(f"[*] Skipping te setup for dockerizing the bot{COLORS['RESET']}")
+        return
+
+    print(f"{COLORS['G']}[*] All set!{COLORS['RESET']}")
+    
 
 if __name__ == '__main__':
     main()
