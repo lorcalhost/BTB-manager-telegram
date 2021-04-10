@@ -1,9 +1,9 @@
+import argparse
 import os
 import pathlib
+import shlex
 import shutil
 import subprocess
-import shlex
-import argparse
 
 import colorama
 
@@ -18,17 +18,6 @@ COLORS = {
 PATH = pathlib.Path(__file__).parent.absolute()
 os.chdir(PATH)
 
-def color_copy_file(src: str, dest: str):
-    try:
-        shutil.copyfile(src, dest)
-        print(f"{COLORS['G']}[+] Copying {src} to {dest}{COLORS['RESET']}")
-    except Exception:
-        print(
-            f"{COLORS['R']}[-] Couldn't find the file: {src}\n"
-            f"\tPlease manually create it at {dest}{COLORS['RESET']}"
-        )
-
-
 
 def delete_image() -> None:
     try:
@@ -40,7 +29,6 @@ def delete_image() -> None:
 
     except KeyboardInterrupt:
         process.kill()
-
 
 
 def make_image() -> None:
@@ -75,7 +63,7 @@ def update_image() -> None:
     make_image()
 
 
-def auto_run() -> None:
+def docker_setup() -> None:
     print(f"{COLORS['Y']}[*] Setting things up for docker...{COLORS['RESET']}")
     command = shlex.split("docker image inspect btbmt")
 
@@ -95,9 +83,78 @@ def auto_run() -> None:
         update_image()
 
 
+def color_copy_file(src: str, dest: str):
+    try:
+        shutil.copyfile(src, dest)
+        print(f"{COLORS['G']}[+] Copying {src} to {dest}{COLORS['RESET']}")
+    except Exception:
+        print(
+            f"{COLORS['R']}[-] Unable to find file {src}\n"
+            f"\tPlease manually create it at {dest}{COLORS['RESET']}"
+        )
+
+
+def default() -> None:
+    if not os.path.exists("binance-trade-bot"):
+        subprocess.call(
+            "git clone https://github.com/edeng23/binance-trade-bot >/dev/null",
+            shell=True,
+        )
+
+    exists_previous_btb_install = input(
+        f"{COLORS['Y']}[*] Is a Binance Trade Bot installation already present on your filesystem (y/n)?: {COLORS['RESET']}"
+    )
+
+    if exists_previous_btb_install in ["y", "Y"]:
+        btb_installation_dir = input(
+            f"{COLORS['Y']}[*] Enter path to your previous Binance Trade bot installation (e.g. ../binance-trade-bot/): {COLORS['RESET']}"
+        )
+
+        while not os.path.exists(btb_installation_dir):
+            btb_installation_dir = input(
+                f"{COLORS['R']}[-] Couldn't find the specified path on the filesystem, try again: {COLORS['RESET']}"
+            )
+        else:
+            print(
+                f"{COLORS['G']}[+] Path {btb_installation_dir} found on the filesystem.{COLORS['RESET']}"
+            )
+
+        color_copy_file(
+            os.path.join(btb_installation_dir, "user.cfg"),
+            "./binance-trade-bot/user.cfg",
+        )
+        color_copy_file(
+            os.path.join(btb_installation_dir, "supported_coin_list"),
+            "./binance-trade-bot/supported_coin_list",
+        )
+        color_copy_file(
+            os.path.join(btb_installation_dir, "config/apprise.yml"),
+            "./binance-trade-bot/config/apprise.yml",
+        )
+
+    elif exists_previous_btb_install in ["n", "N"]:
+        print(
+            f"{COLORS['Y']}[*] Please manually create/edit the following files:\n"
+            f"\t- ./binance-trade-bot/user.cfg\n"
+            f"\t- ./binance-trade-bot/supported_coin_list\n"
+            f"\t- ./binance-trade-bot/config/apprise.yml"
+        )
+
+    docker = input(
+        f"{COLORS['Y']}[*] Would you like to run the setup script for running the bot in a docker container (y/n)?: "
+    )
+
+    if docker in ["y", "Y"]:
+        docker_setup()
+        print(f"{COLORS['G']}[*] All set!{COLORS['RESET']}")
+
+    else:
+        print(
+            f"{COLORS['Y']}[*] Skipping setup for dockerizing the bot{COLORS['RESET']}"
+        )
+
 
 def main():
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -122,7 +179,7 @@ def main():
     args = parser.parse_args()
 
     if not any([args.update_image, args.delete_image, args.make_image]):
-        auto_run()
+        default()
 
     elif args.update_image and not (args.delete_image or args.make_image):
         update_image()
@@ -132,67 +189,6 @@ def main():
 
     elif args.make_image:
         make_image()
-
-    if not os.path.exists("binance-trade-bot"):
-        subprocess.call(
-            "git clone https://github.com/edeng23/binance-trade-bot >/dev/null",
-            shell=True,
-        )
-
-    isBTB = input(
-        f"{COLORS['Y']}[*] Is a Binance Trade Bot installation already present on your filesystem (y/n)?: {COLORS['RESET']}"
-    )
-    if isBTB in ["y", "Y"]:
-        btb_installation_dir = input(
-            f"{COLORS['Y']}[*] Enter path to your previous Binance Trade bot installation (e.g. ../binance-trade-bot/): {COLORS['RESET']}"
-        )
-        os.path.exists(btb_installation_dir)
-
-        while not os.path.exists(btb_installation_dir):
-            btb_installation_dir = input(
-                f"{COLORS['R']}[-] Couldn't find the specified path on the filesystem, try again: {COLORS['RESET']}"
-            )
-        else:
-            print(
-                f"{COLORS['G']}[+] Path {btb_installation_dir} found on the filesystem.{COLORS['RESET']}"
-            )
-
-        color_copy_file(
-            os.path.join(btb_installation_dir, "user.cfg"),
-            "./binance-trade-bot/user.cfg",
-        )
-        color_copy_file(
-            os.path.join(btb_installation_dir, "supported_coin_list"),
-            "./binance-trade-bot/supported_coin_list",
-        )
-        color_copy_file(
-            os.path.join(btb_installation_dir, "config/apprise.yml"),
-            "./binance-trade-bot/config/apprise.yml",
-        )
-
-    elif isBTB in ["n", "N"]:
-        print(
-            f"{COLORS['Y']}[*] Please manually create/edit the following files:\n"
-            f"\t./binance-trade-bot/user.cfg\n"
-            f"\t./binance-trade-bot/supported_coin_list\n"
-            f"\t./binance-trade-bot/config/apprise.yml"
-        )
-
-    docker = input(
-        f"{COLORS['Y']}[*] Would you like to run the setup script for running the bot in a docker container (y/n)?: "
-    )
-
-    if docker in ["y", "Y"]:
-        d_setup()
-
-    else:
-        print(
-            f"{COLORS['Y']}[*] Skipping setup for dockerizing the bot{COLORS['RESET']}"
-        )
-        return
-
-    print(f"{COLORS['G']}[*] All set!{COLORS['RESET']}")
-
 
 
 if __name__ == "__main__":

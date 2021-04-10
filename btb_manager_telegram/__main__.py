@@ -1,9 +1,8 @@
-import subprocess
 import argparse
 import time
+from subprocess import PIPE, run
 
 import colorama
-
 from telegram.ext import ConversationHandler, Updater
 
 from btb_manager_telegram import (
@@ -110,10 +109,8 @@ def main() -> None:
 
 def run_on_docker() -> None:
     try:
-        subprocess.run(
-            "docker image inspect btbmt", shell=True, check=True, stdout=subprocess.PIPE
-        )
-        subprocess.run("docker run --rm -it btbmt", shell=True)
+        run("docker image inspect btbmt", shell=True, check=True, stdout=PIPE)
+        run("docker run --rm -it btbmt", shell=True)
 
     except Exception as e:
         print(
