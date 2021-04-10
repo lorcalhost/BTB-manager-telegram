@@ -117,13 +117,13 @@ def run_on_docker() -> None:
     process = subprocess.Popen(command, stdout=SUBPIPE,
                                stderr=SUBPIPE, stdin=SUBPIPE)
 
-    out, err = check_process.communicate()
+    out, err = process.communicate()
 
     if out == b'[]\n':
         print(f"{colorama.Fore.RED}[-] E: Docker image not found{colorama.Fore.RESET}")
         print(f"{colorama.Fore.YELLOW}[*] Please run the docker_setup.py script "
               "before running the bot in a container.{colorama.Fore.RESET}")
-        
+
     else:
         command = shlex.split('docker run --rm --it btbmt')
         try:
