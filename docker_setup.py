@@ -19,6 +19,16 @@ COLORS = {
     "RESET": colorama.Fore.RESET,
 }
 
+def delete_image() -> None:
+    try:
+        command = shlex.split('docker rmi -f btbmt')
+        process = subprocess.Popen(command, stderr=SUBPIPE, stdin=SUBPIPE)
+        stderr = process.communicate()
+        if stderr[1] == b'Error: No such image: btbmt\n':
+            print(f"{COLORS['R']}[-] Error: No such image: btbmt{COLORS['RESET']}")
+
+    except KeyboardInterrupt:
+        process.kill()
 
 def make_image() -> None:
     command = shlex.split('docker image inspect btbmt')
@@ -35,21 +45,18 @@ def make_image() -> None:
         except KeyboardInterrupt:
             make_process.kill()
 
-def delete_image() -> None:
-    try:
-        command = shlex.split('docker rmi -f btbmt')
-        process = subprocess.Popen(command, stderr=SUBPIPE, stdin=SUBPIPE)
-        stderr = process.communicate()
-        if stderr[1] == b'Error: No such image: btbmt\n':
-            print(f"{COLORS['R']}[-] Error: No such image: btbmt{COLORS['RESET']}")
+    else:
+        make_new = input(f"{COLORS['Y']}[*] A docker image already exists "
+                         f"Do you wish to update it(y/n)?: ")
 
-    except KeyboardInterrupt:
-        process.kill()
+        if make_new in ['y', 'Y']:
+            print(f"[*] Updating the image...{COLORS['RESET']}")
+            update_image()
+
 
 def update_image() -> None:
     delete_image()
     make_image()
-
 
 
 def auto_run() -> None:
