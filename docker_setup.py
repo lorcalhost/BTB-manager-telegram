@@ -16,7 +16,7 @@ COLORS = {
 
 
 def make_image() -> None:
-    subprocess.run('docker build' args=['--no-cache', '-t', 'BTBMT', '.'], shell=True)
+    subprocess.run('docker' args=['build', '--no-cache', '-t', 'BTBMT', '.'], shell=True)
 
 def delete_image() -> None:
     subprocess.run('docker' args=['rmi', '-f', 'BTBMT'], shell=True)
@@ -30,7 +30,7 @@ def update_image() -> None:
 def auto_run() -> None:
     print(f"{COLORS['Y']}[*] Setting things up for docker...{COLORS['RESET']}")
     try:
-        subprocess.run('docker', args=[ 'image', 'inspect', 'BTBMT'], check=True)
+        subprocess.run('docker', args=['image', 'inspect', 'BTBMT'], check=True)
         update_image()
 
     except Exception as e:

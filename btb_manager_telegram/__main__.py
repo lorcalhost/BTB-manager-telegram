@@ -119,7 +119,7 @@ def run_on_docker() -> None:
 
         return
 
-    subprocess.run('docker run', args=['--rm', '-it', 'BTBMT'], shell=True)
+    subprocess.run('docker', args=['run', '--rm', '-it', 'BTBMT'], shell=True)
 
 if __name__ == "__main__":
     on_docker = pre_run_main()
