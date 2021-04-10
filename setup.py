@@ -6,6 +6,7 @@ import colorama
 import pathlib
 import logging
 import shutil
+import shlex
 import sys
 import os
 
@@ -22,28 +23,28 @@ COLORS = {
 
 def input_copy_file(dest: str, message: str):
     try:
-        src = input(message)
+        src = input(message).strip()
         shutil.copyfile(src, dest)
-        logging.info(f"{COLORS['G']}[+] Found the file {src}!{COLORS['RESET']}")
+        print(f"{COLORS['G']}\n[+] Found the file {src}!{COLORS['RESET']}")
     except Exception as e:
-        logging.error(f"{COLORS['R']}[-] Couldn't find the file: {src}"
+        print(f"{COLORS['R']}\n[-] Couldn't find the file: {src} "
                       f"Please set it up.{COLORS['RESET']}")
 
 def main():
-    if not os.isdir("binance-trade-bot"):
+    if not os.path.isdir("binance-trade-bot"):
         os.system('git clone https://github.com/edeng23/binance-trade-bot')
 
     isBTB = input(f"{COLORS['Y']}[*] Is there a BTB installation on your filesystem (y/n)?: ")
     if isBTB in ['y', 'Y']:
 
         input_copy_file("binance-trade-bot/user.cfg",
-                        f"{COLORS['G']}[+] Enter path to user.cfg file: ")
+                        f"{COLORS['G']}\n[+] Enter path to user.cfg file: {COLORS['RESET']}")
 
         input_copy_file("binance-trade-bot/supported_coin_list",
-                        f"{COLORS['G']}[+] Enter the path to supported_coin_list: ")
+                        f"{COLORS['G']}\n[+] Enter the path to supported_coin_list: {COLORS['RESET']}")
 
         input_copy_file("binance-trade-bot/config/apprise.yml",
-                        f"{COLORS['G']}[+] Enter the path to apprise.yml file: ")
+                        f"{COLORS['G']}\n[+] Enter the path to apprise.yml file: {COLORS['RESET']}")
 
 
     elif isBTB in ['n', 'N']:
@@ -58,11 +59,21 @@ def main():
                    " running the bot in a docker container (y/n)?")
 
     if docker in ['y', 'Y']:
-        subprocess.run('$(which python3) docker_setup.py')
+        command = shlex.split('python3 docker_setup.py')
+        try:
+            process = subprocess.Popen(command, stdin=subprocess.PIPE)
+            process.communicate()
+
+        except KeyboardInterrupt:
+            process.kill()
+
+        except Exception as e:
+            print(f"{COLORS['R']}[-] {e} {COLORS['RESET']}")
 
     else:
         print(f"[*] Skipping te setup for dockerizing the bot{COLORS['RESET']}")
-
+        return
+    
     print(f"{COLORS['G']}[*] All set!{COLORS['RESET']}")
 
 
