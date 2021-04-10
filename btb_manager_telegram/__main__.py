@@ -1,7 +1,9 @@
+import subprocess
 import argparse
 import os
 import sys
 import time
+import shlex
 
 import colorama
 
@@ -109,17 +111,29 @@ def main() -> None:
 
 
 def run_on_docker() -> None:
-    try:
-        subprocess.run('docker', args=[ 'image', 'inspect', 'BTBMT'], check=True)
+    SUBPIPE = subprocess.PIPE
 
-    except Exception as e:
-        print(f"{colorama.Fore.RED}[-] E: {e}{colorama.Fore.RESET}")
+    command = shlex.split('docker image inspect btbmt')
+    process = subprocess.Popen(command, stdout=SUBPIPE,
+                               stderr=SUBPIPE, stdin=SUBPIPE)
+
+    out, err = check_process.communicate()
+
+    if out == b'[]\n':
+        print(f"{colorama.Fore.RED}[-] E: Docker image not found{colorama.Fore.RESET}")
         print(f"{colorama.Fore.YELLOW}[*] Please run the docker_setup.py script "
               "before running the bot in a container.{colorama.Fore.RESET}")
+        
+    else:
+        command = shlex.split('docker run --rm --it btbmt')
+        try:
+            process = subprocess.Popen(command, stdout=SUBPIPE,
+                                       stderr=SUBPIPE, stdin=SUBPIPE)
 
-        return
+            process.communicate()
 
-    subprocess.run('docker', args=['run', '--rm', '-it', 'BTBMT'], shell=True)
+        except KeyboardInterrupt:
+            process.kill()
 
 if __name__ == "__main__":
     on_docker = pre_run_main()
