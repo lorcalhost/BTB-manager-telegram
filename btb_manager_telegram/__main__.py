@@ -117,6 +117,7 @@ def run_on_docker() -> None:
     process = subprocess.Popen(command, stdout=SUBPIPE)
 
     out = process.communicate()
+    print(out)
 
     if out == b'[]\n':
         print(f"{colorama.Fore.RED}[-] E: Docker image not found{colorama.Fore.RESET}")
@@ -133,6 +134,9 @@ def run_on_docker() -> None:
 
         except KeyboardInterrupt:
             process.kill()
+
+        except:
+
 
 if __name__ == "__main__":
     on_docker = pre_run_main()
