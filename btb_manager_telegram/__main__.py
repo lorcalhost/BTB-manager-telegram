@@ -1,7 +1,6 @@
 import argparse
-import os
-import sys
 import time
+import subprocess
 
 import colorama
 
@@ -24,7 +23,7 @@ from btb_manager_telegram.utils import (
 )
 
 
-def pre_run_main() -> bool:
+def pre_run_main() -> None:
     parser = argparse.ArgumentParser(
         description="Thanks for using Binance Trade Bot Manager Telegram. "
         'By default the program will use "../binance-trade-bot/" as binance-trade-bot installation path.'
@@ -53,7 +52,8 @@ def pre_run_main() -> bool:
     args = parser.parse_args()
 
     if args.docker:
-        return True
+        run_on_docker()
+        exit(1)
 
     settings.ROOT_PATH = args.path
     settings.TOKEN = args.token
@@ -110,21 +110,19 @@ def main() -> None:
 
 def run_on_docker() -> None:
     try:
-        subprocess.run('docker', args=[ 'image', 'inspect', 'BTBMT'], check=True)
+        subprocess.run("docker image inspect btbmt", shell=True, check=True, stdout=subprocess.PIPE)
 
     except Exception as e:
         print(f"{colorama.Fore.RED}[-] E: {e}{colorama.Fore.RESET}")
-        print(f"{colorama.Fore.YELLOW}[*] Please run the docker_setup.py script "
-              "before running the bot in a container.{colorama.Fore.RESET}")
-
+        print(
+            f"{colorama.Fore.YELLOW}[*] Please run the docker_setup.py script "
+            f"before running the bot in a container.{colorama.Fore.RESET}"
+        )
         return
 
-    subprocess.run('docker', args=['run', '--rm', '-it', 'BTBMT'], shell=True)
+    subprocess.run("docker run --rm -it btbmt", shell=True)
+
 
 if __name__ == "__main__":
-    on_docker = pre_run_main()
-    if on_docker:
-        run_on_docker()
-        sys.exit(-1)
-
+    pre_run_main()
     main()
