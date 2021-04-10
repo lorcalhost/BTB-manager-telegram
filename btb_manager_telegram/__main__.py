@@ -1,3 +1,4 @@
+import subprocess
 import argparse
 import time
 import subprocess
@@ -109,20 +110,20 @@ def main() -> None:
 
 
 def run_on_docker() -> None:
-    try:
-        subprocess.run("docker image inspect btbmt", shell=True, check=True, stdout=subprocess.PIPE)
+    proc = subprocess.run(
+        "docker image inspect btbmt", shell=True, check=True, stdout=subprocess.PIPE
+    )
+    out = proc.communicate()
 
-    except Exception as e:
-        print(f"{colorama.Fore.RED}[-] E: {e}{colorama.Fore.RESET}")
+    if out == b"[]\n":
         print(
+            f"{colorama.Fore.RED}[-] E: Docker image not found{colorama.Fore.RESET}"
             f"{colorama.Fore.YELLOW}[*] Please run the docker_setup.py script "
             f"before running the bot in a container.{colorama.Fore.RESET}"
         )
-        return
+    else:
+        subprocess.run("docker run --rm -it btbmt", shell=True)
 
-    subprocess.run("docker run --rm -it btbmt", shell=True)
-
-
-if __name__ == "__main__":
-    pre_run_main()
-    main()
+    if __name__ == "__main__":
+        pre_run_main()
+        main()
