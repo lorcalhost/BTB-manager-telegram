@@ -1,8 +1,6 @@
 import subprocess
 import argparse
 import time
-import shlex
-import subprocess
 
 import colorama
 
