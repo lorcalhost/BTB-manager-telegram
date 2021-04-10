@@ -111,35 +111,20 @@ def main() -> None:
 
 
 def run_on_docker() -> None:
-    SUBPIPE = subprocess.PIPE
+    try:
+        subprocess.run(
+            "docker image inspect btbmt", shell=True, check=True, stdout=subprocess.PIPE
+        )
+        subprocess.run("docker run --rm -it btbmt", shell=True)
 
-    command = shlex.split('docker image inspect btbmt')
-    process = subprocess.Popen(command, stdout=SUBPIPE)
-
-    out = process.communicate()
-
-    if out == b'[]\n':
-        print(f"{colorama.Fore.RED}[-] E: Docker image not found{colorama.Fore.RESET}")
-        print(f"{colorama.Fore.YELLOW}[*] Please run the docker_setup.py script "
-              "before running the bot in a container.{colorama.Fore.RESET}")
-
-    else:
-        command = shlex.split('docker run --rm --it btbmt')
-        try:
-            process = subprocess.Popen(command, stdout=SUBPIPE,
-                                       stderr=SUBPIPE, stdin=SUBPIPE)
-
-            process.communicate()
-
-        except KeyboardInterrupt:
-            process.kill()
+    except Exception as e:
+        print(
+            f"{colorama.Fore.RED}[-] Error: {e}{colorama.Fore.RESET}"
+            f"{colorama.Fore.YELLOW}[*] Please run the docker_setup.py script "
+            f"before running the bot in a container.{colorama.Fore.RESET}"
+        )
 
 
 if __name__ == "__main__":
-    on_docker = pre_run_main()
-    if on_docker:
-        run_on_docker()
-        sys.exit(-1)
-
     pre_run_main()
     main()
