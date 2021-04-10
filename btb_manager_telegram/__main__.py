@@ -3,6 +3,8 @@ import os
 import sys
 import time
 
+import colorama
+
 from telegram.ext import ConversationHandler, Updater
 
 from btb_manager_telegram import (
@@ -106,15 +108,23 @@ def main() -> None:
     updater.idle()
 
 
+def run_on_docker() -> None:
+    try:
+        subprocess.run('docker', args=[ 'image', 'inspect', 'BTBMT'], check=True)
+
+    except Exception as e:
+        print(f"{colorama.Fore.RED}[-] E: {e}{colorama.Fore.RESET}")
+        print(f"{colorama.Fore.YELLOW}[*] Please run the docker_setup.py script "
+              "before running the bot in a container.{colorama.Fore.RESET}")
+
+        return
+
+    subprocess.run('docker run', args=['--rm', '-it', 'BTBMT'], shell=True)
+
 if __name__ == "__main__":
     on_docker = pre_run_main()
     if on_docker:
-        os.system("docker build --no-cache -t py-container .")
-        try:
-            os.system("docker run --rm -it py-container")
-        except Exception:
-            pass
-        os.system("docker rmi -f py-container")
+        run_on_docker()
         sys.exit(-1)
 
     main()
