@@ -325,9 +325,9 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
         try:
+            find_and_kill_binance_trade_bot_process()
             subprocess.call(
-                "kill -9 $(ps ax | grep btb_manager_telegram | fgrep -v grep | awk '{ print $1 }') && "
-                "git pull && $(which python3) -m pip install -r requirements.txt && "
+                "git pull && $(which python3) -m pip install -r requirements.txt --upgrade && "
                 "$(which python3) -m btb_manager_telegram &",
                 shell=True,
             )
