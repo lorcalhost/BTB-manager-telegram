@@ -368,7 +368,7 @@ def update_btb(update: Update, _: CallbackContext) -> int:
             subprocess.call(
                 f"cd {settings.ROOT_PATH} && "
                 f"git pull && "
-                f"$(which python3) -m pip install -r requirements.txt && "
+                f"$(which python3) -m pip install -r requirements.txt --upgrade && "
                 f"$(which python3) -m binance_trade_bot &",
                 shell=True,
             )
