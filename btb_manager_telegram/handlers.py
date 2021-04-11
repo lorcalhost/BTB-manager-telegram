@@ -328,12 +328,12 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
         try:
-            kill_btb_manager_telegram_process()
             subprocess.call(
                 "git pull && $(which python3) -m pip install -r requirements.txt --upgrade && "
                 "$(which python3) -m btb_manager_telegram &",
                 shell=True,
             )
+            kill_btb_manager_telegram_process()
         except Exception:
             message = "Unable to update BTB Manager Telegram"
             update.message.reply_text(

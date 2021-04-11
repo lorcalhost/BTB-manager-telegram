@@ -96,7 +96,7 @@ def kill_btb_manager_telegram_process():
     try:
         btb_manager_telegram_pid = os.getpid()
         btb_manager_telegram_process = psutil.Process(btb_manager_telegram_pid)
-        btb_manager_telegram_process.terminate()
+        btb_manager_telegram_process.kill()
         btb_manager_telegram_process.wait()
     except Exception as e:
         logger.info(f"ERROR: {e}")
