@@ -264,7 +264,7 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
             f"{update.message.text}\n"
             f"```".replace(".", "\.")
         )
-        coin_file_path = f"{settings.ROOT_PATH}supported_coin_list"
+        coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
         try:
             copyfile(coin_file_path, f"{coin_file_path}.backup")
             with open(coin_file_path, "w") as f:
@@ -293,7 +293,7 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
             f"{update.message.text}\n"
             f"```".replace(".", "\.")
         )
-        user_cfg_file_path = f"{settings.ROOT_PATH}user.cfg"
+        user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
         try:
             copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
             with open(user_cfg_file_path, "w") as f:
@@ -321,7 +321,7 @@ def delete_db(update: Update, _: CallbackContext) -> int:
 
     if update.message.text != "Go back":
         message = "✔ Successfully deleted database file\."
-        db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
+        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
         try:
             copyfile(db_file_path, f"{db_file_path}.backup")
             os.remove(db_file_path)
@@ -423,7 +423,7 @@ def panic(update: Update, _: CallbackContext) -> int:
         find_and_kill_process()
 
         # Get current coin pair
-        db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
+        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
         con = sqlite3.connect(db_file_path)
         cur = con.cursor()
 
@@ -434,7 +434,7 @@ def panic(update: Update, _: CallbackContext) -> int:
         alt_coin_id, crypto_coin_id = cur.fetchone()
 
         # Get Binance api keys and tld
-        user_cfg_file_path = f"{settings.ROOT_PATH}user.cfg"
+        user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
         with open(user_cfg_file_path) as cfg:
             config = ConfigParser()
             config.read_file(cfg)

@@ -19,7 +19,7 @@ def setup_root_path_constant():
 def setup_telegram_constants():
     logger.info("Retrieving Telegram token and user_id from apprise.yml file.")
     telegram_url = None
-    yaml_file_path = f"{settings.ROOT_PATH}config/apprise.yml"
+    yaml_file_path = os.path.join(settings.ROOT_PATH, "config/apprise.yml")
     if os.path.exists(yaml_file_path):
         with open(yaml_file_path) as f:
             try:
