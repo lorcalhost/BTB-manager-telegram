@@ -92,6 +92,16 @@ def find_and_kill_binance_trade_bot_process():
         logger.info(f"ERROR: {e}")
 
 
+def kill_btb_manager_telegram_process():
+    try:
+        btb_manager_telegram_pid = os.getpid()
+        btb_manager_telegram_process = psutil.Process(btb_manager_telegram_pid)
+        btb_manager_telegram_process.terminate()
+        btb_manager_telegram_process.wait()
+    except Exception as e:
+        logger.info(f"ERROR: {e}")
+
+
 def is_tg_bot_update_available():
     try:
         proc = subprocess.Popen(
