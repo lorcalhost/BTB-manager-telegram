@@ -2,7 +2,18 @@ import logging
 import sched
 import time
 
-MENU, EDIT_COIN_LIST, EDIT_USER_CONFIG, DELETE_DB, UPDATE_TG, UPDATE_BTB = range(6)
+(
+    MENU,
+    EDIT_COIN_LIST,
+    EDIT_USER_CONFIG,
+    DELETE_DB,
+    UPDATE_TG,
+    UPDATE_BTB,
+    PANIC_BUTTON,
+) = range(7)
+
+BOUGHT, BUYING, SOLD, SELLING = range(4)
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
