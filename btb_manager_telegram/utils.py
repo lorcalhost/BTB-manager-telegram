@@ -1,5 +1,6 @@
 import os
 import subprocess
+from typing import Optional
 
 import psutil
 import yaml
@@ -68,22 +69,25 @@ def text_4096_cutter(m_list):
     return message
 
 
-def find_process():
-    return any(
-        "binance_trade_bot" in proc.name()
-        or "binance_trade_bot" in " ".join(proc.cmdline())
-        for proc in psutil.process_iter()
-    )
+def get_binance_trade_bot_process() -> Optional[psutil.Process]:
+    name = "binance_trade_bot"
+    is_root_path_absolute = os.path.isabs(settings.ROOT_PATH)
+    bot_path = settings.ROOT_PATH
+    if not is_root_path_absolute:
+        bot_path = os.path.normpath(os.path.join(os.getcwd(), settings.ROOT_PATH))
+
+    for proc in psutil.process_iter():
+        if (
+            name in proc.name() or name in " ".join(proc.cmdline())
+        ) and proc.cwd() == bot_path:
+            return proc
 
 
-def find_and_kill_process():
+def find_and_kill_binance_trade_bot_process():
     try:
-        for proc in psutil.process_iter():
-            if "binance_trade_bot" in proc.name() or "binance_trade_bot" in " ".join(
-                proc.cmdline()
-            ):
-                proc.terminate()
-                proc.wait()
+        binance_trade_bot_process = get_binance_trade_bot_process()
+        binance_trade_bot_process.terminate()
+        binance_trade_bot_process.wait()
     except Exception as e:
         logger.info(f"ERROR: {e}")
 

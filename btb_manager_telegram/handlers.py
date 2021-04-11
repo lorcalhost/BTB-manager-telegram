@@ -22,7 +22,7 @@ from btb_manager_telegram import (
     logger,
     settings,
 )
-from btb_manager_telegram.utils import find_and_kill_process
+from btb_manager_telegram.utils import find_and_kill_binance_trade_bot_process
 
 
 def menu(update: Update, _: CallbackContext) -> int:
@@ -364,7 +364,7 @@ def update_btb(update: Update, _: CallbackContext) -> int:
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
         try:
-            find_and_kill_process()
+            find_and_kill_binance_trade_bot_process()
             subprocess.call(
                 f"cd {settings.ROOT_PATH} && "
                 f"git pull && "

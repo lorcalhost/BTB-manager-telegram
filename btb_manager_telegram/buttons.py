@@ -6,8 +6,8 @@ from datetime import datetime
 
 from btb_manager_telegram import logger, settings
 from btb_manager_telegram.utils import (
-    find_and_kill_process,
-    find_process,
+    find_and_kill_binance_trade_bot_process,
+    get_binance_trade_bot_process,
     is_btb_bot_update_available,
     is_tg_bot_update_available,
     text_4096_cutter,
@@ -209,7 +209,7 @@ def check_status():
     logger.info("Check status button pressed.")
 
     message = "⚠ Binance Trade Bot is not running."
-    if find_process():
+    if get_binance_trade_bot_process():
         message = "✔ Binance Trade Bot is running."
     return message
 
@@ -260,16 +260,16 @@ def start_bot():
     logger.info("Start bot button pressed.")
 
     message = "⚠ Binance Trade Bot is already running\."
-    if not find_process():
+    if not get_binance_trade_bot_process():
         if os.path.exists(f"{settings.ROOT_PATH}binance_trade_bot/"):
             subprocess.call(
                 f"cd {settings.ROOT_PATH} && $(which python3) -m binance_trade_bot &",
                 shell=True,
             )
-            if not find_process():
-                message = "❌ Unable to start Binance Trade Bot\."
-            else:
+            if get_binance_trade_bot_process():
                 message = "✔ Binance Trade Bot successfully started\."
+            else:
+                message = "❌ Unable to start Binance Trade Bot\."
         else:
             message = (
                 f"❌ Unable to find _Binance Trade Bot_ installation at {settings.ROOT_PATH}\.\n"
@@ -282,9 +282,9 @@ def stop_bot():
     logger.info("Stop bot button pressed.")
 
     message = "⚠ Binance Trade Bot is not running."
-    if find_process():
-        find_and_kill_process()
-        if not find_process():
+    if get_binance_trade_bot_process():
+        find_and_kill_binance_trade_bot_process()
+        if not get_binance_trade_bot_process():
             message = "✔ Successfully stopped the bot."
         else:
             message = (
@@ -317,7 +317,7 @@ def delete_db():
     message = "⚠ Please stop Binance Trade Bot before deleting the database file\."
     delete = False
     db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
-    if not find_process():
+    if not get_binance_trade_bot_process():
         if os.path.exists(db_file_path):
             message = "Are you sure you want to delete the database file?"
             delete = True
@@ -334,7 +334,7 @@ def edit_user_cfg():
     message = "⚠ Please stop Binance Trade Bot before editing user configuration file\."
     edit = False
     user_cfg_file_path = f"{settings.ROOT_PATH}user.cfg"
-    if not find_process():
+    if not get_binance_trade_bot_process():
         if os.path.exists(user_cfg_file_path):
             with open(user_cfg_file_path) as f:
                 message = (
@@ -361,7 +361,7 @@ def edit_coin():
     message = "⚠ Please stop Binance Trade Bot before editing the coin list\."
     edit = False
     coin_file_path = f"{settings.ROOT_PATH}supported_coin_list"
-    if not find_process():
+    if not get_binance_trade_bot_process():
         if os.path.exists(coin_file_path):
             with open(coin_file_path) as f:
                 message = (
@@ -386,7 +386,7 @@ def export_db():
     message = "⚠ Please stop Binance Trade Bot before exporting the database file\."
     db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
     fil = None
-    if not find_process():
+    if not get_binance_trade_bot_process():
         if os.path.exists(db_file_path):
             with open(db_file_path, "rb") as db:
                 fil = db.read()
