@@ -17,7 +17,7 @@ from btb_manager_telegram.utils import (
 def current_value():
     logger.info("Current value button pressed.")
 
-    db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
+    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
     if os.path.exists(db_file_path):
         try:
@@ -103,7 +103,7 @@ def current_value():
 def check_progress():
     logger.info("Progress button pressed.")
 
-    db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
+    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
     if os.path.exists(db_file_path):
         try:
@@ -144,8 +144,8 @@ def check_progress():
 def current_ratios():
     logger.info("Current ratios button pressed.")
 
-    db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
-    user_cfg_file_path = f"{settings.ROOT_PATH}user.cfg"
+    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+    user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
     message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
     if os.path.exists(db_file_path):
         try:
@@ -217,7 +217,7 @@ def check_status():
 def trade_history():
     logger.info("Trade history button pressed.")
 
-    db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
+    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
     if os.path.exists(db_file_path):
         try:
@@ -261,7 +261,7 @@ def start_bot():
 
     message = "⚠ Binance Trade Bot is already running\."
     if not get_binance_trade_bot_process():
-        if os.path.exists(f"{settings.ROOT_PATH}binance_trade_bot/"):
+        if os.path.exists(os.path.join(settings.ROOT_PATH, "binance_trade_bot/")):
             subprocess.call(
                 f"cd {settings.ROOT_PATH} && $(which python3) -m binance_trade_bot &",
                 shell=True,
@@ -297,7 +297,7 @@ def stop_bot():
 def read_log():
     logger.info("Read log button pressed.")
 
-    log_file_path = f"{settings.ROOT_PATH}logs/crypto_trading.log"
+    log_file_path = os.path.join(settings.ROOT_PATH, "logs/crypto_trading.log")
     message = f"❌ Unable to find log file at `{log_file_path}`.".replace(".", "\.")
     if os.path.exists(log_file_path):
         with open(log_file_path) as f:
@@ -316,7 +316,7 @@ def delete_db():
 
     message = "⚠ Please stop Binance Trade Bot before deleting the database file\."
     delete = False
-    db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
+    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     if not get_binance_trade_bot_process():
         if os.path.exists(db_file_path):
             message = "Are you sure you want to delete the database file?"
@@ -333,7 +333,7 @@ def edit_user_cfg():
 
     message = "⚠ Please stop Binance Trade Bot before editing user configuration file\."
     edit = False
-    user_cfg_file_path = f"{settings.ROOT_PATH}user.cfg"
+    user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
     if not get_binance_trade_bot_process():
         if os.path.exists(user_cfg_file_path):
             with open(user_cfg_file_path) as f:
@@ -360,7 +360,7 @@ def edit_coin():
 
     message = "⚠ Please stop Binance Trade Bot before editing the coin list\."
     edit = False
-    coin_file_path = f"{settings.ROOT_PATH}supported_coin_list"
+    coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
     if not get_binance_trade_bot_process():
         if os.path.exists(coin_file_path):
             with open(coin_file_path) as f:
@@ -384,7 +384,7 @@ def export_db():
     logger.info("Export database button pressed.")
 
     message = "⚠ Please stop Binance Trade Bot before exporting the database file\."
-    db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
+    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     fil = None
     if not get_binance_trade_bot_process():
         if os.path.exists(db_file_path):

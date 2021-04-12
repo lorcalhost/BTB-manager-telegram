@@ -239,7 +239,7 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
             f"{update.message.text}\n"
             f"```".replace(".", "\.")
         )
-        coin_file_path = f"{settings.ROOT_PATH}supported_coin_list"
+        coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
         try:
             copyfile(coin_file_path, f"{coin_file_path}.backup")
             with open(coin_file_path, "w") as f:
@@ -268,7 +268,7 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
             f"{update.message.text}\n"
             f"```".replace(".", "\.")
         )
-        user_cfg_file_path = f"{settings.ROOT_PATH}user.cfg"
+        user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
         try:
             copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
             with open(user_cfg_file_path, "w") as f:
@@ -296,7 +296,7 @@ def delete_db(update: Update, _: CallbackContext) -> int:
 
     if update.message.text != "Go back":
         message = "✔ Successfully deleted database file\."
-        db_file_path = f"{settings.ROOT_PATH}data/crypto_trading.db"
+        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
         try:
             copyfile(db_file_path, f"{db_file_path}.backup")
             os.remove(db_file_path)
