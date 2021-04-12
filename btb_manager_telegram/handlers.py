@@ -22,7 +22,10 @@ from btb_manager_telegram import (
     logger,
     settings,
 )
-from btb_manager_telegram.utils import find_and_kill_process
+from btb_manager_telegram.utils import (
+    find_and_kill_binance_trade_bot_process,
+    kill_btb_manager_telegram_process,
+)
 
 
 def menu(update: Update, _: CallbackContext) -> int:
@@ -326,11 +329,11 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
         )
         try:
             subprocess.call(
-                "kill -9 $(ps ax | grep btb_manager_telegram | fgrep -v grep | awk '{ print $1 }') && "
-                "git pull && $(which python3) -m pip install -r requirements.txt && "
+                "git pull && $(which python3) -m pip install -r requirements.txt --upgrade && "
                 "$(which python3) -m btb_manager_telegram &",
                 shell=True,
             )
+            kill_btb_manager_telegram_process()
         except Exception:
             message = "Unable to update BTB Manager Telegram"
             update.message.reply_text(
@@ -364,11 +367,11 @@ def update_btb(update: Update, _: CallbackContext) -> int:
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
         try:
-            find_and_kill_process()
+            find_and_kill_binance_trade_bot_process()
             subprocess.call(
                 f"cd {settings.ROOT_PATH} && "
                 f"git pull && "
-                f"$(which python3) -m pip install -r requirements.txt && "
+                f"$(which python3) -m pip install -r requirements.txt --upgrade && "
                 f"$(which python3) -m binance_trade_bot &",
                 shell=True,
             )
