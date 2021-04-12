@@ -1,8 +1,9 @@
 import os
 import subprocess
-from typing import Optional
+from typing import List, Optional
 
 import psutil
+import telegram
 import yaml
 from telegram import Bot
 
@@ -57,11 +58,11 @@ def setup_telegram_constants():
         exit(-1)
 
 
-def text_4096_cutter(m_list):
+def telegram_text_truncator(m_list) -> List[str]:
     message = [""]
     index = 0
     for mes in m_list:
-        if len(message[index]) + len(mes) <= 4096:
+        if len(message[index]) + len(mes) <= telegram.constants.MAX_MESSAGE_LENGTH:
             message[index] += mes
         else:
             message.append(mes)

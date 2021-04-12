@@ -10,7 +10,7 @@ from btb_manager_telegram.utils import (
     get_binance_trade_bot_process,
     is_btb_bot_update_available,
     is_tg_bot_update_available,
-    text_4096_cutter,
+    telegram_text_truncator,
 )
 
 
@@ -88,7 +88,7 @@ def current_value():
                         ".", "\."
                     )
                 ]
-                message = text_4096_cutter(m_list)
+                message = telegram_text_truncator(m_list)
                 con.close()
             except Exception:
                 con.close()
@@ -131,7 +131,7 @@ def check_progress():
                         f"\t\- Last trade: `{last_trade_date}`\n\n".replace(".", "\.")
                     )
 
-                message = text_4096_cutter(m_list)
+                message = telegram_text_truncator(m_list)
                 con.close()
             except Exception:
                 con.close()
@@ -192,7 +192,7 @@ def current_ratios():
                         f"\t\- Ratio: `{round(coin[3], 6)}`\n\n".replace(".", "\.")
                     )
 
-                message = text_4096_cutter(m_list)
+                message = telegram_text_truncator(m_list)
                 con.close()
             except Exception:
                 con.close()
@@ -244,7 +244,7 @@ def trade_history():
                         f"Status: _*{trade[3]}*_\n\n".replace(".", "\.")
                     )
 
-                message = text_4096_cutter(m_list)
+                message = telegram_text_truncator(m_list)
                 con.close()
             except Exception:
                 con.close()
