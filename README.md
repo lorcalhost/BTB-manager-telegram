@@ -10,20 +10,22 @@ I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn
 
 As of now the bot is able to perform the following actions:
 
-- Check bot status (running / not running)
-- Start _Binance Trade Bot_
-- Stop _Binance Trade Bot_
-- Display current coin stats (balance, USD value, BTC value, initial buying price)
-- Display current coin ratios
-- Display progress (how much more of a certain coin you gained since you started using _Binance Trade Bot_)
-- Display trade history
-- Display last 4000 characters of log file
-- Edit coin list (`supported_coin_list` file)
-- Edit user configuration (`user.cfg` file)
-- Delete database file (`crypto_trading.db` file)
-- Export database file
-- **Update** _Binance Trade Bot_ (and notify when new update is available)
-- **Update** _Binance Trade Bot Manager Telegram_ (and notify when new update is available)
+- [x] Check bot status (running / not running)
+- [x] Start _Binance Trade Bot_
+- [x] Stop _Binance Trade Bot_
+- [x] Display current coin stats (balance, USD value, BTC value, initial buying price)
+- [x] Display current coin ratios
+- [x] Display progress (how much more of a certain coin you gained since you started using _Binance Trade Bot_)
+- [x] Display trade history
+- [x] Display last 4000 characters of log file
+- [x] Edit coin list (`supported_coin_list` file)
+- [x] Edit user configuration (`user.cfg` file)
+- [x] Delete database file (`crypto_trading.db` file)
+- [x] Export database file
+- [x] **Update** _Binance Trade Bot_ (and notify when new update is available)
+- [x] **Update** _Binance Trade Bot Manager Telegram_ (and notify when new update is available)
+
+</br>
 
 The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yml` file.  
 Only the Telegram user with `user_id` equal to the one set in the `apprise.yml` file will be able to use the bot.
@@ -63,40 +65,13 @@ $ python3 -m pip install -r requirements.txt
 
 ⚠ Make sure the correct `rwx` permissions are set and the program is run with correct privileges.
 
-## (Optional) Setup Docker image
+## Setup
 
-<details><summary>CLICK ME</summary>
-To run _Binance Trade Bot Manager Telegram_ inside a Docker container you must first make sure to have your _binance-trade-bot_ installation directory inside the _BTB-manager-telegram_ one.  
-Your filesystem should look like this:
-
-```
-.
-└── *parent_dir*
-    └── BTB-manager-telegram
-        └── binance-trade-bot
-```
-
-For quickly setting up the filesystem as intended you can run the `docker_setup.py` script:
-
-```console
-$ python3 docker_setup.py
-```
-
-`docker_setup.py` also takes the following optional arguments:
-
-```console
-optional arguments:
-  -m, --make-image    Create a docker image for the bot.
-  -u, --update-image  Update the docker image for the bot.
-  -D, --delete-image  Delete the docker image for the bot.
-```
-
-</details>
-</br>
+For a quick setup guide [click here](./docs/setup-guide.md).  
+For a Docker setup guide [click here](./docs/docker.md).  
+If you have several _Binance Trade Bot_ instances running at the same time [click here](./docs/multiple-bots.md).
 
 ## Usage
-
-### Run normally
 
 **BTBManagerTelegram** can be run directly by executing the following command:
 
@@ -124,16 +99,8 @@ optional arguments:
                         (optional) Run the script in a docker container.
                         NOTE: Run the 'docker_setup.py' file before passing this flag.
 ```
-
-### Run inside a Docker container
-
-To run _Binance Trade Bot Manager Telegram_ in a Docker container you can do the following **after setting up the image**:
-
-```console
-$ python3 -m btb_manager_telegram --docker
-```
-
-⚠ Due to the nature of Docker containers, whenever you use the _Update Telegram Bot_ feature, only the repository inside the container will be updated while the one on your filesystem will remain untouched.
+Note:  
+Please check the [Docker setup](./docs/docker.md) guide if you would like to run the bot in a Docker container.
 
 ## Interaction
 
@@ -142,7 +109,7 @@ Every time the Telegram bot is restarted the `/start` command should be sent aga
 
 ## Screenshots
 
-<details><summary>CLICK ME</summary>
+<details><summary>Click here</summary>
 
 <p align="center">
   	<img height="20%" width="20%" src="https://i.imgur.com/9JUN2G7.jpg" />&nbsp;&nbsp;&nbsp;&nbsp;
@@ -150,58 +117,8 @@ Every time the Telegram bot is restarted the `/start` command should be sent aga
     <img height="20%" width="20%" src="https://i.imgur.com/UKyREe9.jpg" />
 </p>
 </details>
-</br>
 
-## Troubleshooting
-
-### 1. I am sending the `/start` command to the bot but it's not answering:
-
-<details><summary>CLICK ME</summary>
-
-<p align="center">
-
-Usually when this happens it means that you haven't properly setup your `apprise.yml` file.  
-For security reasons the bot is programmed so that it only responds to the person with `user_id` equal to the one set in the Telegram URL inside the `apprise.yml` file.
-
-Example of `apprise.yml` file:
-
-```yaml
-version: 1
-urls:
-  - tgram://123456789:AABx8iXjE5C-vG4SDhf6ARgdFgxYxhuHb4A/606743502
-```
-
-In this URL:
-
-- `123456789:AABx8iXjE5C-vG4SDhf6ARgdFgxYxhuHb4A` is the bot's `token`
-- `606743502` is the `user_id`
-
-You can find your `user_id` by sending a Telegram message to [@userinfobot](https://t.me/userinfobot).
-
-Note:  
-If the bot is not responsive after using the _Update Telegram Bot_ function something might have gone wrong and you need to manually restart _BTB Manager Telegram_.
-
-</p>
-</details>
-</br>
-
-### 2. ERROR: `Make sure that only one bot instance is running`:
-
-<details><summary>CLICK ME</summary>
-
-<p align="center">
-
-This means that there are two or more instances of `BTB-Manager-Telegram` running at the same time on the same Telegram `token`.  
-To fix this error you can kill all `BTB-Manager-Telegram` instances and restart the Telegram bot.  
-You can kill the processes using the following command:
-
-```bash
-kill -9 $(ps ax | grep btb_manager_telegram | fgrep -v grep | awk '{ print $1 }')
-```
-
-</p>
-</details>
-</br>
+## [Troubleshooting](./docs/troubleshooting.md)
 
 ## Support the Project
 
