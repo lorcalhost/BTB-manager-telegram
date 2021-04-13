@@ -2,8 +2,6 @@
 
 A Telegram bot for remotely managing [Binance Trade Bot].
 
-**If you have feature requests please open an issue on this repo, developers are also welcome to contribute!**
-
 ## About
 
 I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn't have to constantly ssh into my VPS, and my non-techy friends could enjoy the benefits of automated trading.
@@ -120,9 +118,15 @@ Every time the Telegram bot is restarted the `/start` command should be sent aga
 
 ## [Troubleshooting]
 
-## Support the Project
+## Support the project
 
 <a href="https://www.buymeacoffee.com/lorcalhost"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=lorcalhost&button_colour=FFDD00&font_colour=000000&font_family=Lato&outline_colour=000000&coffee_colour=ffffff"></a>
+
+## Contributions and feature requests
+
+If you have any feature requests please [open an issue].
+
+Contributions from anyone are welcome! Before opening pull requests please read the [contributing guidelines].
 
 ## Disclaimer
 
@@ -146,3 +150,5 @@ damages for loss of profits.
 [wsl]: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 [troubleshooting]: ./docs/troubleshooting.md
 [docker setup]: ./docs/docker-setup.md
+[open an issue]: https://github.com/lorcalhost/BTB-manager-telegram/issues/new
+[contributing guidelines]: ./CONTRIBUTING.md

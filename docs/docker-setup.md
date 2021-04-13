@@ -1,5 +1,7 @@
 # Docker
 
+Running _Binance Trade Bot Manager Telegram_ inside a Docker container is an experimental feature.
+
 ## Setup
 
 To run _Binance Trade Bot Manager Telegram_ inside a Docker container you must first make sure to have your _binance-trade-bot_ installation directory inside the _BTB-manager-telegram_ one.  
@@ -26,9 +28,6 @@ optional arguments:
   -u, --update-image  Update the docker image for the bot.
   -D, --delete-image  Delete the docker image for the bot.
 ```
-
-Note:  
-Running _Binance Trade Bot Manager Telegram_ inside a Docker container is an experimental feature.
 
 ## Usage
 
