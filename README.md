@@ -10,20 +10,20 @@ I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn
 
 As of now the bot is able to perform the following actions:
 
-- [x] Check bot status (running / not running)
-- [x] Start _Binance Trade Bot_
-- [x] Stop _Binance Trade Bot_
-- [x] Display current coin stats (balance, USD value, BTC value, initial buying price)
-- [x] Display current coin ratios
-- [x] Display progress (how much more of a certain coin you gained since you started using _Binance Trade Bot_)
-- [x] Display trade history
-- [x] Display last 4000 characters of log file
-- [x] Edit coin list (`supported_coin_list` file)
-- [x] Edit user configuration (`user.cfg` file)
-- [x] Delete database file (`crypto_trading.db` file)
-- [x] Export database file
-- [x] **Update** _Binance Trade Bot_ (and notify when new update is available)
-- [x] **Update** _Binance Trade Bot Manager Telegram_ (and notify when new update is available)
+- [x] 🔍 Check bot status (running / not running)
+- [x] ▶ Start _Binance Trade Bot_
+- [x] ⏹ Stop _Binance Trade Bot_
+- [x] 💵 Display current coin stats (balance, USD value, BTC value, initial buying price)
+- [x] ➗ Display current coin ratios
+- [x] 📈 Display progress (how much more of a certain coin you gained since you started using _Binance Trade Bot_)
+- [x] ⌛ Display trade history
+- [x] 📜 Display last 4000 characters of log file
+- [x] 👛 Edit coin list (`supported_coin_list` file)
+- [x] ⚙ Edit user configuration (`user.cfg` file)
+- [x] ❌ Delete database file (`crypto_trading.db` file)
+- [x] 📤 Export database file
+- [x] ⬆ **Update** _Binance Trade Bot_ (and notify when new update is available)
+- [x] ⬆ **Update** _Binance Trade Bot Manager Telegram_ (and notify when new update is available)
 
 </br>
 
@@ -67,9 +67,9 @@ $ python3 -m pip install -r requirements.txt
 
 ## Setup
 
-For a quick setup guide [click here](./docs/setup-guide.md).  
-For a Docker setup guide [click here](./docs/docker.md).  
-If you have several _Binance Trade Bot_ instances running at the same time [click here](./docs/multiple-bots.md).
+- For a quick Telegram bot setup guide [click here](./docs/telegram-setup.md).
+- For a Docker setup guide [click here](./docs/docker-setup.md).
+- If you would like to run several _Binance Trade Bot_ instances at the same time [click here](./docs/multiple-bots.md).
 
 ## Usage
 
@@ -99,8 +99,8 @@ optional arguments:
                         (optional) Run the script in a docker container.
                         NOTE: Run the 'docker_setup.py' file before passing this flag.
 ```
-Note:  
-Please check the [Docker setup](./docs/docker.md) guide if you would like to run the bot in a Docker container.
+
+⚠ Please check the [Docker setup] guide if you would like to run the bot in a Docker container.
 
 ## Interaction
 
@@ -118,7 +118,7 @@ Every time the Telegram bot is restarted the `/start` command should be sent aga
 </p>
 </details>
 
-## [Troubleshooting](./docs/troubleshooting.md)
+## [Troubleshooting]
 
 ## Support the Project
 
@@ -144,3 +144,5 @@ damages for loss of profits.
 
 [binance trade bot]: https://github.com/edeng23/binance-trade-bot
 [wsl]: https://docs.microsoft.com/en-us/windows/wsl/install-win10
+[troubleshooting]: ./docs/troubleshooting.md
+[docker setup]: ./docs/docker-setup.md
