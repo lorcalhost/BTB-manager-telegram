@@ -329,8 +329,8 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
         )
         try:
             subprocess.call(
-                "git pull && $(which python3) -m pip install -r requirements.txt --upgrade && "
-                "$(which python3) -m btb_manager_telegram &",
+                f"git pull && $(which python3) -m pip install -r requirements.txt --upgrade && "
+                f'$(which python3) -m btb_manager_telegram -p "{settings.ROOT_PATH}" &',
                 shell=True,
             )
             kill_btb_manager_telegram_process()
