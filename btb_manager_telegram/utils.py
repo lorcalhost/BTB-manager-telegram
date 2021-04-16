@@ -1,7 +1,8 @@
 import os
 import subprocess
-from typing import List, Optional
 from time import sleep
+from typing import List, Optional
+
 import psutil
 import telegram
 import yaml
