@@ -360,8 +360,8 @@ def update_btb(update: Update, _: CallbackContext) -> int:
 
     if update.message.text != "Cancel update":
         message = (
-            "The bot is updating\.\n"
-            "Wait a few seconds, the bot will restart automatically\."
+            "The bot has been stopped and is now updating\.\n"
+            "Wait a few seconds, then restart manually\."
         )
         update.message.reply_text(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -371,8 +371,7 @@ def update_btb(update: Update, _: CallbackContext) -> int:
             subprocess.call(
                 f"cd {settings.ROOT_PATH} && "
                 f"git pull && "
-                f"$(which python3) -m pip install -r requirements.txt --upgrade && "
-                f"$(which python3) -m binance_trade_bot &",
+                f"$(which python3) -m pip install -r requirements.txt --upgrade",
                 shell=True,
             )
         except Exception:
