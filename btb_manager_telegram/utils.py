@@ -1,7 +1,7 @@
 import os
 import subprocess
 from typing import List, Optional
-
+from time import sleep
 import psutil
 import telegram
 import yaml
@@ -147,6 +147,8 @@ def update_checker():
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
             bot.send_message(settings.USER_ID, message, parse_mode="MarkdownV2")
+            bot.close()
+            sleep(1)
             scheduler.enter(
                 60 * 60 * 12,
                 1,
@@ -165,6 +167,8 @@ def update_checker():
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
             bot.send_message(settings.USER_ID, message, parse_mode="MarkdownV2")
+            bot.close()
+            sleep(1)
             scheduler.enter(
                 60 * 60 * 12,
                 1,
@@ -176,6 +180,7 @@ def update_checker():
         settings.TG_UPDATE_BROADCASTED_BEFORE is False
         or settings.BTB_UPDATE_BROADCASTED_BEFORE is False
     ):
+        sleep(1)
         scheduler.enter(
             60 * 60,
             1,
