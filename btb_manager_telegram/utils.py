@@ -21,7 +21,7 @@ def setup_root_path_constant():
 
 
 def setup_telegram_constants():
-    logger.info("Retrieving Telegram token and user_id from apprise.yml file.")
+    logger.info("Retrieving Telegram token and chat_id from apprise.yml file.")
     telegram_url = None
     yaml_file_path = os.path.join(settings.ROOT_PATH, "config/apprise.yml")
     if os.path.exists(yaml_file_path):
@@ -48,14 +48,14 @@ def setup_telegram_constants():
         exit(-1)
     try:
         settings.TOKEN = telegram_url.split("/")[0]
-        settings.USER_ID = telegram_url.split("/")[1]
+        settings.CHAT_ID = telegram_url.split("/")[1]
         logger.info(
             f"Successfully retrieved Telegram configuration. "
-            f"The bot will only respond to user with user_id {settings.USER_ID}"
+            f"The bot will only respond to user in the chat with chat_id {settings.CHAT_ID}"
         )
     except Exception:
         logger.error(
-            "No user_id has been set in the yaml configuration, anyone would be able to control your bot. Aborting."
+            "No chat_id has been set in the yaml configuration, anyone would be able to control your bot. Aborting."
         )
         exit(-1)
 
@@ -148,7 +148,7 @@ def update_checker():
             )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
-            bot.send_message(settings.USER_ID, message, parse_mode="MarkdownV2")
+            bot.send_message(settings.CHAT_ID, message, parse_mode="MarkdownV2")
             bot.close()
             sleep(1)
             scheduler.enter(
@@ -168,7 +168,7 @@ def update_checker():
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
-            bot.send_message(settings.USER_ID, message, parse_mode="MarkdownV2")
+            bot.send_message(settings.CHAT_ID, message, parse_mode="MarkdownV2")
             bot.close()
             sleep(1)
             scheduler.enter(
@@ -194,7 +194,7 @@ def update_reminder(self, message):
     logger.info(f"Reminding user: {message}")
 
     bot = Bot(settings.TOKEN)
-    bot.send_message(settings.USER_ID, message, parse_mode="MarkdownV2")
+    bot.send_message(settings.CHAT_ID, message, parse_mode="MarkdownV2")
     scheduler.enter(
         60 * 60 * 12,
         1,

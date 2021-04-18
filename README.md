@@ -25,8 +25,8 @@ As of now the bot is able to perform the following actions:
 
 </br>
 
-The program's default behavior fetches Telegram `token` and `user_id` from [Binance Trade Bot]'s `apprise.yml` file.  
-Only the Telegram user with `user_id` equal to the one set in the `apprise.yml` file will be able to use the bot.
+The program's default behavior fetches Telegram `token` and `chat_id` from [Binance Trade Bot]'s `apprise.yml` file.  
+Only the Telegram users in the chat with `chat_id` equal to the one set in the `apprise.yml` file will be able to use the bot.
 
 ⚠ The program is fully compatible with **Linux** and **Windows** through **[WSL]**, further compatibility testing needs to be done for **native Windows** and **MacOS**.
 
@@ -84,15 +84,15 @@ $ nohup python3 -m btb_manager_telegram &
 Make sure [Binance Trade Bot]'s `apprise.yml` file is correctly setup before running.  
 </br>
 Note:  
-If _Binance Trade Bot_ and _BTB-Manager-Telegram_ were **not** installed in the same parent directory or you want to use different `token` and `user_id` from the ones in the `apprise.yml` file, the following optional arguments can be used:
+If _Binance Trade Bot_ and _BTB-Manager-Telegram_ were **not** installed in the same parent directory or you want to use different `token` and `chat_id` from the ones in the `apprise.yml` file, the following optional arguments can be used:
 
 ```console
 optional arguments:
   -p PATH, --path PATH  (optional) binance-trade-bot installation absolute path
   -t TOKEN, --token TOKEN
                         (optional) Telegram bot token
-  -u USER_ID, --user_id USER_ID
-                        (optional) Telegram user id
+  -c CHAT_ID, --chat_id CHAT_ID
+                        (optional) Telegram chat id
   -d DOCKER, --docker DOCKER
                         (optional) Run the script in a docker container.
                         NOTE: Run the 'docker_setup.py' file before passing this flag.

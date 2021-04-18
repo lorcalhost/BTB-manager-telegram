@@ -409,7 +409,7 @@ MENU_HANDLER = MessageHandler(
 )
 
 ENTRY_POINT_HANDLER = CommandHandler(
-    "start", start, Filters.user(user_id=eval(settings.USER_ID))
+    "start", start, Filters.chat(chat_id=eval(settings.CHAT_ID))
 )
 
 EDIT_COIN_LIST_HANDLER = MessageHandler(Filters.regex("(.*?)"), edit_coin)

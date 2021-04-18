@@ -38,7 +38,7 @@ def pre_run_main() -> None:
         "-t", "--token", type=str, help="(optional) Telegram bot token", default=None
     )
     parser.add_argument(
-        "-u", "--user_id", type=str, help="(optional) Telegram user id", default=None
+        "-c", "--chat_id", type=str, help="(optional) Telegram chat id", default=None
     )
     parser.add_argument(
         "-d",
@@ -56,11 +56,11 @@ def pre_run_main() -> None:
 
     settings.ROOT_PATH = args.path
     settings.TOKEN = args.token
-    settings.USER_ID = args.user_id
+    settings.CHAT_ID = args.chat_id
 
     setup_root_path_constant()
 
-    if settings.TOKEN is None or settings.USER_ID is None:
+    if settings.TOKEN is None or settings.CHAT_ID is None:
         setup_telegram_constants()
 
     # Setup update notifications scheduler

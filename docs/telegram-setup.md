@@ -10,12 +10,12 @@ _Binance Trade Bot_'s `apprise.yml` file needs to be correctly set up in order f
    It will send you your Telegram bot `token`.
 
 4. On Telegram, talk to [@userinfobot].  
-   It will send you some information among which your Telegram `user_id`.
+   It will send you some information among which your Telegram `chat_id`.
 
 5. Inside your `apprise.yml` file delete the `#` character from the `# - tgram://TOKEN/CHAT_ID` line.  
-   Replace `TOKEN` and `CHAT_ID` with your `token` and `user_id`.
+   Replace `TOKEN` and `CHAT_ID` with your `token` and `chat_id`.
 
-After these steps if your token was `123:abc` and your `user_id` was `1337` your `apprise.yml` file should look like this:
+After these steps if your token was `123:abc` and your `chat_id` was `1337` your `apprise.yml` file should look like this:
 
 ```yaml
 version: 1
@@ -24,7 +24,7 @@ urls:
 ```
 
 Note:  
-_Binance Trade Bot Manager Telegram_ will only work in 1v1 chats with the bot, please don't put a `group_id` as `user_id`.
+_Binance Trade Bot Manager Telegram_ you can also decide to put a group chat id instead of a personal `chat_id`.
 
 [@botfather]: https://t.me/botfather
 [@userinfobot]: https://t.me/userinfobot
