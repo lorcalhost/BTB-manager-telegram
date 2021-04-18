@@ -7,6 +7,7 @@ from datetime import datetime
 from btb_manager_telegram import logger, settings
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
+    format_float,
     get_binance_trade_bot_process,
     is_btb_bot_update_available,
     is_tg_bot_update_available,
@@ -41,7 +42,7 @@ def current_value():
                     raise Exception()
                 if state == "ORDERED":
                     return [
-                        f"A buy order of `{round(order_size, 2)}` *{bridge}* is currently placed on coin *{current_coin}*.\n\n"
+                        f"A buy order of `{format_float(order_size)}` *{bridge}* is currently placed on coin *{current_coin}*.\n\n"
                         f"_Waiting for buy order to complete_.".replace(".", "\.")
                     ]
             except Exception:
@@ -79,12 +80,12 @@ def current_value():
                 m_list = [
                     f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
                     f"*Current coin {current_coin}:*\n"
-                    f"\t\- Balance: `{round(balance, 6)}` *{current_coin}*\n"
-                    f"\t\- Current coin exchange ratio: `{round(usd_price, 6)}` *USD*/*{current_coin}*\n"
-                    f"\t\- Value in *USD*: `{round((balance * usd_price), 2)}` *USD*\n"
-                    f"\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` *BTC*\n\n"
+                    f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
+                    f"\t\- Current coin exchange ratio: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
+                    f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
+                    f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
                     f"_Initially bought for_ {round(buy_price, 2)} *{bridge}*\n"
-                    f"_Exchange ratio when purchased:_ `{round((buy_price / alt_amount), 6)}` *{bridge}*/*{current_coin}*".replace(
+                    f"_Exchange ratio when purchased:_ `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}*".replace(
                         ".", "\."
                     )
                 ]
@@ -125,10 +126,12 @@ def check_progress():
                     ).strftime("%H:%M:%S %d/%m/%Y")
                     m_list.append(
                         f"*{coin[0]}*\n"
-                        f"\t\- Amount: `{round(coin[1], 6)}` *{coin[0]}*\n"
+                        f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
                         f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                        f"\t\- Change: {f'`{round(coin[3], 2)}` *{coin[0]}*' if coin[3] is not None else f'`{coin[3]}`'}\n"
-                        f"\t\- Last trade: `{last_trade_date}`\n\n".replace(".", "\.")
+                        f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}*' if coin[3] is not None else f'`{coin[3]}`'}\n"
+                        f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
+                            ".", "\."
+                        )
                     )
 
                 message = telegram_text_truncator(m_list)
@@ -183,13 +186,15 @@ def current_ratios():
 
                 m_list = [
                     f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
-                    f"*Coin ratios compared to {current_coin}:*\n".replace(".", "\.")
+                    f"*Coin ratios compared to {current_coin} in decreasing order:*\n".replace(
+                        ".", "\."
+                    )
                 ]
                 for coin in query:
                     m_list.append(
                         f"*{coin[1]}*:\n"
                         f"\t\- Price: `{coin[2]}` {bridge}\n"
-                        f"\t\- Ratio: `{round(coin[3], 6)}`\n\n".replace(".", "\.")
+                        f"\t\- Ratio: `{format_float(coin[3])}`\n\n".replace(".", "\.")
                     )
 
                 message = telegram_text_truncator(m_list)
@@ -240,7 +245,7 @@ def trade_history():
                     date = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
                     m_list.append(
                         f"`{date.strftime('%H:%M:%S %d/%m/%Y')}`\n"
-                        f"*{'Sold' if trade[2] else 'Bought'}* `{round(trade[4], 6)}` *{trade[0]}*{f' for `{round(trade[5], 2)}` *{trade[1]}*' if trade[5] is not None else ''}\n"
+                        f"*{'Sold' if trade[2] else 'Bought'}* `{format_float(trade[4])}` *{trade[0]}*{f' for `{format_float(trade[5])}` *{trade[1]}*' if trade[5] is not None else ''}\n"
                         f"Status: _*{trade[3]}*_\n\n".replace(".", "\.")
                     )
 
