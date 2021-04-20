@@ -324,7 +324,9 @@ def delete_db():
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     if not get_binance_trade_bot_process():
         if os.path.exists(db_file_path):
-            message = "Are you sure you want to delete the database file?"
+            message = (
+                "Are you sure you want to delete the database file and clear the logs?"
+            )
             delete = True
         else:
             message = f"⚠ Unable to find database file at `{db_file_path}`.".replace(

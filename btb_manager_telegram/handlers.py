@@ -297,11 +297,20 @@ def delete_db(update: Update, _: CallbackContext) -> int:
     if update.message.text != "Go back":
         message = "✔ Successfully deleted database file\."
         db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        log_file_path = os.path.join(settings.ROOT_PATH, "logs/crypto_trading.log")
         try:
             copyfile(db_file_path, f"{db_file_path}.backup")
             os.remove(db_file_path)
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to delete database file: {e}")
             message = "❌ Unable to delete database file\."
+        try:
+            with open(log_file_path, "w") as f:
+                f.truncate()
+        except Exception as e:
+            logger.error(f"❌ Unable to clear log file: {e}")
+            message = "❌ Unable to clear log file\."
+
     else:
         message = "👌 Exited without changes\.\n" "Your database was *not* deleted\."
 
