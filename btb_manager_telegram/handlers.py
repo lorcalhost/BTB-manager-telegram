@@ -244,7 +244,8 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
             copyfile(coin_file_path, f"{coin_file_path}.backup")
             with open(coin_file_path, "w") as f:
                 f.write(update.message.text + "\n")
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to edit coin list file: {e}")
             message = "❌ Unable to edit coin list file\."
     else:
         message = "👌 Exited without changes\.\nYour `supported_coin_list` file was *not* modified\."
@@ -273,7 +274,8 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
             copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
             with open(user_cfg_file_path, "w") as f:
                 f.write(update.message.text + "\n\n\n")
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to edit user configuration file: {e}")
             message = "❌ Unable to edit user configuration file\."
     else:
         message = (
@@ -343,7 +345,8 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
                 shell=True,
             )
             kill_btb_manager_telegram_process()
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to update BTB Manager Telegram: {e}")
             message = "Unable to update BTB Manager Telegram"
             update.message.reply_text(
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -383,7 +386,8 @@ def update_btb(update: Update, _: CallbackContext) -> int:
                 f"$(which python3) -m pip install -r requirements.txt --upgrade",
                 shell=True,
             )
-        except Exception:
+        except Exception as e:
+            logger.error(f"Unable to update Binance Trade Bot: {e}")
             message = "Unable to update Binance Trade Bot"
             update.message.reply_text(
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"

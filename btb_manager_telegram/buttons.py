@@ -45,7 +45,8 @@ def current_value():
                         f"A buy order of `{format_float(order_size)}` *{bridge}* is currently placed on coin *{current_coin}*.\n\n"
                         f"_Waiting for buy order to complete_.".replace(".", "\.")
                     ]
-            except Exception:
+            except Exception as e:
+                logger.error(f"❌ Unable to fetch current coin from database: {e}")
                 con.close()
                 return ["❌ Unable to fetch current coin from database\."]
 
@@ -68,7 +69,10 @@ def current_value():
                 if btc_price is None:
                     btc_price = 0
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
-            except Exception:
+            except Exception as e:
+                logger.error(
+                    f"❌ Unable to fetch current coin information from database: {e}"
+                )
                 con.close()
                 return [
                     "❌ Unable to fetch current coin information from database\.",
@@ -91,12 +95,16 @@ def current_value():
                 ]
                 message = telegram_text_truncator(m_list)
                 con.close()
-            except Exception:
+            except Exception as e:
+                logger.error(
+                    f"❌ Something went wrong, unable to generate value at this time: {e}"
+                )
                 con.close()
                 return [
                     "❌ Something went wrong, unable to generate value at this time\."
                 ]
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to perform actions on the database: {e}")
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -136,10 +144,14 @@ def check_progress():
 
                 message = telegram_text_truncator(m_list)
                 con.close()
-            except Exception:
+            except Exception as e:
+                logger.error(
+                    f"❌ Unable to fetch progress information from database: {e}"
+                )
                 con.close()
                 return ["❌ Unable to fetch progress information from database\."]
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to perform actions on the database: {e}")
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -169,7 +181,8 @@ def current_ratios():
                 current_coin = cur.fetchone()[0]
                 if current_coin is None:
                     raise Exception()
-            except Exception:
+            except Exception as e:
+                logger.error(f"❌ Unable to fetch current coin from database: {e}")
                 con.close()
                 return ["❌ Unable to fetch current coin from database\."]
 
@@ -199,13 +212,17 @@ def current_ratios():
 
                 message = telegram_text_truncator(m_list)
                 con.close()
-            except Exception:
+            except Exception as e:
+                logger.error(
+                    f"❌ Something went wrong, unable to generate ratios at this time: {e}"
+                )
                 con.close()
                 return [
                     "❌ Something went wrong, unable to generate ratios at this time\.",
                     "⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.",
                 ]
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to perform actions on the database: {e}")
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -251,12 +268,16 @@ def trade_history():
 
                 message = telegram_text_truncator(m_list)
                 con.close()
-            except Exception:
+            except Exception as e:
+                logger.error(
+                    f"❌ Something went wrong, unable to generate trade history at this time: {e}"
+                )
                 con.close()
                 return [
                     "❌ Something went wrong, unable to generate trade history at this time\."
                 ]
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to perform actions on the database: {e}")
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
