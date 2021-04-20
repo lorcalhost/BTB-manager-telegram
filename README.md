@@ -103,7 +103,10 @@ optional arguments:
 ## Interaction
 
 Interaction with **BTBManagerTelegram** can be _started_ by sending the `/start` command in the bot's Telegram chat.  
-Every time the Telegram bot is restarted the `/start` command should be sent again.
+Every time the Telegram bot is restarted, the `/start` command should be sent again.
+
+You can also add the bot to a group if multiple people need to access this bot. Please note that each user will have to type `/start` in the group, before they can start interacting with the bot.
+
 
 ## Screenshots
 
