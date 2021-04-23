@@ -7,11 +7,12 @@ from datetime import datetime
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
 from btb_manager_telegram.utils import (
-    find_and_kill_process,
-    find_process,
+    find_and_kill_binance_trade_bot_process,
+    format_float,
+    get_binance_trade_bot_process,
     is_btb_bot_update_available,
     is_tg_bot_update_available,
-    text_4096_cutter,
+    telegram_text_truncator,
 )
 
 
@@ -42,10 +43,11 @@ def current_value():
                     raise Exception()
                 if state == "ORDERED":
                     return [
-                        f"A buy order of `{round(order_size, 2)}` *{bridge}* is currently placed on coin *{current_coin}*.\n\n"
+                        f"A buy order of `{format_float(order_size)}` *{bridge}* is currently placed on coin *{current_coin}*.\n\n"
                         f"_Waiting for buy order to complete_.".replace(".", "\.")
                     ]
-            except Exception:
+            except Exception as e:
+                logger.error(f"❌ Unable to fetch current coin from database: {e}")
                 con.close()
                 return ["❌ Unable to fetch current coin from database\."]
 
@@ -68,7 +70,10 @@ def current_value():
                 if btc_price is None:
                     btc_price = 0
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
-            except Exception:
+            except Exception as e:
+                logger.error(
+                    f"❌ Unable to fetch current coin information from database: {e}"
+                )
                 con.close()
                 return [
                     "❌ Unable to fetch current coin information from database\.",
@@ -80,23 +85,27 @@ def current_value():
                 m_list = [
                     f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
                     f"*Current coin {current_coin}:*\n"
-                    f"\t\- Balance: `{round(balance, 6)}` *{current_coin}*\n"
-                    f"\t\- Current coin exchange ratio: `{round(usd_price, 6)}` *USD*/*{current_coin}*\n"
-                    f"\t\- Value in *USD*: `{round((balance * usd_price), 2)}` *USD*\n"
-                    f"\t\- Value in *BTC*: `{round((balance * btc_price), 6)}` *BTC*\n\n"
+                    f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
+                    f"\t\- Current coin exchange ratio: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
+                    f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
+                    f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
                     f"_Initially bought for_ {round(buy_price, 2)} *{bridge}*\n"
-                    f"_Exchange ratio when purchased:_ `{round((buy_price / alt_amount), 6)}` *{bridge}*/*{current_coin}*".replace(
+                    f"_Exchange ratio when purchased:_ `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}*".replace(
                         ".", "\."
                     )
                 ]
-                message = text_4096_cutter(m_list)
+                message = telegram_text_truncator(m_list)
                 con.close()
-            except Exception:
+            except Exception as e:
+                logger.error(
+                    f"❌ Something went wrong, unable to generate value at this time: {e}"
+                )
                 con.close()
                 return [
                     "❌ Something went wrong, unable to generate value at this time\."
                 ]
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to perform actions on the database: {e}")
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -126,18 +135,24 @@ def check_progress():
                     ).strftime("%H:%M:%S %d/%m/%Y")
                     m_list.append(
                         f"*{coin[0]}*\n"
-                        f"\t\- Amount: `{round(coin[1], 6)}` *{coin[0]}*\n"
+                        f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
                         f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                        f"\t\- Change: {f'`{round(coin[3], 2)}` *{coin[0]}*' if coin[3] is not None else f'`{coin[3]}`'}\n"
-                        f"\t\- Last trade: `{last_trade_date}`\n\n".replace(".", "\.")
+                        f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}*' if coin[3] is not None else f'`{coin[3]}`'}\n"
+                        f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
+                            ".", "\."
+                        )
                     )
 
-                message = text_4096_cutter(m_list)
+                message = telegram_text_truncator(m_list)
                 con.close()
-            except Exception:
+            except Exception as e:
+                logger.error(
+                    f"❌ Unable to fetch progress information from database: {e}"
+                )
                 con.close()
                 return ["❌ Unable to fetch progress information from database\."]
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to perform actions on the database: {e}")
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -167,7 +182,8 @@ def current_ratios():
                 current_coin = cur.fetchone()[0]
                 if current_coin is None:
                     raise Exception()
-            except Exception:
+            except Exception as e:
+                logger.error(f"❌ Unable to fetch current coin from database: {e}")
                 con.close()
                 return ["❌ Unable to fetch current coin from database\."]
 
@@ -184,24 +200,30 @@ def current_ratios():
 
                 m_list = [
                     f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
-                    f"*Coin ratios compared to {current_coin}:*\n".replace(".", "\.")
+                    f"*Coin ratios compared to {current_coin} in decreasing order:*\n".replace(
+                        ".", "\."
+                    )
                 ]
                 for coin in query:
                     m_list.append(
                         f"*{coin[1]}*:\n"
                         f"\t\- Price: `{coin[2]}` {bridge}\n"
-                        f"\t\- Ratio: `{round(coin[3], 6)}`\n\n".replace(".", "\.")
+                        f"\t\- Ratio: `{format_float(coin[3])}`\n\n".replace(".", "\.")
                     )
 
-                message = text_4096_cutter(m_list)
+                message = telegram_text_truncator(m_list)
                 con.close()
-            except Exception:
+            except Exception as e:
+                logger.error(
+                    f"❌ Something went wrong, unable to generate ratios at this time: {e}"
+                )
                 con.close()
                 return [
                     "❌ Something went wrong, unable to generate ratios at this time\.",
                     "⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.",
                 ]
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to perform actions on the database: {e}")
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -210,7 +232,7 @@ def check_status():
     logger.info("Check status button pressed.")
 
     message = "⚠ Binance Trade Bot is not running."
-    if find_process():
+    if get_binance_trade_bot_process():
         message = "✔ Binance Trade Bot is running."
     return message
 
@@ -241,18 +263,22 @@ def trade_history():
                     date = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
                     m_list.append(
                         f"`{date.strftime('%H:%M:%S %d/%m/%Y')}`\n"
-                        f"*{'Sold' if trade[2] else 'Bought'}* `{round(trade[4], 6)}` *{trade[0]}*{f' for `{round(trade[5], 2)}` *{trade[1]}*' if trade[5] is not None else ''}\n"
+                        f"*{'Sold' if trade[2] else 'Bought'}* `{format_float(trade[4])}` *{trade[0]}*{f' for `{format_float(trade[5])}` *{trade[1]}*' if trade[5] is not None else ''}\n"
                         f"Status: _*{trade[3]}*_\n\n".replace(".", "\.")
                     )
 
-                message = text_4096_cutter(m_list)
+                message = telegram_text_truncator(m_list)
                 con.close()
-            except Exception:
+            except Exception as e:
+                logger.error(
+                    f"❌ Something went wrong, unable to generate trade history at this time: {e}"
+                )
                 con.close()
                 return [
                     "❌ Something went wrong, unable to generate trade history at this time\."
                 ]
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to perform actions on the database: {e}")
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -261,16 +287,16 @@ def start_bot():
     logger.info("Start bot button pressed.")
 
     message = "⚠ Binance Trade Bot is already running\."
-    if not find_process():
+    if not get_binance_trade_bot_process():
         if os.path.exists(os.path.join(settings.ROOT_PATH, "binance_trade_bot/")):
             subprocess.call(
                 f"cd {settings.ROOT_PATH} && $(which python3) -m binance_trade_bot &",
                 shell=True,
             )
-            if not find_process():
-                message = "❌ Unable to start Binance Trade Bot\."
-            else:
+            if get_binance_trade_bot_process():
                 message = "✔ Binance Trade Bot successfully started\."
+            else:
+                message = "❌ Unable to start Binance Trade Bot\."
         else:
             message = (
                 f"❌ Unable to find _Binance Trade Bot_ installation at {settings.ROOT_PATH}\.\n"
@@ -283,9 +309,9 @@ def stop_bot():
     logger.info("Stop bot button pressed.")
 
     message = "⚠ Binance Trade Bot is not running."
-    if find_process():
-        find_and_kill_process()
-        if not find_process():
+    if get_binance_trade_bot_process():
+        find_and_kill_binance_trade_bot_process()
+        if not get_binance_trade_bot_process():
             message = "✔ Successfully stopped the bot."
         else:
             message = (
@@ -318,9 +344,11 @@ def delete_db():
     message = "⚠ Please stop Binance Trade Bot before deleting the database file\."
     delete = False
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
-    if not find_process():
+    if not get_binance_trade_bot_process():
         if os.path.exists(db_file_path):
-            message = "Are you sure you want to delete the database file?"
+            message = (
+                "Are you sure you want to delete the database file and clear the logs?"
+            )
             delete = True
         else:
             message = f"⚠ Unable to find database file at `{db_file_path}`.".replace(
@@ -335,7 +363,7 @@ def edit_user_cfg():
     message = "⚠ Please stop Binance Trade Bot before editing user configuration file\."
     edit = False
     user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
-    if not find_process():
+    if not get_binance_trade_bot_process():
         if os.path.exists(user_cfg_file_path):
             with open(user_cfg_file_path) as f:
                 message = (
@@ -362,7 +390,7 @@ def edit_coin():
     message = "⚠ Please stop Binance Trade Bot before editing the coin list\."
     edit = False
     coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
-    if not find_process():
+    if not get_binance_trade_bot_process():
         if os.path.exists(coin_file_path):
             with open(coin_file_path) as f:
                 message = (
@@ -387,7 +415,7 @@ def export_db():
     message = "⚠ Please stop Binance Trade Bot before exporting the database file\."
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     fil = None
-    if not find_process():
+    if not get_binance_trade_bot_process():
         if os.path.exists(db_file_path):
             with open(db_file_path, "rb") as db:
                 fil = db.read()

@@ -30,7 +30,10 @@ from btb_manager_telegram import (
     settings,
 )
 from btb_manager_telegram.binance_api_utils import send_signed_request
-from btb_manager_telegram.utils import find_and_kill_process
+from btb_manager_telegram.utils import (
+    find_and_kill_binance_trade_bot_process,
+    kill_btb_manager_telegram_process,
+)
 
 
 def menu(update: Update, _: CallbackContext) -> int:
@@ -269,7 +272,8 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
             copyfile(coin_file_path, f"{coin_file_path}.backup")
             with open(coin_file_path, "w") as f:
                 f.write(update.message.text + "\n")
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to edit coin list file: {e}")
             message = "❌ Unable to edit coin list file\."
     else:
         message = "👌 Exited without changes\.\nYour `supported_coin_list` file was *not* modified\."
@@ -298,7 +302,8 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
             copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
             with open(user_cfg_file_path, "w") as f:
                 f.write(update.message.text + "\n\n\n")
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to edit user configuration file: {e}")
             message = "❌ Unable to edit user configuration file\."
     else:
         message = (
@@ -322,11 +327,20 @@ def delete_db(update: Update, _: CallbackContext) -> int:
     if update.message.text != "Go back":
         message = "✔ Successfully deleted database file\."
         db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        log_file_path = os.path.join(settings.ROOT_PATH, "logs/crypto_trading.log")
         try:
             copyfile(db_file_path, f"{db_file_path}.backup")
             os.remove(db_file_path)
-        except Exception:
+        except Exception as e:
+            logger.error(f"❌ Unable to delete database file: {e}")
             message = "❌ Unable to delete database file\."
+        try:
+            with open(log_file_path, "w") as f:
+                f.truncate()
+        except Exception as e:
+            logger.error(f"❌ Unable to clear log file: {e}")
+            message = "❌ Unable to clear log file\."
+
     else:
         message = "👌 Exited without changes\.\n" "Your database was *not* deleted\."
 
@@ -354,12 +368,13 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
         )
         try:
             subprocess.call(
-                "kill -9 $(ps ax | grep btb_manager_telegram | fgrep -v grep | awk '{ print $1 }') && "
-                "git pull && $(which python3) -m pip install -r requirements.txt && "
-                "$(which python3) -m btb_manager_telegram &",
+                f"git pull && $(which python3) -m pip install -r requirements.txt --upgrade && "
+                f'$(which python3) -m btb_manager_telegram -p "{settings.ROOT_PATH}" &',
                 shell=True,
             )
-        except Exception:
+            kill_btb_manager_telegram_process()
+        except Exception as e:
+            logger.error(f"❌ Unable to update BTB Manager Telegram: {e}")
             message = "Unable to update BTB Manager Telegram"
             update.message.reply_text(
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -385,22 +400,22 @@ def update_btb(update: Update, _: CallbackContext) -> int:
 
     if update.message.text != "Cancel update":
         message = (
-            "The bot is updating\.\n"
-            "Wait a few seconds, the bot will restart automatically\."
+            "The bot has been stopped and is now updating\.\n"
+            "Wait a few seconds, then restart manually\."
         )
         update.message.reply_text(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
         try:
-            find_and_kill_process()
+            find_and_kill_binance_trade_bot_process()
             subprocess.call(
                 f"cd {settings.ROOT_PATH} && "
                 f"git pull && "
-                f"$(which python3) -m pip install -r requirements.txt && "
-                f"$(which python3) -m binance_trade_bot &",
+                f"$(which python3) -m pip install -r requirements.txt --upgrade",
                 shell=True,
             )
-        except Exception:
+        except Exception as e:
+            logger.error(f"Unable to update Binance Trade Bot: {e}")
             message = "Unable to update Binance Trade Bot"
             update.message.reply_text(
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -420,7 +435,7 @@ def panic(update: Update, _: CallbackContext) -> int:
     keyboard = [["Great 👌"]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     if update.message.text != "Go back":
-        find_and_kill_process()
+        find_and_kill_binance_trade_bot_process()
 
         # Get current coin pair
         db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
@@ -500,7 +515,7 @@ MENU_HANDLER = MessageHandler(
 )
 
 ENTRY_POINT_HANDLER = CommandHandler(
-    "start", start, Filters.user(user_id=eval(settings.USER_ID))
+    "start", start, Filters.chat(chat_id=eval(settings.CHAT_ID))
 )
 
 EDIT_COIN_LIST_HANDLER = MessageHandler(Filters.regex("(.*?)"), edit_coin)

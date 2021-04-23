@@ -1,8 +1,12 @@
 import os
 import subprocess
+from time import sleep
+from typing import List, Optional
 
 import psutil
+import telegram
 import yaml
+from numpy import format_float_positional
 from telegram import Bot
 
 from btb_manager_telegram import logger, scheduler, settings
@@ -17,7 +21,7 @@ def setup_root_path_constant():
 
 
 def setup_telegram_constants():
-    logger.info("Retrieving Telegram token and user_id from apprise.yml file.")
+    logger.info("Retrieving Telegram token and chat_id from apprise.yml file.")
     telegram_url = None
     yaml_file_path = os.path.join(settings.ROOT_PATH, "config/apprise.yml")
     if os.path.exists(yaml_file_path):
@@ -44,23 +48,23 @@ def setup_telegram_constants():
         exit(-1)
     try:
         settings.TOKEN = telegram_url.split("/")[0]
-        settings.USER_ID = telegram_url.split("/")[1]
+        settings.CHAT_ID = telegram_url.split("/")[1]
         logger.info(
             f"Successfully retrieved Telegram configuration. "
-            f"The bot will only respond to user with user_id {settings.USER_ID}"
+            f"The bot will only respond to user in the chat with chat_id {settings.CHAT_ID}"
         )
     except Exception:
         logger.error(
-            "No user_id has been set in the yaml configuration, anyone would be able to control your bot. Aborting."
+            "No chat_id has been set in the yaml configuration, anyone would be able to control your bot. Aborting."
         )
         exit(-1)
 
 
-def text_4096_cutter(m_list):
+def telegram_text_truncator(m_list) -> List[str]:
     message = [""]
     index = 0
     for mes in m_list:
-        if len(message[index]) + len(mes) <= 4096:
+        if len(message[index]) + len(mes) <= telegram.constants.MAX_MESSAGE_LENGTH:
             message[index] += mes
         else:
             message.append(mes)
@@ -68,22 +72,35 @@ def text_4096_cutter(m_list):
     return message
 
 
-def find_process():
-    return any(
-        "binance_trade_bot" in proc.name()
-        or "binance_trade_bot" in " ".join(proc.cmdline())
-        for proc in psutil.process_iter()
-    )
+def get_binance_trade_bot_process() -> Optional[psutil.Process]:
+    name = "binance_trade_bot"
+    is_root_path_absolute = os.path.isabs(settings.ROOT_PATH)
+    bot_path = settings.ROOT_PATH
+    if not is_root_path_absolute:
+        bot_path = os.path.normpath(os.path.join(os.getcwd(), settings.ROOT_PATH))
+
+    for proc in psutil.process_iter():
+        if (
+            name in proc.name() or name in " ".join(proc.cmdline())
+        ) and proc.cwd() == bot_path:
+            return proc
 
 
-def find_and_kill_process():
+def find_and_kill_binance_trade_bot_process():
     try:
-        for proc in psutil.process_iter():
-            if "binance_trade_bot" in proc.name() or "binance_trade_bot" in " ".join(
-                proc.cmdline()
-            ):
-                proc.terminate()
-                proc.wait()
+        binance_trade_bot_process = get_binance_trade_bot_process()
+        binance_trade_bot_process.terminate()
+        binance_trade_bot_process.wait()
+    except Exception as e:
+        logger.info(f"ERROR: {e}")
+
+
+def kill_btb_manager_telegram_process():
+    try:
+        btb_manager_telegram_pid = os.getpid()
+        btb_manager_telegram_process = psutil.Process(btb_manager_telegram_pid)
+        btb_manager_telegram_process.kill()
+        btb_manager_telegram_process.wait()
     except Exception as e:
         logger.info(f"ERROR: {e}")
 
@@ -96,7 +113,8 @@ def is_tg_bot_update_available():
         )
         output, _ = proc.communicate()
         re = "Your branch is behind" in str(output)
-    except Exception:
+    except Exception as e:
+        logger.error(e)
         re = None
     return re
 
@@ -113,7 +131,8 @@ def is_btb_bot_update_available():
         )
         output, _ = proc.communicate()
         re = "Your branch is behind" in str(output)
-    except Exception:
+    except Exception as e:
+        logger.error(e)
         re = None
     return re
 
@@ -131,7 +150,9 @@ def update_checker():
             )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
-            bot.send_message(settings.USER_ID, message, parse_mode="MarkdownV2")
+            bot.send_message(settings.CHAT_ID, message, parse_mode="MarkdownV2")
+            bot.close()
+            sleep(1)
             scheduler.enter(
                 60 * 60 * 12,
                 1,
@@ -149,7 +170,9 @@ def update_checker():
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
-            bot.send_message(settings.USER_ID, message, parse_mode="MarkdownV2")
+            bot.send_message(settings.CHAT_ID, message, parse_mode="MarkdownV2")
+            bot.close()
+            sleep(1)
             scheduler.enter(
                 60 * 60 * 12,
                 1,
@@ -161,6 +184,7 @@ def update_checker():
         settings.TG_UPDATE_BROADCASTED_BEFORE is False
         or settings.BTB_UPDATE_BROADCASTED_BEFORE is False
     ):
+        sleep(1)
         scheduler.enter(
             60 * 60,
             1,
@@ -172,9 +196,13 @@ def update_reminder(self, message):
     logger.info(f"Reminding user: {message}")
 
     bot = Bot(settings.TOKEN)
-    bot.send_message(settings.USER_ID, message, parse_mode="MarkdownV2")
+    bot.send_message(settings.CHAT_ID, message, parse_mode="MarkdownV2")
     scheduler.enter(
         60 * 60 * 12,
         1,
         update_reminder,
     )
+
+
+def format_float(num):
+    return format_float_positional(num, trim="-")

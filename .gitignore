@@ -140,3 +140,4 @@ user.cfg.backup
 supported_coin_list
 supported_coin_list.backup
 logs/
+.history/
