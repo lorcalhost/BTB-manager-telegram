@@ -37,9 +37,9 @@ def menu(update: Update, _: CallbackContext) -> int:
     logger.info(f"Menu selector. ({update.message.text})")
 
     keyboard = [
-        ["💵 Current value", "🚨 Panic button"],
-        ["📈 Progress", "➗ Current ratios"],
-        ["🔍 Check bot status", "⌛ Trade History"],
+        ["💵 Current value", "➗ Current ratios"],
+        ["📈 Progress", "⌛ Trade History"],
+        ["🔍 Check bot status", "🚨 Panic button"],
         ["🛠 Maintenance", "⚙️ Configurations"],
     ]
 
@@ -64,7 +64,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         maintenance_keyboard, resize_keyboard=True
     )
 
-    if update.message.text in ["Begin", "⬅️ Back"]:
+    if update.message.text in ["Begin", "⬅️ Back", "Great 👌"]:
         message = "Please select one of the options."
         update.message.reply_text(message, reply_markup=reply_markup)
 
@@ -417,7 +417,7 @@ def update_btb(update: Update, _: CallbackContext) -> int:
 def panic(update: Update, _: CallbackContext) -> int:
     logger.info(f"Panic Button is doing its job. ({update.message.text})")
 
-    keyboard = [["OK 👌"]]
+    keyboard = [["Great 👌"]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     if update.message.text != "Go back":
         find_and_kill_process()
@@ -494,7 +494,7 @@ MENU_HANDLER = MessageHandler(
         "^(Begin|💵 Current value|🚨 Panic button|📈 Progress|➗ Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|"
         "⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|"
         "⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|Update Telegram Bot|Update Binance Trade Bot|"
-        "⬅️ Back|Go back|OK|Cancel update|OK 👌)$"
+        "⬅️ Back|Go back|OK|Cancel update|OK 👌|Great 👌)$"
     ),
     menu,
 )

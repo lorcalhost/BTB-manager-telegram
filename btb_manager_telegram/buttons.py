@@ -470,7 +470,7 @@ def panic_btn():
                 price_now = get_current_price(alt_coin_id, crypto_coin_id)
                 if state == "COMPLETE":
                     return [
-                        f"You are currently holding `{round(alt_trade_amount, 6)}` *{alt_coin_id}* bought for {round(crypto_trade_amount, 2)} *{crypto_coin_id}*.\n\n"
+                        f"You are currently holding `{round(alt_trade_amount, 6)}` *{alt_coin_id}* bought for `{round(crypto_trade_amount, 2)}` *{crypto_coin_id}*.\n\n"
                         f"Exchange rate when bought:\n"
                         f"`{round(price_old, 4)}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
                         f"Current exchange rate:\n"
@@ -478,7 +478,7 @@ def panic_btn():
                         f"Current value:\n"
                         f"`{round(price_now * alt_trade_amount, 4)}` *{crypto_coin_id}*\n\n"
                         f"Change:\n"
-                        f"`{round(100 - (price_old / price_now) * 100, 2)}` *%*\n\n"
+                        f"`{round((price_now - price_old) / price_old * 100, 2)}` *%*\n\n"
                         f"Would you like to stop _Binance Trade Bot_ and sell at market price?".replace(
                             ".", "\."
                         ),
@@ -492,7 +492,7 @@ def panic_btn():
                         f"Current exchange rate:\n"
                         f"`{round(price_now, 4)}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
                         f"Change:\n"
-                        f"`{round(100 - (price_old / price_now) * 100, 2)}` *%*\n\n"
+                        f"`{round((price_now - price_old) / price_old * 100, 2)}` *%*\n\n"
                         f"Would you like to stop _Binance Trade Bot_ and cancel the open order?".replace(
                             ".", "\."
                         ),
@@ -517,7 +517,7 @@ def panic_btn():
                         f"Current exchange rate:\n"
                         f"`{round(price_now, 4)}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
                         f"Change:\n"
-                        f"`{round(100 - (price_old / price_now) * 100, 2)}` *%*\n\n"
+                        f"`{round((price_now - price_old) / price_old * 100, 2)}` *%*\n\n"
                         f"Would you like to stop _Binance Trade Bot_ and cancel the open order?".replace(
                             ".", "\."
                         ),
@@ -525,11 +525,15 @@ def panic_btn():
                     ]
 
             con.close()
-        except Exception:
+        except Exception as e:
             con.close()
+            logger.error(
+                f"❌ Something went wrong, the panic button is not working at this time: {e}"
+            )
             return [
                 "❌ Something went wrong, the panic button is not working at this time\.",
                 -1,
             ]
-    except Exception:
+    except Exception as e:
+        logger.error(f"❌ Unable to perform actions on the database: {e}")
         return ["❌ Unable to perform actions on the database\.", -1]
