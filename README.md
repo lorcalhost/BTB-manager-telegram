@@ -22,13 +22,15 @@ As of now the bot is able to perform the following actions:
 - [x] 📤 Export database file
 - [x] ⬆ **Update** _Binance Trade Bot_ (and notify when new update is available)
 - [x] ⬆ **Update** _Binance Trade Bot Manager Telegram_ (and notify when new update is available)
+- [x] 🚨 Panic button (Kills _Binance Trade Bot Manager Telegram_ and cancels all open orders / sells at market price)
 
 </br>
 
 The program's default behavior fetches Telegram `token` and `chat_id` from [Binance Trade Bot]'s `apprise.yml` file.  
 Only the Telegram users in the chat with `chat_id` equal to the one set in the `apprise.yml` file will be able to use the bot.
 
-⚠ The program is fully compatible with **Linux** and **Windows** through **[WSL]**, further compatibility testing needs to be done for **native Windows** and **MacOS**.
+⚠ The program is fully compatible with **Linux** and **Windows** through **[WSL]**;  
+`RWX` permission problems are present on **native Windows** and **MacOS**.
 
 ## Installation
 
@@ -106,7 +108,6 @@ Interaction with **BTBManagerTelegram** can be _started_ by sending the `/start`
 Every time the Telegram bot is restarted, the `/start` command should be sent again.
 
 You can also add the bot to a group if multiple people need to access this bot. Please note that each user will have to type `/start` in the group, before they can start interacting with the bot.
-
 
 ## Screenshots
 
