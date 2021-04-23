@@ -1,5 +1,7 @@
 import os
+import sqlite3
 import subprocess
+from configparser import ConfigParser
 from shutil import copyfile
 
 from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
@@ -12,16 +14,22 @@ from telegram.ext import (
 )
 
 from btb_manager_telegram import (
+    BOUGHT,
+    BUYING,
     DELETE_DB,
     EDIT_COIN_LIST,
     EDIT_USER_CONFIG,
     MENU,
+    PANIC_BUTTON,
+    SELLING,
+    SOLD,
     UPDATE_BTB,
     UPDATE_TG,
     buttons,
     logger,
     settings,
 )
+from btb_manager_telegram.binance_api_utils import send_signed_request
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
     kill_btb_manager_telegram_process,
@@ -32,11 +40,9 @@ def menu(update: Update, _: CallbackContext) -> int:
     logger.info(f"Menu selector. ({update.message.text})")
 
     keyboard = [
-        [
-            "💵 Current value",
-        ],
-        ["📈 Progress", "➗ Current ratios"],
-        ["🔍 Check bot status", "⌛ Trade History"],
+        ["💵 Current value", "➗ Current ratios"],
+        ["📈 Progress", "⌛ Trade History"],
+        ["🔍 Check bot status", "🚨 Panic button"],
         ["🛠 Maintenance", "⚙️ Configurations"],
     ]
 
@@ -61,7 +67,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         maintenance_keyboard, resize_keyboard=True
     )
 
-    if update.message.text in ["Begin", "⬅️ Back"]:
+    if update.message.text in ["Begin", "⬅️ Back", "Great 👌"]:
         message = "Please select one of the options."
         update.message.reply_text(message, reply_markup=reply_markup)
 
@@ -77,6 +83,28 @@ def menu(update: Update, _: CallbackContext) -> int:
         for mes in buttons.current_value():
             update.message.reply_text(
                 mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            )
+
+    elif update.message.text == "🚨 Panic button":
+        re = buttons.panic_btn()
+        if re[1] in [BOUGHT, BUYING, SOLD, SELLING]:
+            if re[1] == BOUGHT:
+                kb = [["⚠ Stop & sell at market price"], ["Go back"]]
+            elif re[1] in [BUYING, SELLING]:
+                kb = [["⚠ Stop & cancel order"], ["Go back"]]
+            elif re[1] == SOLD:
+                kb = [["⚠ Stop the bot"], ["Go back"]]
+
+            update.message.reply_text(
+                re[0],
+                reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                parse_mode="MarkdownV2",
+            )
+            return PANIC_BUTTON
+
+        else:
+            update.message.reply_text(
+                re[0], reply_markup=reply_markup_config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == "📈 Progress":
@@ -401,6 +429,71 @@ def update_btb(update: Update, _: CallbackContext) -> int:
     return MENU
 
 
+def panic(update: Update, _: CallbackContext) -> int:
+    logger.info(f"Panic Button is doing its job. ({update.message.text})")
+
+    keyboard = [["Great 👌"]]
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    if update.message.text != "Go back":
+        find_and_kill_binance_trade_bot_process()
+
+        # Get current coin pair
+        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        con = sqlite3.connect(db_file_path)
+        cur = con.cursor()
+
+        # Get last trade
+        cur.execute(
+            """SELECT alt_coin_id, crypto_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1;"""
+        )
+        alt_coin_id, crypto_coin_id = cur.fetchone()
+
+        # Get Binance api keys and tld
+        user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+        with open(user_cfg_file_path) as cfg:
+            config = ConfigParser()
+            config.read_file(cfg)
+            api_key = config.get("binance_user_config", "api_key")
+            api_secret_key = config.get("binance_user_config", "api_secret_key")
+            tld = config.get("binance_user_config", "tld")
+
+        if update.message.text != "⚠ Stop & sell at market price":
+            params = {
+                "symbol": f"{alt_coin_id}{crypto_coin_id}",
+                "side": "SELL",
+                "type": "MARKET",
+            }
+            message = send_signed_request(
+                api_key,
+                api_secret_key,
+                f"https://api.binance.{tld}",
+                "POST",
+                "/api/v3/order",
+                payload=params,
+            )
+
+        if update.message.text != "⚠ Stop & cancel order":
+            params = {"symbol": f"{alt_coin_id}{crypto_coin_id}"}
+            message = send_signed_request(
+                api_key,
+                api_secret_key,
+                f"https://api.binance.{tld}",
+                "DELETE",
+                "/api/v3/openOrders",
+                payload=params,
+            )
+
+        if update.message.text != "⚠ Stop the bot":
+            message = "Killed _Binance Trade Bot_!"
+    else:
+        message = "👌 Exited without changes\.\n" "Binance Trade Bot was *not* updated\."
+
+    update.message.reply_text(
+        message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+    )
+    return MENU
+
+
 def cancel(update: Update, _: CallbackContext) -> int:
     logger.info("Conversation canceled.")
 
@@ -413,10 +506,10 @@ def cancel(update: Update, _: CallbackContext) -> int:
 
 MENU_HANDLER = MessageHandler(
     Filters.regex(
-        "^(Begin|💵 Current value|📈 Progress|➗ Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|"
+        "^(Begin|💵 Current value|🚨 Panic button|📈 Progress|➗ Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|"
         "⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|"
         "⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|Update Telegram Bot|Update Binance Trade Bot|"
-        "⬅️ Back|Go back|OK|Cancel update|OK 👌)$"
+        "⬅️ Back|Go back|OK|Cancel update|OK 👌|Great 👌)$"
     ),
     menu,
 )
@@ -437,6 +530,13 @@ UPDATE_TG_HANDLER = MessageHandler(
 
 UPDATE_BTB_HANDLER = MessageHandler(
     Filters.regex("^(Update|Cancel update)$"), update_btb
+)
+
+PANIC_BUTTON_HANDLER = MessageHandler(
+    Filters.regex(
+        "^(⚠ Stop & sell at market price|⚠ Stop & cancel order|⚠ Stop the bot|Go back)$"
+    ),
+    panic,
 )
 
 FALLBACK_HANDLER = CommandHandler("cancel", cancel)
