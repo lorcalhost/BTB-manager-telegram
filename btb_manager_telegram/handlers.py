@@ -12,6 +12,7 @@ from telegram.ext import (
     Filters,
     MessageHandler,
 )
+from telegram.utils.helpers import escape_markdown
 
 from btb_manager_telegram import (
     BOUGHT,
@@ -239,7 +240,7 @@ def start(update: Update, _: CallbackContext) -> int:
 
     keyboard = [["Begin"]]
     message = (
-        f"Hi *{update.message.from_user.first_name}*\!\n"
+        f"Hi *{escape_markdown(update.message.from_user.first_name)}*\!\n"
         f"Welcome to _Binace Trade Bot Manager Telegram_\.\n\n"
         f"This Telegram bot was developed by @lorcalhost\.\n"
         f"Find out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.\n\n"
