@@ -62,13 +62,13 @@ def setup_telegram_constants():
 
 
 def telegram_text_truncator(
-    m_list, padding_len=0, padding_chars_head="", padding_chars_tail=""
+    m_list, padding_chars_head="", padding_chars_tail=""
 ) -> List[str]:
     message = [padding_chars_head]
     index = 0
     for mes in m_list:
         if (
-            len(message[index]) + len(mes) + padding_len
+            len(message[index]) + len(mes) + len(padding_chars_tail)
             <= telegram.constants.MAX_MESSAGE_LENGTH
         ):
             message[index] += mes
@@ -154,7 +154,7 @@ def update_checker():
 
             message = (
                 "⚠ An update for _BTB Manager Telegram_ is available\.\n\n"
-                "Please update by going to *🛠 Maintenance* and pressing the *Update Telegram Bot* button\."
+                "Please update by going to *🛠 Maintenance* and pressing the *⬆ Update Telegram Bot* button\."
             )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)

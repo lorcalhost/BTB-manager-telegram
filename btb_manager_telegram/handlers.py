@@ -59,9 +59,9 @@ def menu(update: Update, _: CallbackContext) -> int:
     ]
 
     maintenance_keyboard = [
-        ["Update Telegram Bot"],
-        ["Update Binance Trade Bot"],
-        ["Execute custom script"],
+        ["⬆ Update Telegram Bot"],
+        ["⬆ Update Binance Trade Bot"],
+        ["🤖 Execute custom script"],
         ["⬅️ Back"],
     ]
 
@@ -203,7 +203,7 @@ def menu(update: Update, _: CallbackContext) -> int:
                 filename="crypto_trading.db",
             )
 
-    elif update.message.text == "Update Telegram Bot":
+    elif update.message.text == "⬆ Update Telegram Bot":
         re = buttons.update_tg_bot()
         if re[1]:
             kb = [["Update", "Cancel update"]]
@@ -220,7 +220,7 @@ def menu(update: Update, _: CallbackContext) -> int:
                 parse_mode="MarkdownV2",
             )
 
-    elif update.message.text == "Update Binance Trade Bot":
+    elif update.message.text == "⬆ Update Binance Trade Bot":
         re = buttons.update_btb()
         if re[1]:
             kb = [["Update", "Cancel update"]]
@@ -237,7 +237,7 @@ def menu(update: Update, _: CallbackContext) -> int:
                 parse_mode="MarkdownV2",
             )
 
-    elif update.message.text == "Execute custom script":
+    elif update.message.text == "🤖 Execute custom script":
         re = get_custom_scripts_keyboard()
         if re[1]:
             kb = re[0]
@@ -518,7 +518,7 @@ def panic(update: Update, _: CallbackContext) -> int:
 
 
 def execute_custom_script(update: Update, _: CallbackContext) -> int:
-    logger.info(f"Going to execute custom script. ({update.message.text})")
+    logger.info(f"Going to 🤖 execute custom script. ({update.message.text})")
 
     keyboard = [["OK 👌"]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
@@ -547,7 +547,6 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
                 output, _ = proc.communicate()
                 message_list = telegram_text_truncator(
                     escape_markdown(output.decode("utf-8")),
-                    padding_len=8,
                     padding_chars_head="```\n",
                     padding_chars_tail="```",
                 )
@@ -579,8 +578,8 @@ MENU_HANDLER = MessageHandler(
     Filters.regex(
         "^(Begin|💵 Current value|🚨 Panic button|📈 Progress|➗ Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|"
         "⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|"
-        "⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|Update Telegram Bot|Update Binance Trade Bot|"
-        "Execute custom script|⬅️ Back|Go back|OK|Cancel update|Cancel|OK 👌|Great 👌)$"
+        "⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|⬆ Update Telegram Bot|⬆ Update Binance Trade Bot|"
+        "🤖 Execute custom script|⬅️ Back|Go back|OK|Cancel update|Cancel|OK 👌|Great 👌)$"
     ),
     menu,
 )
