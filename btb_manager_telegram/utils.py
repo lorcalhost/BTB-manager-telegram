@@ -61,15 +61,22 @@ def setup_telegram_constants():
         exit(-1)
 
 
-def telegram_text_truncator(m_list) -> List[str]:
-    message = [""]
+def telegram_text_truncator(
+    m_list, padding_len=0, padding_chars_head="", padding_chars_tail=""
+) -> List[str]:
+    message = [padding_chars_head]
     index = 0
     for mes in m_list:
-        if len(message[index]) + len(mes) <= telegram.constants.MAX_MESSAGE_LENGTH:
+        if (
+            len(message[index]) + len(mes) + padding_len
+            <= telegram.constants.MAX_MESSAGE_LENGTH
+        ):
             message[index] += mes
         else:
-            message.append(mes)
+            message[index] += padding_chars_tail
+            message.append(padding_chars_head + mes)
             index += 1
+    message[index] += padding_chars_tail
     return message
 
 
@@ -210,6 +217,8 @@ def format_float(num):
 
 
 def get_custom_scripts_keyboard():
+    logger.info("Getting list of custom scripts.")
+
     custom_scripts_path = "./config/custom_scripts.json"
     keyboard = []
     custom_script_exist = False
@@ -218,11 +227,17 @@ def get_custom_scripts_keyboard():
     if os.path.exists(custom_scripts_path):
         with open(custom_scripts_path) as f:
             scripts = json.load(f)
-            if len(scripts) > 0:
-                for script in scripts:
-                    keyboard.append([script])
+            for script_name in scripts:
+                keyboard.append([script_name])
+
+        if len(keyboard) > 1:
+            custom_script_exist = True
+            message = "Select one of your custom scripts to execute it\."
+    else:
+        logger.warning(
+            "Unable to find custom_scripts.json file inside BTB-manager-telegram's config/ directory."
+        )
+        message = "Unable to find `custom_scripts.json` file inside *BTB\-manager\-telegram*'s `config/` directory\."
+
     keyboard.append(["Cancel"])
-    if len(keyboard) > 1:
-        custom_script_exist = True
-        message = "Select one of your custom scripts to execute it\."
     return keyboard, custom_script_exist, message

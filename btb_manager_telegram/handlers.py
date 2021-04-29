@@ -545,12 +545,19 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
                     stdout=subprocess.PIPE,
                 )
                 output, _ = proc.communicate()
-                message_list = telegram_text_truncator(output.decode("utf-8"))
+                message_list = telegram_text_truncator(
+                    escape_markdown(output.decode("utf-8")),
+                    padding_len=8,
+                    padding_chars_head="```\n",
+                    padding_chars_tail="```",
+                )
                 for message in message_list:
-                    update.message.reply_text(message, reply_markup=reply_markup)
+                    update.message.reply_text(
+                        message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                    )
             except Exception as e:
                 logger.error(f"Error during script execution: {e}")
-                message = f"Error during script execution\."
+                message = "Error during script execution\."
                 update.message.reply_text(
                     message, reply_markup=reply_markup, parse_mode="MarkdownV2"
                 )
