@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 from time import sleep
@@ -206,3 +207,22 @@ def update_reminder(self, message):
 
 def format_float(num):
     return format_float_positional(num, trim="-")
+
+
+def get_custom_scripts_keyboard():
+    custom_scripts_path = "./config/custom_scripts.json"
+    keyboard = []
+    custom_script_exist = False
+    message = "No custom script was found inside *BTB\-manager\-telegram*'s `/config/custom_scripts.json` file\."
+
+    if os.path.exists(custom_scripts_path):
+        with open(custom_scripts_path) as f:
+            scripts = json.load(f)
+            if len(scripts) > 0:
+                for script in scripts:
+                    keyboard.append([script])
+    keyboard.append(["Cancel"])
+    if len(keyboard) > 1:
+        custom_script_exist = True
+        message = "Select one of your custom scripts to execute it\."
+    return keyboard, custom_script_exist, message

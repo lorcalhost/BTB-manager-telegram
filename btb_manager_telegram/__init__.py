@@ -10,7 +10,8 @@ import time
     UPDATE_TG,
     UPDATE_BTB,
     PANIC_BUTTON,
-) = range(7)
+    CUSTOM_SCRIPT,
+) = range(8)
 
 BOUGHT, BUYING, SOLD, SELLING = range(4)
 

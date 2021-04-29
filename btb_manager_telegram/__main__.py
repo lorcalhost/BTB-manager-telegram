@@ -6,6 +6,7 @@ import colorama
 from telegram.ext import ConversationHandler, Updater
 
 from btb_manager_telegram import (
+    CUSTOM_SCRIPT,
     DELETE_DB,
     EDIT_COIN_LIST,
     EDIT_USER_CONFIG,
@@ -94,6 +95,7 @@ def main() -> None:
             UPDATE_TG: [handlers.UPDATE_TG_HANDLER],
             UPDATE_BTB: [handlers.UPDATE_BTB_HANDLER],
             PANIC_BUTTON: [handlers.PANIC_BUTTON_HANDLER],
+            CUSTOM_SCRIPT: [handlers.CUSTOM_SCRIPT_HANDLER],
         },
         fallbacks=[handlers.FALLBACK_HANDLER],
         per_user=True,

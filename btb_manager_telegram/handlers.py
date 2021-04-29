@@ -1,3 +1,4 @@
+import json
 import os
 import sqlite3
 import subprocess
@@ -17,6 +18,7 @@ from telegram.utils.helpers import escape_markdown
 from btb_manager_telegram import (
     BOUGHT,
     BUYING,
+    CUSTOM_SCRIPT,
     DELETE_DB,
     EDIT_COIN_LIST,
     EDIT_USER_CONFIG,
@@ -33,7 +35,9 @@ from btb_manager_telegram import (
 from btb_manager_telegram.binance_api_utils import send_signed_request
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
+    get_custom_scripts_keyboard,
     kill_btb_manager_telegram_process,
+    telegram_text_truncator,
 )
 
 
@@ -57,6 +61,7 @@ def menu(update: Update, _: CallbackContext) -> int:
     maintenance_keyboard = [
         ["Update Telegram Bot"],
         ["Update Binance Trade Bot"],
+        ["Execute custom script"],
         ["⬅️ Back"],
     ]
 
@@ -76,7 +81,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         message = "Please select one of the options."
         update.message.reply_text(message, reply_markup=reply_markup_config)
 
-    elif update.message.text in ["🛠 Maintenance", "Cancel update", "OK 👌"]:
+    elif update.message.text in ["🛠 Maintenance", "Cancel update", "Cancel", "OK 👌"]:
         message = "Please select one of the options."
         update.message.reply_text(message, reply_markup=reply_markup_maintenance)
 
@@ -228,6 +233,23 @@ def menu(update: Update, _: CallbackContext) -> int:
         else:
             update.message.reply_text(
                 re[0],
+                reply_markup=reply_markup_maintenance,
+                parse_mode="MarkdownV2",
+            )
+
+    elif update.message.text == "Execute custom script":
+        re = get_custom_scripts_keyboard()
+        if re[1]:
+            kb = re[0]
+            update.message.reply_text(
+                re[2],
+                reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                parse_mode="MarkdownV2",
+            )
+            return CUSTOM_SCRIPT
+        else:
+            update.message.reply_text(
+                re[2],
                 reply_markup=reply_markup_maintenance,
                 parse_mode="MarkdownV2",
             )
@@ -495,6 +517,47 @@ def panic(update: Update, _: CallbackContext) -> int:
     return MENU
 
 
+def execute_custom_script(update: Update, _: CallbackContext) -> int:
+    logger.info(f"Going to execute custom script. ({update.message.text})")
+
+    keyboard = [["OK 👌"]]
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+
+    custom_scripts_path = "./config/custom_scripts.json"
+    if update.message.text != "Cancel":
+        with open(custom_scripts_path) as f:
+            scripts = json.load(f)
+
+            try:
+                command = ["bash", "-c", str(scripts[update.message.text])]
+            except Exception as e:
+                logger.error(
+                    f"Unable to find script named {update.message.text} in custom_scripts.json file: {e}"
+                )
+                message = f"Unable to find script named `{escape_markdown(update.message.text)}` in `custom_scripts.json` file\."
+                update.message.reply_text(
+                    message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                )
+
+            try:
+                proc = subprocess.Popen(
+                    command,
+                    stdout=subprocess.PIPE,
+                )
+                output, _ = proc.communicate()
+                message_list = telegram_text_truncator(output.decode("utf-8"))
+                for message in message_list:
+                    update.message.reply_text(message, reply_markup=reply_markup)
+            except Exception as e:
+                logger.error(f"Error during script execution: {e}")
+                message = f"Error during script execution\."
+                update.message.reply_text(
+                    message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                )
+
+    return MENU
+
+
 def cancel(update: Update, _: CallbackContext) -> int:
     logger.info("Conversation canceled.")
 
@@ -510,7 +573,7 @@ MENU_HANDLER = MessageHandler(
         "^(Begin|💵 Current value|🚨 Panic button|📈 Progress|➗ Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|"
         "⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|"
         "⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|Update Telegram Bot|Update Binance Trade Bot|"
-        "⬅️ Back|Go back|OK|Cancel update|OK 👌|Great 👌)$"
+        "Execute custom script|⬅️ Back|Go back|OK|Cancel update|Cancel|OK 👌|Great 👌)$"
     ),
     menu,
 )
@@ -539,5 +602,7 @@ PANIC_BUTTON_HANDLER = MessageHandler(
     ),
     panic,
 )
+
+CUSTOM_SCRIPT_HANDLER = MessageHandler(Filters.regex("(.*?)"), execute_custom_script)
 
 FALLBACK_HANDLER = CommandHandler("cancel", cancel)

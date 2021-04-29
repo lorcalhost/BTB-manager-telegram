@@ -1,0 +1,4 @@
+{
+  "Test script 1": "echo hello",
+  "Test script 2": "echo world"
+}
