@@ -23,6 +23,7 @@ As of now the bot is able to perform the following actions:
 - [x] ⬆ **Update** _Binance Trade Bot_ (and notify when new update is available)
 - [x] ⬆ **Update** _Binance Trade Bot Manager Telegram_ (and notify when new update is available)
 - [x] 🚨 Panic button (Kills _Binance Trade Bot Manager Telegram_ and cancels all open orders / sells at market price)
+- [x] [User defined custom scripts](./docs/custom-scripts.md)
 
 </br>
 
@@ -70,6 +71,9 @@ $ python3 -m pip install -r requirements.txt
 - For a quick Telegram bot setup guide [click here](./docs/telegram-setup.md).
 - For a Docker setup guide [click here](./docs/docker-setup.md).
 - If you would like to run several _Binance Trade Bot_ instances at the same time [click here](./docs/multiple-bots.md).
+
+Note:  
+`BTB-manager-telegram` also supports [user defined custom scripts](./docs/custom-scripts.md).
 
 ## Usage
 

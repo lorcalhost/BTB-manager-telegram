@@ -92,17 +92,17 @@ def menu(update: Update, _: CallbackContext) -> int:
             )
 
     elif update.message.text == "🚨 Panic button":
-        re = buttons.panic_btn()
-        if re[1] in [BOUGHT, BUYING, SOLD, SELLING]:
-            if re[1] == BOUGHT:
+        message, status = buttons.panic_btn()
+        if status in [BOUGHT, BUYING, SOLD, SELLING]:
+            if status == BOUGHT:
                 kb = [["⚠ Stop & sell at market price"], ["Go back"]]
-            elif re[1] in [BUYING, SELLING]:
+            elif status in [BUYING, SELLING]:
                 kb = [["⚠ Stop & cancel order"], ["Go back"]]
-            elif re[1] == SOLD:
+            elif status == SOLD:
                 kb = [["⚠ Stop the bot"], ["Go back"]]
 
             update.message.reply_text(
-                re[0],
+                message,
                 reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
@@ -110,7 +110,7 @@ def menu(update: Update, _: CallbackContext) -> int:
 
         else:
             update.message.reply_text(
-                re[0], reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == "📈 Progress":
@@ -152,104 +152,103 @@ def menu(update: Update, _: CallbackContext) -> int:
         )
 
     elif update.message.text == "❌ Delete database":
-        re = buttons.delete_db()
-        if re[1]:
+        message, status = buttons.delete_db()
+        if status:
             kb = [["⚠ Confirm", "Go back"]]
             update.message.reply_text(
-                re[0],
+                message,
                 reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return DELETE_DB
         else:
             update.message.reply_text(
-                re[0], reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == "⚙ Edit user.cfg":
-        re = buttons.edit_user_cfg()
-        if re[1]:
+        message, status = buttons.edit_user_cfg()
+        if status:
             update.message.reply_text(
-                re[0], reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
+                message, reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
             )
             return EDIT_USER_CONFIG
         else:
             update.message.reply_text(
-                re[0], reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == "👛 Edit coin list":
-        re = buttons.edit_coin()
-        if re[1]:
+        message, status = buttons.edit_coin()
+        if status:
             update.message.reply_text(
-                re[0], reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
+                message, reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
             )
             return EDIT_COIN_LIST
         else:
             update.message.reply_text(
-                re[0], reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == "📤 Export database":
-        re = buttons.export_db()
+        message, document = buttons.export_db()
         update.message.reply_text(
-            re[0], reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+            message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
         )
-        if re[1] is not None:
+        if document is not None:
             bot = Bot(settings.TOKEN)
             bot.send_document(
                 chat_id=update.message.chat_id,
-                document=re[1],
+                document=document,
                 filename="crypto_trading.db",
             )
 
     elif update.message.text == "⬆ Update Telegram Bot":
-        re = buttons.update_tg_bot()
-        if re[1]:
+        message, status = buttons.update_tg_bot()
+        if status:
             kb = [["Update", "Cancel update"]]
             update.message.reply_text(
-                re[0],
+                message,
                 reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return UPDATE_TG
         else:
             update.message.reply_text(
-                re[0],
+                message,
                 reply_markup=reply_markup_maintenance,
                 parse_mode="MarkdownV2",
             )
 
     elif update.message.text == "⬆ Update Binance Trade Bot":
-        re = buttons.update_btb()
-        if re[1]:
+        message, status = buttons.update_btb()
+        if status:
             kb = [["Update", "Cancel update"]]
             update.message.reply_text(
-                re[0],
+                message,
                 reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return UPDATE_BTB
         else:
             update.message.reply_text(
-                re[0],
+                message,
                 reply_markup=reply_markup_maintenance,
                 parse_mode="MarkdownV2",
             )
 
     elif update.message.text == "🤖 Execute custom script":
-        re = get_custom_scripts_keyboard()
-        if re[1]:
-            kb = re[0]
+        kb, status, message = get_custom_scripts_keyboard()
+        if status:
             update.message.reply_text(
-                re[2],
+                message,
                 reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return CUSTOM_SCRIPT
         else:
             update.message.reply_text(
-                re[2],
+                message,
                 reply_markup=reply_markup_maintenance,
                 parse_mode="MarkdownV2",
             )
