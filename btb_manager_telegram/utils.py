@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 from time import sleep
@@ -60,15 +61,22 @@ def setup_telegram_constants():
         exit(-1)
 
 
-def telegram_text_truncator(m_list) -> List[str]:
-    message = [""]
+def telegram_text_truncator(
+    m_list, padding_chars_head="", padding_chars_tail=""
+) -> List[str]:
+    message = [padding_chars_head]
     index = 0
     for mes in m_list:
-        if len(message[index]) + len(mes) <= telegram.constants.MAX_MESSAGE_LENGTH:
+        if (
+            len(message[index]) + len(mes) + len(padding_chars_tail)
+            <= telegram.constants.MAX_MESSAGE_LENGTH
+        ):
             message[index] += mes
         else:
-            message.append(mes)
+            message[index] += padding_chars_tail
+            message.append(padding_chars_head + mes)
             index += 1
+    message[index] += padding_chars_tail
     return message
 
 
@@ -146,7 +154,7 @@ def update_checker():
 
             message = (
                 "⚠ An update for _BTB Manager Telegram_ is available\.\n\n"
-                "Please update by going to *🛠 Maintenance* and pressing the *Update Telegram Bot* button\."
+                "Please update by going to *🛠 Maintenance* and pressing the *⬆ Update Telegram Bot* button\."
             )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
@@ -206,3 +214,30 @@ def update_reminder(self, message):
 
 def format_float(num):
     return format_float_positional(num, trim="-")
+
+
+def get_custom_scripts_keyboard():
+    logger.info("Getting list of custom scripts.")
+
+    custom_scripts_path = "./config/custom_scripts.json"
+    keyboard = []
+    custom_script_exist = False
+    message = "No custom script was found inside *BTB\-manager\-telegram*'s `/config/custom_scripts.json` file\."
+
+    if os.path.exists(custom_scripts_path):
+        with open(custom_scripts_path) as f:
+            scripts = json.load(f)
+            for script_name in scripts:
+                keyboard.append([script_name])
+
+        if len(keyboard) > 1:
+            custom_script_exist = True
+            message = "Select one of your custom scripts to execute it\."
+    else:
+        logger.warning(
+            "Unable to find custom_scripts.json file inside BTB-manager-telegram's config/ directory."
+        )
+        message = "Unable to find `custom_scripts.json` file inside *BTB\-manager\-telegram*'s `config/` directory\."
+
+    keyboard.append(["Cancel"])
+    return keyboard, custom_script_exist, message

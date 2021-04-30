@@ -427,7 +427,7 @@ def export_db():
 
 
 def update_tg_bot():
-    logger.info("Update Telegram bot button pressed.")
+    logger.info("⬆ Update Telegram Bot button pressed.")
 
     message = "Your BTB Manager Telegram installation is already up to date\."
     upd = False
@@ -447,7 +447,7 @@ def update_tg_bot():
 
 
 def update_btb():
-    logger.info("Update Binance Trade Bot button pressed.")
+    logger.info("⬆ Update Binance Trade Bot button pressed.")
 
     message = "Your Binance Trade Bot installation is already up to date\."
     upd = False
@@ -465,7 +465,7 @@ def update_btb():
 
 
 def panic_btn():
-    logger.info("Panic Button button pressed.")
+    logger.info("🚨 Panic Button button pressed.")
 
     # Check if open orders / not in usd
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
