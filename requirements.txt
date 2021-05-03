@@ -2,5 +2,5 @@ colorama==0.4.4
 configparser==5.0.2
 numpy==1.20.2
 psutil==5.8.0
-python-telegram-bot==13.4.1
+python-telegram-bot==13.5
 pyyaml==5.4.1
