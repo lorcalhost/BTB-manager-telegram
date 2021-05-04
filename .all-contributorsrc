@@ -60,6 +60,15 @@
         "ideas",
         "doc"
       ]
+    },
+    {
+      "login": "kydrenw",
+      "name": "Hoang Dinh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4505155?v=4",
+      "profile": "https://github.com/kydrenw",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
