@@ -159,6 +159,7 @@ def update_checker():
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
             bot.send_message(settings.CHAT_ID, message, parse_mode="MarkdownV2")
+            sleep(1)
             bot.close()
             sleep(1)
             scheduler.enter(
@@ -179,6 +180,7 @@ def update_checker():
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
             bot.send_message(settings.CHAT_ID, message, parse_mode="MarkdownV2")
+            sleep(1)
             bot.close()
             sleep(1)
             scheduler.enter(
