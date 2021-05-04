@@ -88,10 +88,13 @@ def get_binance_trade_bot_process() -> Optional[psutil.Process]:
         bot_path = os.path.normpath(os.path.join(os.getcwd(), settings.ROOT_PATH))
 
     for proc in psutil.process_iter():
-        if (
-            name in proc.name() or name in " ".join(proc.cmdline())
-        ) and proc.cwd() == bot_path:
-            return proc
+        try:
+            if (
+                name in proc.name() or name in " ".join(proc.cmdline())
+            ) and proc.cwd() == bot_path:
+                return proc
+        except psutil.AccessDenied:
+            continue
 
 
 def find_and_kill_binance_trade_bot_process():
