@@ -19,6 +19,18 @@
         "bug",
         "ideas"
       ]
+    },
+    {
+      "login": "DmytroLitvinov",
+      "name": "Dmytro Litvinov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16066485?v=4",
+      "profile": "https://DmytroLitvinov.com",
+      "contributions": [
+        "code",
+        "ideas",
+        "maintenance",
+        "mentoring"
+      ]
     }
   ],
   "contributorsPerLine": 7,
