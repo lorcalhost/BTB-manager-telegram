@@ -175,6 +175,7 @@ This project follows the [all-contributors] specification.
     <td align="center"><a href="http://heitorramon.com"><img src="https://avatars.githubusercontent.com/u/1626923?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Heitor Ramon Ribeiro</b></sub></a><br /><a href="#ideas-bloodf" title="Ideas, Planning, & Feedback">🤔</a> <a href="#design-bloodf" title="Design">🎨</a></td>
     <td align="center"><a href="https://github.com/NovusEdge"><img src="https://avatars.githubusercontent.com/u/68768969?v=4?s=100" width="100px;" alt=""/><br /><sub><b>NovusEdge</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=NovusEdge" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/pwnfoo"><img src="https://avatars.githubusercontent.com/u/9546091?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sachin S. Kamath</b></sub></a><br /><a href="#ideas-pwnfoo" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=pwnfoo" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/kydrenw"><img src="https://avatars.githubusercontent.com/u/4505155?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Hoang Dinh</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Akydrenw" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
