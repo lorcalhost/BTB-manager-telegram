@@ -31,6 +31,16 @@
         "maintenance",
         "mentoring"
       ]
+    },
+    {
+      "login": "bloodf",
+      "name": "Heitor Ramon Ribeiro",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1626923?v=4",
+      "profile": "http://heitorramon.com",
+      "contributions": [
+        "ideas",
+        "design"
+      ]
     }
   ],
   "contributorsPerLine": 7,
