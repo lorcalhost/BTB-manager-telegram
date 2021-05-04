@@ -50,6 +50,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "pwnfoo",
+      "name": "Sachin S. Kamath",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9546091?v=4",
+      "profile": "https://github.com/pwnfoo",
+      "contributions": [
+        "ideas",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
