@@ -436,6 +436,7 @@ def update_btb(update: Update, _: CallbackContext) -> int:
                 f"$(which python3) -m pip install -r requirements.txt --upgrade",
                 shell=True,
             )
+            settings.BTB_UPDATE_BROADCASTED_BEFORE = False
         except Exception as e:
             logger.error(f"Unable to update Binance Trade Bot: {e}")
             message = "Unable to update Binance Trade Bot"
