@@ -128,7 +128,15 @@ You can also add the bot to a group if multiple people need to access this bot. 
 
 ## Support the project
 
-<a href="https://www.buymeacoffee.com/lorcalhost"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=lorcalhost&button_colour=FFDD00&font_colour=000000&font_family=Lato&outline_colour=000000&coffee_colour=ffffff"></a>
+I am currently a broke university student, if you like my work and use it on a daily basis consider supporting the project through a small donation. :smile:
+
+[:heart: Sponsor on GitHub](https://github.com/sponsors/lorcalhost)
+
+<a href="https://www.buymeacoffee.com/lorcalhost">
+  <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=lorcalhost&button_colour=FFDD00&font_colour=000000&font_family=Lato&outline_colour=000000&coffee_colour=ffffff">
+</a>
+
+_Donations through GitHub sponsors will be matched by GitHub (e.g. if you decide to donate 10$, GitHub will add 10$ to the donation)._
 
 ## Contributions and feature requests
 
@@ -152,7 +160,24 @@ Under no circumstances will I or the project's maintainers be held responsible o
 damages, losses, expenses, costs, or liabilities whatsoever, including, without limitation, any direct or indirect
 damages for loss of profits.
 
-##### ⚙ Developed for love of task automation by [Lorenzo Callegari](https://github.com/lorcalhost)
+## Contributors ✨
+
+Many people contributed to the project by providing ideas, finding bugs and helping in the development ([Emoji Key ✨](https://allcontributors.org/docs/en/emoji-key)).  
+This project follows the [all-contributors] specification.
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://lorcalhost.com"><img src="https://avatars.githubusercontent.com/u/9640455?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Lorenzo Callegari 乐子睿</b></sub></a><br /><a href="#infra-lorcalhost" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/lorcalhost/test/commits?author=lorcalhost" title="Tests">⚠️</a> <a href="https://github.com/lorcalhost/test/commits?author=lorcalhost" title="Code">💻</a> <a href="https://github.com/lorcalhost/test/commits?author=lorcalhost" title="Documentation">📖</a> <a href="#maintenance-lorcalhost" title="Maintenance">🚧</a> <a href="https://github.com/lorcalhost/test/issues?q=author%3Alorcalhost" title="Bug reports">🐛</a> <a href="#ideas-lorcalhost" title="Ideas, Planning, & Feedback">🤔</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 [binance trade bot]: https://github.com/edeng23/binance-trade-bot
 [wsl]: https://docs.microsoft.com/en-us/windows/wsl/install-win10
@@ -160,3 +185,4 @@ damages for loss of profits.
 [docker setup]: ./docs/docker-setup.md
 [open an issue]: https://github.com/lorcalhost/BTB-manager-telegram/issues/new
 [contributing guidelines]: ./CONTRIBUTING.md
+[all-contributors]: https://github.com/all-contributors/all-contributors

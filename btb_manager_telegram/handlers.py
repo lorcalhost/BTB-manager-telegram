@@ -265,7 +265,7 @@ def start(update: Update, _: CallbackContext) -> int:
         f"Welcome to _Binace Trade Bot Manager Telegram_\.\n\n"
         f"This Telegram bot was developed by @lorcalhost\.\n"
         f"Find out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.\n\n"
-        f"If you like the bot please [consider supporting the project 🍻](https://www.buymeacoffee.com/lorcalhost)\."
+        f"*If you like my work please [consider supporting the project through a small donation](https://github.com/sponsors/lorcalhost)\. ❤*"
     )
     reply_markup = ReplyKeyboardMarkup(
         keyboard, one_time_keyboard=True, resize_keyboard=True

@@ -1,0 +1,30 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "contributors": [
+    {
+      "login": "lorcalhost",
+      "name": "Lorenzo Callegari 乐子睿",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9640455?v=4",
+      "profile": "https://lorcalhost.com",
+      "contributions": [
+        "infra",
+        "test",
+        "code",
+        "doc",
+        "maintenance",
+        "bug",
+        "ideas"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "BTB-manager-telegram",
+  "projectOwner": "lorcalhost",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
