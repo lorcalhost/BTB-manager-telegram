@@ -83,7 +83,7 @@ def telegram_text_truncator(
 def get_binance_trade_bot_process() -> Optional[psutil.Process]:
     name = "binance_trade_bot"
     is_root_path_absolute = os.path.isabs(settings.ROOT_PATH)
-    bot_path = settings.ROOT_PATH
+    bot_path = os.path.normpath(settings.ROOT_PATH)
     if not is_root_path_absolute:
         bot_path = os.path.normpath(os.path.join(os.getcwd(), settings.ROOT_PATH))
 
