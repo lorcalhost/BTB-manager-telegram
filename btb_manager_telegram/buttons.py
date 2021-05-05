@@ -5,7 +5,7 @@ from configparser import ConfigParser
 from datetime import datetime
 
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
-from btb_manager_telegram.binance_api_utils import get_current_price
+from btb_manager_telegram.binance_api_utils import get_current_price, get_accsnp
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
     format_float,
@@ -18,6 +18,15 @@ from btb_manager_telegram.utils import (
 
 def current_value():
     logger.info("Current value button pressed.")
+
+    # Check if open orders / not in usd
+    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+    if not os.path.exists(db_file_path):
+        return ["ERROR: Database file not found\.", -1]
+
+    user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    if not os.path.exists(user_cfg_file_path):
+        return ["ERROR: `user.cfg` file not found\.", -1]
 
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
@@ -43,7 +52,8 @@ def current_value():
                     raise Exception()
                 if state == "ORDERED":
                     return [
-                        f"A buy order of `{format_float(order_size)}` *{bridge}* is currently placed on coin *{current_coin}*.\n\n"
+                        f"A buy order of `{format_float(order_size)}` *{bridge}* is currently placed on "
+                        f"coin *{current_coin}*.\n\n"
                         f"_Waiting for buy order to complete_.".replace(".", "\.")
                     ]
             except Exception as e:
@@ -497,6 +507,7 @@ def panic_btn():
             if not selling:
                 price_old = crypto_trade_amount / alt_trade_amount
                 price_now = get_current_price(alt_coin_id, crypto_coin_id)
+
                 if state == "COMPLETE":
                     return [
                         f"You are currently holding `{round(alt_trade_amount, 6)}` *{alt_coin_id}* bought for `{round(crypto_trade_amount, 2)}` *{crypto_coin_id}*.\n\n"
@@ -553,7 +564,7 @@ def panic_btn():
                         SELLING,
                     ]
 
-            con.close()
+
         except Exception as e:
             con.close()
             logger.error(
@@ -566,3 +577,101 @@ def panic_btn():
     except Exception as e:
         logger.error(f"❌ Unable to perform actions on the database: {e}")
         return ["❌ Unable to perform actions on the database\.", -1]
+
+
+def accsnp():
+    logger.info("Accaunt Snapshot pressed")
+    try:
+        query = get_accsnp()
+        message = telegram_text_truncator(query)
+        return [
+            f"{message}"
+        ]
+    except Exception as e:
+        logger.error(f"❌ Error code: {e}")
+        return ["❌ Unable to perform actions on Binance.", -1]
+
+
+def zreport():
+    logger.info("Z report button pressed.")
+    try:
+        # Check if open orders / not in usd
+        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        if not os.path.exists(db_file_path):
+            return ["ERROR: Database file not found\.", -1]
+
+        user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+        if not os.path.exists(user_cfg_file_path):
+            return ["ERROR: `user.cfg` file not found\.", -1]
+
+        try:
+            con = sqlite3.connect(db_file_path)
+            cur = con.cursor()
+
+            # Get last trade
+            try:
+                cur.execute(
+                    """SELECT alt_coin_id, crypto_coin_id, selling, state, alt_trade_amount, crypto_trade_amount, datetime FROM trade_history where state='COMPLETE'  ORDER BY datetime DESC, alt_coin_id ASC LIMIT 10;"""
+                )
+                query = cur.fetchall()
+                print(query)
+                m_list = [
+                    f"Last **{10 if len(query) > 10 else len(query)}** trades:\n\n"
+                ]
+                for sx in query:
+                    for a in sx:
+                        if a is None:
+                            continue
+
+                    alt_coin_id: str = sx[0]
+                    crypto_coin_id: str = sx[1]
+                    selling: int = sx[2]
+                    state: str = sx[3]
+                    alt_trade_amount: float = sx[4]
+                    crypto_trade_amount: float = sx[5]
+                    date_time: datetime = sx[6]
+                    date = datetime.strptime(sx[6], "%Y-%m-%d %H:%M:%S.%f")
+                    sell = "SOLD"
+                    buy = "BOUGTH"
+                    price_old = sx[5] / sx[4]
+                    """boughtprice = self.db.get_price_buy(alt_coin_id)
+                    if selling
+                        boughtprice
+                    else
+                        price_old"""
+                    price_now = get_current_price(sx[0], sx[1])
+                    change = round((price_now - price_old) / price_old * 100, 2)
+                    balance = round(price_now * (crypto_trade_amount + alt_trade_amount), 4)
+                    m_list.append(
+                        "------------------------------\n"
+                        f"{sx[0]}               {date} \n"
+                        f"Exchange rate when {sell if selling else buy}:\n"
+                        f"`{round(price_old, 4)}` *{sx[0]}*/*{sx[1]}*\n"
+                        f"Current exchange rate:\n"
+                        f"`{round(price_now, 4)}` *{sx[0]}*/*{sx[1]}*\n"
+                        f"Current value:\n"
+                        f"`{balance}` \n"
+                        f"Change:\n"
+                        f"`{change}`%\n\n"
+                    )
+                message = telegram_text_truncator(m_list)
+                return message
+            except Exception as e:
+                logger.error(
+                    f"❌ Z report: "
+                    f"{e}"
+                )
+                con.close()
+                return [
+                    "❌ Z report \."
+                ]
+        except Exception as e:
+            logger.error(f"❌ Unable to perform actions on the database: {e}")
+            message = ["❌ Unable to perform actions on the database\."]
+            return message
+    except Exception as e:
+        logger.error(f"❌ Unable to perform actions on the database: {e}")
+        message = ["❌ Unable to perform actions on the database\."]
+        return message
+
+
