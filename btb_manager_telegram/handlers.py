@@ -44,10 +44,18 @@ from btb_manager_telegram.utils import (
 def menu(update: Update, _: CallbackContext) -> int:
     logger.info(f"Menu selector. ({update.message.text})")
 
+    # Panic button disabled until PR #74 is complete
+    # keyboard = [
+    #     ["💵 Current value", "➗ Current ratios"],
+    #     ["📈 Progress", "⌛ Trade History"],
+    #     ["🔍 Check bot status", "🚨 Panic button"],
+    #     ["🛠 Maintenance", "⚙️ Configurations"],
+    # ]
+
     keyboard = [
-        ["💵 Current value", "➗ Current ratios"],
-        ["📈 Progress", "⌛ Trade History"],
-        ["🔍 Check bot status", "🚨 Panic button"],
+        ["💵 Current value"],
+        ["📈 Progress", "➗ Current ratios"],
+        ["🔍 Check bot status", "⌛ Trade History"],
         ["🛠 Maintenance", "⚙️ Configurations"],
     ]
 
