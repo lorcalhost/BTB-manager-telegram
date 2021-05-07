@@ -2,8 +2,9 @@ import os
 import sqlite3
 import subprocess
 from configparser import ConfigParser
-from shutil import copyfile
 from datetime import datetime
+from shutil import copyfile
+
 from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
     CallbackContext,
@@ -50,7 +51,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         ["▶ Start trade bot", "⏹ Stop trade bot"],
         ["📜 Read last log lines", "❌ Delete database"],
         ["⚙ Edit user.cfg", "👛 Edit coin list"],
-        ["Snapshot", "Z Report"],
+        ["🔸 Binance Snapshot", "Z Report"],
         ["📤 Export database", "⬅️ Back"],
     ]
 
@@ -120,16 +121,16 @@ def menu(update: Update, _: CallbackContext) -> int:
                 mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
 
-    elif update.message.text == "Snapshot":
-        for mes in buttons.accsnp():
+    elif update.message.text == "🔸 Binance Snapshot":
+        for mes in buttons.account_snapshot():
             update.message.reply_text(
-                mes, reply_markup=reply_markup, parse_mode=""
+                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == "Z Report":
         for mes in buttons.zreport():
             update.message.reply_text(
-                mes, reply_markup=reply_markup, parse_mode=""
+                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == "🔍 Check bot status":
@@ -448,7 +449,7 @@ def panic(update: Update, _: CallbackContext) -> int:
     keyboard = [["Great 👌"]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     if update.message.text != "Go back":
-        #find_and_kill_binance_trade_bot_process()
+        find_and_kill_binance_trade_bot_process()
 
         # Get current coin pair
         db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
@@ -521,7 +522,7 @@ MENU_HANDLER = MessageHandler(
     Filters.regex(
         "^(Begin|💵 Current value|🚨 Panic button|📈 Progress|➗ Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|"
         "⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|"
-        "⚙ Edit user.cfg|👛 Edit coin list|Snapshot|Z Report|📤 Export database|Update Telegram Bot|Update Binance Trade Bot|"
+        "⚙ Edit user.cfg|👛 Edit coin list|🔸 Binance Snapshot|Z Report|📤 Export database|Update Telegram Bot|Update Binance Trade Bot|"
         "⬅️ Back|Go back|OK|Cancel update|OK 👌|Great 👌)$"
     ),
     menu,

@@ -1,19 +1,15 @@
-import json
 import hashlib
 import hmac
 import os
-import subprocess
-import sys
 import time
-import hashlib
 from configparser import ConfigParser
 from urllib.parse import urlencode
-from datetime import datetime
 
 import requests
-from typing import List
+from telegram.utils.helpers import escape_markdown
 
 from btb_manager_telegram import logger, settings
+from btb_manager_telegram.debug import json_print
 
 
 def hashing(secret, query_string):
@@ -46,8 +42,10 @@ def send_signed_request(key, secret, base_url, http_method, url_path, payload={}
     else:
         query_string = f"timestamp={get_timestamp()}"
 
-    url = f'{base_url}{url_path}?{query_string}&signature={hashing(secret, query_string)}'
-    print(f"{http_method} {url}")
+    url = (
+        f"{base_url}{url_path}?{query_string}&signature={hashing(secret, query_string)}"
+    )
+    # logger.debug(f"{http_method} {url}")
     params = {"url": url, "params": {}}
     response = dispatch_request(key, http_method)(**params)
     return response.json()
@@ -60,13 +58,7 @@ def get_current_price(ticker, bridge):
     return eval(response["price"])
 
 
-def jprint(obj):
-    # create a formatted string of the Python JSON object
-    text = json.dumps(obj, sort_keys=True, indent=4)
-    print(text)
-
-
-def get_accsnp():
+def get_account_snapshot():
     user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
     with open(user_cfg_file_path) as cfg:
         config = ConfigParser()
@@ -87,33 +79,34 @@ def get_accsnp():
             "/sapi/v1/accountSnapshot",
             payload=params,
         )
-        code = message['code']
-        msg = message['msg']
-        if code != 200:
-            print(code)
-            print(msg)
 
-        snapshotVos = (message['snapshotVos'])
+        # msg = message["msg"]
+        code = message["code"]
+        if code != 200:
+            return [
+                "Error while fetching data from Binance\.\n",
+                f"Return code `{code}`",
+            ]
+
+        snapshotVos = message["snapshotVos"]
         data = snapshotVos[0]["data"]
         totalAssetOfBtc = data["totalAssetOfBtc"]
-        jprint(totalAssetOfBtc)
+        # json_print(totalAssetOfBtc)
         balances = data["balances"]
-        jprint(balances)
-        result = f"{totalAssetOfBtc}BTC     ",
+        # json_print(balances)
+        message = f"Total value in *BTC* `{totalAssetOfBtc}` *BTC*\n\n"
         for bal in balances:
-            if bal["free"] != 0:
-                asset = bal["asset"]
-                free = bal["free"]
-                locked = bal["locked"]
-                response = f"Asset: {asset} free: {free} locked: {locked}        ",
-                result += response
-
-
-        print(result)
-        #result = result.replace(".", "\.")
-
-        return result
+            asset = bal["asset"]
+            free = bal["free"]
+            locked = bal["locked"]
+            if free != 0 or locked != 0:
+                message += (
+                    f"*{asset}*\n"
+                    f"\tAvailable: `{free}`"
+                    f" \(Locked: `{locked}`\)\n\n"
+                )
+        return message
 
     except Exception as e:
-        logger.error(f"get_accsnp {e}")
-        return [f"get_accsnp {e}"]
+        logger.error(f"Error while getting getting Binance account snapshot: {e}")
+        return ["Error while getting getting Binance account snapshot\."]

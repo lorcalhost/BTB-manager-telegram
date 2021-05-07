@@ -5,7 +5,10 @@ from configparser import ConfigParser
 from datetime import datetime
 
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
-from btb_manager_telegram.binance_api_utils import get_current_price, get_accsnp
+from btb_manager_telegram.binance_api_utils import (
+    get_account_snapshot,
+    get_current_price,
+)
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
     format_float,
@@ -563,7 +566,7 @@ def panic_btn():
                         ),
                         SELLING,
                     ]
-
+            con.close()
 
         except Exception as e:
             con.close()
@@ -579,17 +582,14 @@ def panic_btn():
         return ["❌ Unable to perform actions on the database\.", -1]
 
 
-def accsnp():
-    logger.info("Accaunt Snapshot pressed")
+def account_snapshot():
+    logger.info("🔸 Binance Snapshot button pressed")
     try:
-        query = get_accsnp()
-        message = telegram_text_truncator(query)
-        return [
-            f"{message}"
-        ]
+        query = get_account_snapshot()
+        return telegram_text_truncator(query)
     except Exception as e:
         logger.error(f"❌ Error code: {e}")
-        return ["❌ Unable to perform actions on Binance.", -1]
+        return ["❌ Unable to perform actions on Binance\.", -1]
 
 
 def zreport():
@@ -641,7 +641,9 @@ def zreport():
                         price_old"""
                     price_now = get_current_price(sx[0], sx[1])
                     change = round((price_now - price_old) / price_old * 100, 2)
-                    balance = round(price_now * (crypto_trade_amount + alt_trade_amount), 4)
+                    balance = round(
+                        price_now * (crypto_trade_amount + alt_trade_amount), 4
+                    )
                     m_list.append(
                         "------------------------------\n"
                         f"{sx[0]}               {date} \n"
@@ -657,14 +659,9 @@ def zreport():
                 message = telegram_text_truncator(m_list)
                 return message
             except Exception as e:
-                logger.error(
-                    f"❌ Z report: "
-                    f"{e}"
-                )
+                logger.error(f"❌ Z report: " f"{e}")
                 con.close()
-                return [
-                    "❌ Z report \."
-                ]
+                return ["❌ Z report \."]
         except Exception as e:
             logger.error(f"❌ Unable to perform actions on the database: {e}")
             message = ["❌ Unable to perform actions on the database\."]
@@ -673,5 +670,3 @@ def zreport():
         logger.error(f"❌ Unable to perform actions on the database: {e}")
         message = ["❌ Unable to perform actions on the database\."]
         return message
-
-
