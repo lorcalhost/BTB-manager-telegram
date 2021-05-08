@@ -99,7 +99,7 @@ def get_account_snapshot():
             asset = bal["asset"]
             free = bal["free"]
             locked = bal["locked"]
-            if free != 0 or locked != 0:
+            if float(free) != 0 or float(locked) != 0:
                 message += (
                     f"*{asset}*\n"
                     f"\tAvailable: `{free}`"
