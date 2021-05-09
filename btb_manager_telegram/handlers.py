@@ -269,7 +269,7 @@ def start(update: Update, _: CallbackContext) -> int:
 
     keyboard = [["Begin"]]
     message = (
-        f"Hi *{escape_markdown(update.message.from_user.first_name)}*\!\n"
+        f"Hi *{escape_markdown(update.message.from_user.first_name, version=2)}*\!\n"
         f"Welcome to _Binace Trade Bot Manager Telegram_\.\n\n"
         f"This Telegram bot was developed by @lorcalhost\.\n"
         f"Find out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.\n\n"
@@ -542,7 +542,7 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
                 logger.error(
                     f"Unable to find script named {update.message.text} in custom_scripts.json file: {e}"
                 )
-                message = f"Unable to find script named `{escape_markdown(update.message.text)}` in `custom_scripts.json` file\."
+                message = f"Unable to find script named `{escape_markdown(update.message.text, version=2)}` in `custom_scripts.json` file\."
                 update.message.reply_text(
                     message, reply_markup=reply_markup, parse_mode="MarkdownV2"
                 )
@@ -554,7 +554,7 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
                 )
                 output, _ = proc.communicate()
                 message_list = telegram_text_truncator(
-                    escape_markdown(output.decode("utf-8")),
+                    escape_markdown(output.decode("utf-8"), version=2),
                     padding_chars_head="```\n",
                     padding_chars_tail="```",
                 )
