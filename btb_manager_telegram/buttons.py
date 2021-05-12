@@ -47,7 +47,9 @@ def current_value():
                         f"_Waiting for buy order to complete_.".replace(".", "\.")
                     ]
             except Exception as e:
-                logger.error(f"❌ Unable to fetch current coin from database: {e}")
+                logger.error(
+                    f"❌ Unable to fetch current coin from database: {e}", exc_info=True
+                )
                 con.close()
                 return ["❌ Unable to fetch current coin from database\."]
 
@@ -72,7 +74,8 @@ def current_value():
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
             except Exception as e:
                 logger.error(
-                    f"❌ Unable to fetch current coin information from database: {e}"
+                    f"❌ Unable to fetch current coin information from database: {e}",
+                    exc_info=True,
                 )
                 con.close()
                 return [
@@ -99,14 +102,17 @@ def current_value():
                 con.close()
             except Exception as e:
                 logger.error(
-                    f"❌ Something went wrong, unable to generate value at this time: {e}"
+                    f"❌ Something went wrong, unable to generate value at this time: {e}",
+                    exc_info=True,
                 )
                 con.close()
                 return [
                     "❌ Something went wrong, unable to generate value at this time\."
                 ]
         except Exception as e:
-            logger.error(f"❌ Unable to perform actions on the database: {e}")
+            logger.error(
+                f"❌ Unable to perform actions on the database: {e}", exc_info=True
+            )
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -148,12 +154,15 @@ def check_progress():
                 con.close()
             except Exception as e:
                 logger.error(
-                    f"❌ Unable to fetch progress information from database: {e}"
+                    f"❌ Unable to fetch progress information from database: {e}",
+                    exc_info=True,
                 )
                 con.close()
                 return ["❌ Unable to fetch progress information from database\."]
         except Exception as e:
-            logger.error(f"❌ Unable to perform actions on the database: {e}")
+            logger.error(
+                f"❌ Unable to perform actions on the database: {e}", exc_info=True
+            )
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -184,7 +193,9 @@ def current_ratios():
                 if current_coin is None:
                     raise Exception()
             except Exception as e:
-                logger.error(f"❌ Unable to fetch current coin from database: {e}")
+                logger.error(
+                    f"❌ Unable to fetch current coin from database: {e}", exc_info=True
+                )
                 con.close()
                 return ["❌ Unable to fetch current coin from database\."]
 
@@ -216,7 +227,8 @@ def current_ratios():
                 con.close()
             except Exception as e:
                 logger.error(
-                    f"❌ Something went wrong, unable to generate ratios at this time: {e}"
+                    f"❌ Something went wrong, unable to generate ratios at this time: {e}",
+                    exc_info=True,
                 )
                 con.close()
                 return [
@@ -224,7 +236,9 @@ def current_ratios():
                     "⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.",
                 ]
         except Exception as e:
-            logger.error(f"❌ Unable to perform actions on the database: {e}")
+            logger.error(
+                f"❌ Unable to perform actions on the database: {e}", exc_info=True
+            )
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -272,14 +286,17 @@ def trade_history():
                 con.close()
             except Exception as e:
                 logger.error(
-                    f"❌ Something went wrong, unable to generate trade history at this time: {e}"
+                    f"❌ Something went wrong, unable to generate trade history at this time: {e}",
+                    exc_info=True,
                 )
                 con.close()
                 return [
                     "❌ Something went wrong, unable to generate trade history at this time\."
                 ]
         except Exception as e:
-            logger.error(f"❌ Unable to perform actions on the database: {e}")
+            logger.error(
+                f"❌ Unable to perform actions on the database: {e}", exc_info=True
+            )
             message = ["❌ Unable to perform actions on the database\."]
     return message
 
@@ -557,12 +574,13 @@ def panic_btn():
         except Exception as e:
             con.close()
             logger.error(
-                f"❌ Something went wrong, the panic button is not working at this time: {e}"
+                f"❌ Something went wrong, the panic button is not working at this time: {e}",
+                exc_info=True,
             )
             return [
                 "❌ Something went wrong, the panic button is not working at this time\.",
                 -1,
             ]
     except Exception as e:
-        logger.error(f"❌ Unable to perform actions on the database: {e}")
+        logger.error(f"❌ Unable to perform actions on the database: {e}", exc_info=True)
         return ["❌ Unable to perform actions on the database\.", -1]

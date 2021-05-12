@@ -125,7 +125,7 @@ def is_tg_bot_update_available():
         output, _ = proc.communicate()
         re = "Your branch is behind" in str(output)
     except Exception as e:
-        logger.error(e)
+        logger.error(e, exc_info=True)
         re = None
     return re
 
@@ -143,7 +143,7 @@ def is_btb_bot_update_available():
         output, _ = proc.communicate()
         re = "Your branch is behind" in str(output)
     except Exception as e:
-        logger.error(e)
+        logger.error(e, exc_info=True)
         re = None
     return re
 
