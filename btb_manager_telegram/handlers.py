@@ -303,7 +303,7 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
             with open(coin_file_path, "w") as f:
                 f.write(update.message.text + "\n")
         except Exception as e:
-            logger.error(f"❌ Unable to edit coin list file: {e}")
+            logger.error(f"❌ Unable to edit coin list file: {e}", exc_info=True)
             message = "❌ Unable to edit coin list file\."
     else:
         message = "👌 Exited without changes\.\nYour `supported_coin_list` file was *not* modified\."
@@ -333,7 +333,9 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
             with open(user_cfg_file_path, "w") as f:
                 f.write(update.message.text + "\n\n\n")
         except Exception as e:
-            logger.error(f"❌ Unable to edit user configuration file: {e}")
+            logger.error(
+                f"❌ Unable to edit user configuration file: {e}", exc_info=True
+            )
             message = "❌ Unable to edit user configuration file\."
     else:
         message = (
@@ -362,13 +364,13 @@ def delete_db(update: Update, _: CallbackContext) -> int:
             copyfile(db_file_path, f"{db_file_path}.backup")
             os.remove(db_file_path)
         except Exception as e:
-            logger.error(f"❌ Unable to delete database file: {e}")
+            logger.error(f"❌ Unable to delete database file: {e}", exc_info=True)
             message = "❌ Unable to delete database file\."
         try:
             with open(log_file_path, "w") as f:
                 f.truncate()
         except Exception as e:
-            logger.error(f"❌ Unable to clear log file: {e}")
+            logger.error(f"❌ Unable to clear log file: {e}", exc_info=True)
             message = "❌ Unable to clear log file\."
 
     else:
@@ -404,7 +406,7 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
             )
             kill_btb_manager_telegram_process()
         except Exception as e:
-            logger.error(f"❌ Unable to update BTB Manager Telegram: {e}")
+            logger.error(f"❌ Unable to update BTB Manager Telegram: {e}", exc_info=True)
             message = "Unable to update BTB Manager Telegram"
             update.message.reply_text(
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -446,7 +448,7 @@ def update_btb(update: Update, _: CallbackContext) -> int:
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = False
         except Exception as e:
-            logger.error(f"Unable to update Binance Trade Bot: {e}")
+            logger.error(f"Unable to update Binance Trade Bot: {e}", exc_info=True)
             message = "Unable to update Binance Trade Bot"
             update.message.reply_text(
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -540,7 +542,8 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
                 command = ["bash", "-c", str(scripts[update.message.text])]
             except Exception as e:
                 logger.error(
-                    f"Unable to find script named {update.message.text} in custom_scripts.json file: {e}"
+                    f"Unable to find script named {update.message.text} in custom_scripts.json file: {e}",
+                    exc_info=True,
                 )
                 message = f"Unable to find script named `{escape_markdown(update.message.text, version=2)}` in `custom_scripts.json` file\."
                 update.message.reply_text(
@@ -563,7 +566,7 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
                         message, reply_markup=reply_markup, parse_mode="MarkdownV2"
                     )
             except Exception as e:
-                logger.error(f"Error during script execution: {e}")
+                logger.error(f"Error during script execution: {e}", exc_info=True)
                 message = "Error during script execution\."
                 update.message.reply_text(
                     message, reply_markup=reply_markup, parse_mode="MarkdownV2"
