@@ -90,12 +90,12 @@ def current_value():
                     f"*Current coin {current_coin}:*\n"
                     f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
                     f"\t\- Current coin exchange rate: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
-                    f"\t\- Value in *GBP*: `{round((balance * usd_price), 2)}` *GBP*\n"
+                    f"\t\- Value in *GBP*: `{round((balance * usd_price)*0.72, 2)}` *GBP*\n"
                     f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
                     f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
                     f"_Initially bought for_ `{round(buy_price, 2)}` *{bridge}* / `{round(buy_price*0.72, 2)}` *GBP*\n"
                     f"_Exchange rate when purchased:_ `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}*\n"
-                    f"{f'*Change in value*: `{round((usd_price - alt_amount) / alt_amount * 100, 2)}` *%*' if bridge in ['USDT', 'BUSD'] else ''}".replace(
+                    f"{f'*Change in value*: `{round((usd_price - (buy_price / alt_amount)) / (buy_price / alt_amount) * 100, 2)}` *%*' if bridge in ['USDT', 'BUSD'] else ''}".replace(
                         ".", "\."
                     )
                 ]
