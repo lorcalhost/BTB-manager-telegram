@@ -7,7 +7,6 @@ from typing import List, Optional
 import psutil
 import telegram
 import yaml
-from numpy import format_float_positional
 from telegram import Bot
 
 from btb_manager_telegram import logger, scheduler, settings
@@ -218,7 +217,7 @@ def update_reminder(self, message):
 
 
 def format_float(num):
-    return format_float_positional(num, trim="-")
+    return f"{num:0.8f}".rstrip("0").rstrip(".")
 
 
 def get_custom_scripts_keyboard():
