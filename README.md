@@ -178,6 +178,9 @@ This project follows the [all-contributors] specification.
     <td align="center"><a href="https://github.com/kydrenw"><img src="https://avatars.githubusercontent.com/u/4505155?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Hoang Dinh</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Akydrenw" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/idkravitz"><img src="https://avatars.githubusercontent.com/u/200144?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dmitry Kravtsov</b></sub></a><br /><a href="#ideas-idkravitz" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=idkravitz" title="Code">💻</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/sydekumf"><img src="https://avatars.githubusercontent.com/u/3983052?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Florian Sydekum</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=sydekumf" title="Code">💻</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
