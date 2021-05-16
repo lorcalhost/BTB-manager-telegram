@@ -88,6 +88,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "tntwist",
+      "name": "Nico L.",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6589385?v=4",
+      "profile": "https://github.com/tntwist",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
