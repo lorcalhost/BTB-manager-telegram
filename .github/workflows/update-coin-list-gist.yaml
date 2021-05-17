@@ -1,0 +1,32 @@
+name: Update coin list gist
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+
+jobs:
+  updateGamesList:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r .github/workflows/update-coin-list-gist/requirements.txt
+      - name: Generate correlated-coin-lists.json
+        env:
+          BINANCE_API_KEY: ${{ secrets.BINANCE_API_KEY }}
+          BINANCE_API_SECRET_KEY: ${{ secrets.BINANCE_API_SECRET_KEY }}
+        run: |
+          python ./.github/workflows/update-coin-list-gist/update.py
+      - name: Deploy to Gist
+        uses: exuanbo/actions-deploy-gist@v1.0.3
+        with:
+          token: ${{ secrets.TOKEN }}
+          gist_id: b7fbb3afabb6304ab0aca66312ca89cd
+          gist_file_name: correlated-coin-lists.json
+          file_path: ./correlated-coin-lists.json
