@@ -144,7 +144,7 @@ def check_progress():
                         f"*{coin[0]}*\n"
                         f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
                         f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                        f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}*' if coin[3] is not None else f'`{coin[3]}`'}\n"
+                        f"\t\- Change: {f'`{format_float(coin[3])}` *%*' if coin[3] is not None else f'`{coin[3]}`'}\n"
                         f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
                             ".", "\."
                         )
