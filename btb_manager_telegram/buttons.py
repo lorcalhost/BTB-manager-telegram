@@ -162,12 +162,18 @@ def check_progress():
                 # Generate message
                 m_list = ["Current coin amount progress:\n\n"]
                 for coin in query:
-                    pre_last_trade_date = datetime.strptime(
-                        coin[4], "%Y-%m-%d %H:%M:%S.%f"
-                    )
                     last_trade_date = datetime.strptime(
                         coin[5], "%Y-%m-%d %H:%M:%S.%f"
                     )
+                    if coin[4] is None:
+                        pre_last_trade_date = datetime.strptime(
+                            coin[5], "%Y-%m-%d %H:%M:%S.%f"
+                        )
+                    else:
+                        pre_last_trade_date = datetime.strptime(
+                            coin[4], "%Y-%m-%d %H:%M:%S.%f"
+                        )
+
                     time_passed = last_trade_date - pre_last_trade_date
                     last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
                     m_list.append(
