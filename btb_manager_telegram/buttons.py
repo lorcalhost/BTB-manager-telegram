@@ -91,11 +91,11 @@ def current_value():
 
                 return_rate_1_day, return_rate_7_day = 0, 0
                 balance_1_day, btc_price_1_day, balance_7_day, btc_price_7_day = 0, 0, 0, 0
-                if query_1_day is not None:
+                if query_1_day is not None and btc_price != 0:
                     balance_1_day, btc_price_1_day = query_1_day
                     return_rate_1_day = round((balance * btc_price - balance_1_day * btc_price_1_day) / (balance_1_day * btc_price_1_day) * 100, 2)
 
-                if query_7_day is not None:
+                if query_7_day is not None and btc_price != 0:
                     balance_7_day, btc_price_7_day = query_7_day
                     return_rate_7_day = round((balance * btc_price - balance_7_day * btc_price_7_day) / (balance_7_day * btc_price_7_day) * 100, 2)
             except Exception as e:
