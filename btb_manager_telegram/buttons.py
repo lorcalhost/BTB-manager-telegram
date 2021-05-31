@@ -90,14 +90,29 @@ def current_value():
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
 
                 return_rate_1_day, return_rate_7_day = 0, 0
-                balance_1_day, btc_price_1_day, balance_7_day, btc_price_7_day = 0, 0, 0, 0
+                balance_1_day, btc_price_1_day, balance_7_day, btc_price_7_day = (
+                    0,
+                    0,
+                    0,
+                    0,
+                )
                 if query_1_day is not None and btc_price != 0:
                     balance_1_day, btc_price_1_day = query_1_day
-                    return_rate_1_day = round((balance * btc_price - balance_1_day * btc_price_1_day) / (balance_1_day * btc_price_1_day) * 100, 2)
+                    return_rate_1_day = round(
+                        (balance * btc_price - balance_1_day * btc_price_1_day)
+                        / (balance_1_day * btc_price_1_day)
+                        * 100,
+                        2,
+                    )
 
                 if query_7_day is not None and btc_price != 0:
                     balance_7_day, btc_price_7_day = query_7_day
-                    return_rate_7_day = round((balance * btc_price - balance_7_day * btc_price_7_day) / (balance_7_day * btc_price_7_day) * 100, 2)
+                    return_rate_7_day = round(
+                        (balance * btc_price - balance_7_day * btc_price_7_day)
+                        / (balance_7_day * btc_price_7_day)
+                        * 100,
+                        2,
+                    )
             except Exception as e:
                 logger.error(
                     f"❌ Unable to fetch current coin information from database: {e}",
@@ -117,7 +132,7 @@ def current_value():
                     f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
                     f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n"
                     f"\t\- Exchange rate now:           `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
-                    f"\t\- *Change in value*: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*'\n"
+                    f"\t\- *Change in value*: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
                     f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
                     f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
                     f"1 day change BTC: `{return_rate_1_day}` %\n"
@@ -162,9 +177,7 @@ def check_progress():
                 # Generate message
                 m_list = ["Current coin amount progress:\n\n"]
                 for coin in query:
-                    last_trade_date = datetime.strptime(
-                        coin[5], "%Y-%m-%d %H:%M:%S.%f"
-                    )
+                    last_trade_date = datetime.strptime(coin[5], "%Y-%m-%d %H:%M:%S.%f")
                     if coin[4] is None:
                         pre_last_trade_date = datetime.strptime(
                             coin[5], "%Y-%m-%d %H:%M:%S.%f"
@@ -180,7 +193,7 @@ def check_progress():
                         f"*{coin[0]}*\n"
                         f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
                         f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                        f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in the last {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
+                        f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
                         f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
                             ".", "\."
                         )
