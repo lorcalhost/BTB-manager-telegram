@@ -97,6 +97,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "SeriousSeal",
+      "name": "SeriousSeal",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57253532?v=4",
+      "profile": "https://github.com/SeriousSeal",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
