@@ -60,7 +60,7 @@ def current_value():
                 )
                 query = cur.fetchone()
                 cur.execute(
-                    f"""SELECT cv.balance, cv.btc_price
+                    f"""SELECT cv.balance, cv.usd_price
                         FROM coin_value as cv
                         WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
                         AND cv.datetime > (SELECT th.datetime FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
@@ -68,7 +68,7 @@ def current_value():
                 )
                 query_1_day = cur.fetchone()
                 cur.execute(
-                    f"""SELECT cv.balance, cv.btc_price
+                    f"""SELECT cv.balance, cv.usd_price
                         FROM coin_value as cv
                         WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
                         AND cv.datetime > (SELECT th.datetime FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
@@ -90,26 +90,34 @@ def current_value():
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
 
                 return_rate_1_day, return_rate_7_day = 0, 0
-                balance_1_day, btc_price_1_day, balance_7_day, btc_price_7_day = (
+                balance_1_day, usd_price_1_day, balance_7_day, usd_price_7_day = (
                     0,
                     0,
                     0,
                     0,
                 )
-                if query_1_day is not None and btc_price != 0:
-                    balance_1_day, btc_price_1_day = query_1_day
+                if (
+                    query_1_day is not None
+                    and all(elem is not None for elem in query_1_day)
+                    and usd_price != 0
+                ):
+                    balance_1_day, usd_price_1_day = query_1_day
                     return_rate_1_day = round(
-                        (balance * btc_price - balance_1_day * btc_price_1_day)
-                        / (balance_1_day * btc_price_1_day)
+                        (balance * usd_price - balance_1_day * usd_price_1_day)
+                        / (balance_1_day * usd_price_1_day)
                         * 100,
                         2,
                     )
 
-                if query_7_day is not None and btc_price != 0:
-                    balance_7_day, btc_price_7_day = query_7_day
+                if (
+                    query_7_day is not None
+                    and all(elem is not None for elem in query_7_day)
+                    and usd_price != 0
+                ):
+                    balance_7_day, usd_price_7_day = query_7_day
                     return_rate_7_day = round(
-                        (balance * btc_price - balance_7_day * btc_price_7_day)
-                        / (balance_7_day * btc_price_7_day)
+                        (balance * usd_price - balance_7_day * usd_price_7_day)
+                        / (balance_7_day * usd_price_7_day)
                         * 100,
                         2,
                     )
@@ -135,8 +143,8 @@ def current_value():
                     f"\t\- *Change in value*: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
                     f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
                     f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
-                    f"1 day change BTC: `{return_rate_1_day}` %\n"
-                    f"7 days change BTC: `{return_rate_7_day}` %\n"
+                    f"1 day change USD: `{return_rate_1_day}` %\n"
+                    f"7 days change USD: `{return_rate_7_day}` %\n"
                 ]
                 message = telegram_text_truncator(m_list)
                 con.close()
