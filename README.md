@@ -181,6 +181,7 @@ This project follows the [all-contributors] specification.
   <tr>
     <td align="center"><a href="https://github.com/sydekumf"><img src="https://avatars.githubusercontent.com/u/3983052?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Florian Sydekum</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=sydekumf" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/tntwist"><img src="https://avatars.githubusercontent.com/u/6589385?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nico L.</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Atntwist" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/SeriousSeal"><img src="https://avatars.githubusercontent.com/u/57253532?v=4?s=100" width="100px;" alt=""/><br /><sub><b>SeriousSeal</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=SeriousSeal" title="Code">💻</a></td>
   </tr>
 </table>
 
