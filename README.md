@@ -98,8 +98,8 @@ If _Binance Trade Bot_ and _BTB-Manager-Telegram_ were **not** installed in the 
 ```console
 optional arguments:
   -p PATH, --path PATH  (optional) binance-trade-bot installation absolute path
-  -y PYTHON_PATH, --python_path PYTHON_PATH
-                        (optional) python binary path
+  -y PYTHON, --python PYTHON_PATH
+                        (optional) python binary to be used for the BTB. If unset, uses the same executable (and thus virtual env if any) than the telegram bot.
   -t TOKEN, --token TOKEN
                         (optional) Telegram bot token
   -c CHAT_ID, --chat_id CHAT_ID
