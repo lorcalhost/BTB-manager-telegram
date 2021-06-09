@@ -1,7 +1,7 @@
 import argparse
+import shutil
 import time
 from subprocess import PIPE, run
-import shutil
 
 import colorama
 from telegram.ext import ConversationHandler, Updater
