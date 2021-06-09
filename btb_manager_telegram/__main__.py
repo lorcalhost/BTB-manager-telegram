@@ -68,6 +68,7 @@ def pre_run_main() -> None:
     settings.PYTHON_PATH = args.python
     settings.TOKEN = args.token
     settings.CHAT_ID = args.chat_id
+    settings.RAW_ARGS = " ".join(sys.argv[1:])
 
     setup_root_path_constant()
 
