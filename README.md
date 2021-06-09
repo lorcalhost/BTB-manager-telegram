@@ -87,7 +87,7 @@ $ python3 -m btb_manager_telegram
 $ nohup python3 -m btb_manager_telegram &
 
 # If you are using a virtual environment for the binance trade bot you can specify the python binary path
-$ python3 -m btb_manager_telegram --python-path=/home/pi/binance-trade-bot/venv/bin/python
+$ python3 -m btb_manager_telegram --python_path=/home/pi/binance-trade-bot/venv/bin/python
 ```
 
 Make sure [Binance Trade Bot]'s `apprise.yml` file is correctly setup before running.  
