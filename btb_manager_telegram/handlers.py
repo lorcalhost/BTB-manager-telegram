@@ -403,7 +403,7 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
             manager_python_path = sys.executable
             subprocess.call(
                 f"git pull && {manager_python_path} -m pip install -r requirements.txt --upgrade && "
-                f'{manager_python_path} -m btb_manager_telegram {settings.RAW_ARGS} &',
+                f"{manager_python_path} -m btb_manager_telegram {settings.RAW_ARGS} &",
                 shell=True,
             )
             kill_btb_manager_telegram_process()
