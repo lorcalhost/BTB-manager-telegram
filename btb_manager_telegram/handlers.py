@@ -1,10 +1,10 @@
 import json
 import os
+import shutil
 import sqlite3
 import subprocess
-from configparser import ConfigParser
 import sys
-import shutil
+from configparser import ConfigParser
 
 from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
