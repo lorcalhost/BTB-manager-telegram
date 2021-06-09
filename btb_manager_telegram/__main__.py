@@ -66,8 +66,8 @@ def pre_run_main() -> None:
 
     settings.ROOT_PATH = args.path
     settings.PYTHON_PATH = args.python_path
-    if args.python_path == '$(which python3)':
-        settings.PYTHON_PATH = shutil.which('python3')
+    if args.python_path == "$(which python3)":
+        settings.PYTHON_PATH = shutil.which("python3")
     settings.TOKEN = args.token
     settings.CHAT_ID = args.chat_id
 

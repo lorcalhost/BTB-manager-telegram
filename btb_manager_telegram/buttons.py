@@ -323,9 +323,7 @@ def start_bot():
                     f"Make sure the `binance-trade-bot` and `BTB-manager-telegram` are in the same parent directory\."
                 )
         else:
-            message = (
-                f"❌ Unable to find python binary at `{settings.PYTHON_PATH}`\.\n"
-            )
+            message = f"❌ Unable to find python binary at `{settings.PYTHON_PATH}`\.\n"
     return message
 
 
