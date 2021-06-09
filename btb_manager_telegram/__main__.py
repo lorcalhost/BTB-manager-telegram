@@ -1,6 +1,7 @@
 import argparse
 import time
 from subprocess import PIPE, run
+import shutil
 
 import colorama
 from telegram.ext import ConversationHandler, Updater
@@ -37,6 +38,13 @@ def pre_run_main() -> None:
         default="../binance-trade-bot/",
     )
     parser.add_argument(
+        "-y",
+        "--python_path",
+        type=str,
+        help="(optional) python binary path",
+        default="$(which python3)",
+    )
+    parser.add_argument(
         "-t", "--token", type=str, help="(optional) Telegram bot token", default=None
     )
     parser.add_argument(
@@ -57,6 +65,9 @@ def pre_run_main() -> None:
         exit(1)
 
     settings.ROOT_PATH = args.path
+    settings.PYTHON_PATH = args.python_path
+    if args.python_path == '$(which python3)':
+        settings.PYTHON_PATH = shutil.which('python3')
     settings.TOKEN = args.token
     settings.CHAT_ID = args.chat_id
 
