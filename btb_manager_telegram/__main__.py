@@ -34,14 +34,14 @@ def pre_run_main() -> None:
         "-p",
         "--path",
         type=str,
-        help="(optional) binance-trade-bot installation absolute path.",
+        help="(optional) binance-trade-bot installation path.",
         default="../binance-trade-bot/",
     )
     parser.add_argument(
-        "-y",
-        "--python",
+        "-pp",
+        "--python_path",
         type=str,
-        help="(optional) python binary to be used for the BTB. If unset, uses the same executable (and thus virtual env if any) than the telegram bot.",
+        help="(optional) Python binary to be used for the BTB. If unset, uses the same executable (and thus virtual env if any) than the telegram bot.",
         default=sys.executable,
     )
     parser.add_argument(
@@ -65,7 +65,7 @@ def pre_run_main() -> None:
         exit(1)
 
     settings.ROOT_PATH = args.path
-    settings.PYTHON_PATH = args.python
+    settings.PYTHON_PATH = args.python_path
     settings.TOKEN = args.token
     settings.CHAT_ID = args.chat_id
     settings.RAW_ARGS = " ".join(sys.argv[1:])

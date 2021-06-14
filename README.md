@@ -86,7 +86,7 @@ $ python3 -m btb_manager_telegram
 # If the bot is running on a server you may want to keep it running even after ssh connection is closed by using nohup
 $ nohup python3 -m btb_manager_telegram &
 
-# If you are using a virtual environment for the binance trade bot you can specify the python binary path
+# If you are using a virtual environment for the binance trade bot you can specify the Python binary path
 $ python3 -m btb_manager_telegram --python_path=/home/pi/binance-trade-bot/venv/bin/python
 ```
 
@@ -97,9 +97,9 @@ If _Binance Trade Bot_ and _BTB-Manager-Telegram_ were **not** installed in the 
 
 ```console
 optional arguments:
-  -p PATH, --path PATH  (optional) binance-trade-bot installation absolute path
-  -y PYTHON, --python PYTHON_PATH
-                        (optional) python binary to be used for the BTB. If unset, uses the same executable (and thus virtual env if any) than the telegram bot.
+  -p PATH, --path PATH  (optional) binance-trade-bot installation path
+  -y PYTHON, --python_path PYTHON_PATH
+                        (optional) Python binary to be used for the BTB. If unset, uses the same executable (and thus virtual env if any) than the telegram bot.
   -t TOKEN, --token TOKEN
                         (optional) Telegram bot token
   -c CHAT_ID, --chat_id CHAT_ID
