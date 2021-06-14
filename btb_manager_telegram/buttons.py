@@ -373,20 +373,23 @@ def start_bot():
 
     message = "⚠ Binance Trade Bot is already running\."
     if not get_binance_trade_bot_process():
-        if os.path.exists(os.path.join(settings.ROOT_PATH, "binance_trade_bot/")):
-            subprocess.call(
-                f"cd {settings.ROOT_PATH} && $(which python3) -m binance_trade_bot &",
-                shell=True,
-            )
-            if get_binance_trade_bot_process():
-                message = "✔ Binance Trade Bot successfully started\."
+        if os.path.isfile(settings.PYTHON_PATH):
+            if os.path.exists(os.path.join(settings.ROOT_PATH, "binance_trade_bot/")):
+                subprocess.call(
+                    f"cd {settings.ROOT_PATH} && {settings.PYTHON_PATH} -m binance_trade_bot &",
+                    shell=True,
+                )
+                if get_binance_trade_bot_process():
+                    message = "✔ Binance Trade Bot successfully started\."
+                else:
+                    message = "❌ Unable to start Binance Trade Bot\."
             else:
-                message = "❌ Unable to start Binance Trade Bot\."
+                message = (
+                    f"❌ Unable to find _Binance Trade Bot_ installation at `{settings.ROOT_PATH}`\.\n"
+                    f"Make sure the `binance-trade-bot` and `BTB-manager-telegram` are in the same parent directory\."
+                )
         else:
-            message = (
-                f"❌ Unable to find _Binance Trade Bot_ installation at `{settings.ROOT_PATH}`\.\n"
-                f"Make sure the `binance-trade-bot` and `BTB-manager-telegram` are in the same parent directory\."
-            )
+            message = f"❌ Unable to find python binary at `{settings.PYTHON_PATH}`\.\n"
     return message
 
 
