@@ -1,7 +1,6 @@
 import json
 import os
 import subprocess
-import i18n
 from configparser import ConfigParser
 from time import sleep
 from typing import List, Optional
@@ -11,6 +10,7 @@ import telegram
 import yaml
 from telegram import Bot
 
+import i18n
 from btb_manager_telegram import logger, scheduler, settings
 
 
@@ -20,10 +20,10 @@ def setup_i18n():
     with open("./config/lang.cfg") as cfg:
         config.read_file(cfg)
 
-    settings.LANG = config.get('user_lang_setting', 'lang')
+    settings.LANG = config.get("user_lang_setting", "lang")
     i18n.set("locale", settings.LANG)
     i18n.set("fallback", "en")
-    i18n.set('skip_locale_root_data', True)
+    i18n.set("skip_locale_root_data", True)
     i18n.set("filename_format", "{locale}.{format}")
     i18n.load_path.append("./i18n")
 
@@ -242,7 +242,7 @@ def get_custom_scripts_keyboard():
     custom_scripts_path = "./config/custom_scripts.json"
     keyboard = []
     custom_script_exist = False
-    message = i18n.t('script_not_found_in_file_error')
+    message = i18n.t("script_not_found_in_file_error")
 
     if os.path.exists(custom_scripts_path):
         with open(custom_scripts_path) as f:
@@ -252,12 +252,12 @@ def get_custom_scripts_keyboard():
 
         if len(keyboard) > 1:
             custom_script_exist = True
-            message = i18n.t('select_script')
+            message = i18n.t("select_script")
     else:
         logger.warning(
             "Unable to find custom_scripts.json file inside BTB-manager-telegram's config/ directory."
         )
-        message = i18n.t('script_not_found_in_folder_error')
+        message = i18n.t("script_not_found_in_folder_error")
 
-    keyboard.append([i18n.t('cancel')])
+    keyboard.append([i18n.t("cancel")])
     return keyboard, custom_script_exist, message
