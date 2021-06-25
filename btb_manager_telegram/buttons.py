@@ -57,30 +57,37 @@ def current_value():
             # Get balance, current coin price in USD, current coin price in BTC
             try:
                 cur.execute(
-                    f"""SELECT balance, usd_price, btc_price, datetime FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;"""
+                    f"""SELECT balance, usd_price, btc_price, datetime
+                        FROM 'coin_value'
+                        WHERE coin_id = '{current_coin}'
+                        ORDER BY datetime DESC LIMIT 1;"""
                 )
                 query = cur.fetchone()
+
                 cur.execute(
-                    f"""SELECT cv.balance, cv.btc_price
+                    """SELECT cv.balance, cv.usd_price
                         FROM coin_value as cv
                         WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
                         AND cv.datetime > (SELECT th.datetime FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
                         ORDER BY cv.datetime ASC LIMIT 1;"""
                 )
                 query_1_day = cur.fetchone()
+
                 cur.execute(
-                    f"""SELECT cv.balance, cv.btc_price
+                    """SELECT cv.balance, cv.usd_price
                         FROM coin_value as cv
                         WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
                         AND cv.datetime > (SELECT th.datetime FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
                         ORDER BY cv.datetime ASC LIMIT 1;"""
                 )
                 query_7_day = cur.fetchone()
+
                 if query is None:
                     return [
                         i18n.t("no_information", current_coin=current_coin),
                         i18n.t("no_current_value_during_trade"),
                     ]
+
                 balance, usd_price, btc_price, last_update = query
                 if balance is None:
                     balance = 0
@@ -91,26 +98,35 @@ def current_value():
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
 
                 return_rate_1_day, return_rate_7_day = 0, 0
-                balance_1_day, btc_price_1_day, balance_7_day, btc_price_7_day = (
+                balance_1_day, usd_price_1_day, balance_7_day, usd_price_7_day = (
                     0,
                     0,
                     0,
                     0,
                 )
-                if query_1_day is not None and btc_price != 0:
-                    balance_1_day, btc_price_1_day = query_1_day
+
+                if (
+                    query_1_day is not None
+                    and all(elem is not None for elem in query_1_day)
+                    and usd_price != 0
+                ):
+                    balance_1_day, usd_price_1_day = query_1_day
                     return_rate_1_day = round(
-                        (balance * btc_price - balance_1_day * btc_price_1_day)
-                        / (balance_1_day * btc_price_1_day)
+                        (balance * usd_price - balance_1_day * usd_price_1_day)
+                        / (balance_1_day * usd_price_1_day)
                         * 100,
                         2,
                     )
 
-                if query_7_day is not None and btc_price != 0:
-                    balance_7_day, btc_price_7_day = query_7_day
+                if (
+                    query_7_day is not None
+                    and all(elem is not None for elem in query_7_day)
+                    and usd_price != 0
+                ):
+                    balance_7_day, usd_price_7_day = query_7_day
                     return_rate_7_day = round(
-                        (balance * btc_price - balance_7_day * btc_price_7_day)
-                        / (balance_7_day * btc_price_7_day)
+                        (balance * usd_price - balance_7_day * usd_price_7_day)
+                        / (balance_7_day * usd_price_7_day)
                         * 100,
                         2,
                     )
@@ -136,6 +152,7 @@ def current_value():
                     f"\t{i18n.t('value_change', change=round((balance * usd_price - buy_price) / buy_price * 100, 2))}\n",
                     f"\t{i18n.t('value_usd', value=round(balance * usd_price, 2))}\n",
                     f"\t{i18n.t('value_btc', value=round(balance * btc_price))}\n\n",
+                    f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
                     f"{i18n.t('one_day_change_btc', value=return_rate_1_day)}\n",
                     f"{i18n.t('seven_day_change_btc', value=return_rate_7_day)}\n",
                 ]
@@ -381,20 +398,23 @@ def start_bot():
 
     message = i18n.t("bot_already_running")
     if not get_binance_trade_bot_process():
-        if os.path.exists(os.path.join(settings.ROOT_PATH, "binance_trade_bot/")):
-            subprocess.call(
-                f"cd {settings.ROOT_PATH} && $(which python3) -m binance_trade_bot &",
-                shell=True,
-            )
-            if get_binance_trade_bot_process():
-                message = i18n.t("bot_started")
+        if os.path.isfile(settings.PYTHON_PATH):
+            if os.path.exists(os.path.join(settings.ROOT_PATH, "binance_trade_bot/")):
+                subprocess.call(
+                    f"cd {settings.ROOT_PATH} && {settings.PYTHON_PATH} -m binance_trade_bot &",
+                    shell=True,
+                )
+                if get_binance_trade_bot_process():
+                    message = i18n.t("bot_started")
+                else:
+                    message = i18n.t("bot_start_error")
             else:
-                message = i18n.t("bot_start_error")
+                message = (
+                    f"{i18n.t('installation_path_error', path=settings.ROOT_PATH)}\n"
+                    f"{i18n.t('directory_hint')}"
+                )
         else:
-            message = (
-                f"{i18n.t('installation_path_error', path=settings.ROOT_PATH)}\n"
-                f"{i18n.t('directory_hint')}"
-            )
+            message = f"❌ Unable to find python binary at `{settings.PYTHON_PATH}`\.\n"
     return message
 
 

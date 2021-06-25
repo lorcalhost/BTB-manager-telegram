@@ -250,7 +250,7 @@ def get_custom_scripts_keyboard():
             for script_name in scripts:
                 keyboard.append([script_name])
 
-        if len(keyboard) > 1:
+        if len(keyboard) >= 1:
             custom_script_exist = True
             message = i18n.t("select_script")
     else:

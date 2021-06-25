@@ -92,6 +92,9 @@ $ python3 -m btb_manager_telegram
 
 # If the bot is running on a server you may want to keep it running even after ssh connection is closed by using nohup
 $ nohup python3 -m btb_manager_telegram &
+
+# If you are using a virtual environment for the binance trade bot you can specify the Python binary path
+$ python3 -m btb_manager_telegram --python_path=/home/pi/binance-trade-bot/venv/bin/python
 ```
 
 Make sure [Binance Trade Bot]'s `apprise.yml` file is correctly setup before running.  
@@ -101,7 +104,9 @@ If _Binance Trade Bot_ and _BTB-Manager-Telegram_ were **not** installed in the 
 
 ```console
 optional arguments:
-  -p PATH, --path PATH  (optional) binance-trade-bot installation absolute path
+  -p PATH, --path PATH  (optional) binance-trade-bot installation path
+  -y PYTHON, --python_path PYTHON_PATH
+                        (optional) Python binary to be used for the BTB. If unset, uses the same executable (and thus virtual env if any) than the telegram bot.
   -t TOKEN, --token TOKEN
                         (optional) Telegram bot token
   -c CHAT_ID, --chat_id CHAT_ID
@@ -189,6 +194,7 @@ This project follows the [all-contributors] specification.
     <td align="center"><a href="https://github.com/sydekumf"><img src="https://avatars.githubusercontent.com/u/3983052?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Florian Sydekum</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=sydekumf" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/tntwist"><img src="https://avatars.githubusercontent.com/u/6589385?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nico L.</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Atntwist" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/SeriousSeal"><img src="https://avatars.githubusercontent.com/u/57253532?v=4?s=100" width="100px;" alt=""/><br /><sub><b>SeriousSeal</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=SeriousSeal" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/titulebolide"><img src="https://avatars.githubusercontent.com/u/44905741?v=4?s=100" width="100px;" alt=""/><br /><sub><b>titulebolide</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=titulebolide" title="Code">💻</a> <a href="#ideas-titulebolide" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
