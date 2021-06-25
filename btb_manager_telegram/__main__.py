@@ -18,6 +18,7 @@ from btb_manager_telegram import (
     settings,
 )
 from btb_manager_telegram.utils import (
+    setup_i18n,
     setup_root_path_constant,
     setup_telegram_constants,
     update_checker,
@@ -60,6 +61,7 @@ def pre_run_main() -> None:
     settings.TOKEN = args.token
     settings.CHAT_ID = args.chat_id
 
+    setup_i18n()
     setup_root_path_constant()
 
     if settings.TOKEN is None or settings.CHAT_ID is None:

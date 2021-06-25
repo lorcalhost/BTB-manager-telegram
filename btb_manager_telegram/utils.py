@@ -1,6 +1,8 @@
 import json
 import os
 import subprocess
+import i18n
+from configparser import ConfigParser
 from time import sleep
 from typing import List, Optional
 
@@ -10,6 +12,20 @@ import yaml
 from telegram import Bot
 
 from btb_manager_telegram import logger, scheduler, settings
+
+
+def setup_i18n():
+    config = ConfigParser()
+
+    with open("./config/lang.cfg") as cfg:
+        config.read_file(cfg)
+
+    settings.LANG = config.get('user_lang_setting', 'lang')
+    i18n.set("locale", settings.LANG)
+    i18n.set("fallback", "en")
+    i18n.set('skip_locale_root_data', True)
+    i18n.set("filename_format", "{locale}.{format}")
+    i18n.load_path.append("./i18n")
 
 
 def setup_root_path_constant():
@@ -155,8 +171,8 @@ def update_checker():
             logger.info("BTB Manager Telegram update found.")
 
             message = (
-                "⚠ An update for _BTB Manager Telegram_ is available\.\n\n"
-                "Please update by going to *🛠 Maintenance* and pressing the *⬆ Update Telegram Bot* button\."
+                f"{i18n.t('tg_bot_update_availabe')}\n\n"
+                f"{i18n.t('tg_bot_update_instruction')}"
             )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
@@ -176,8 +192,8 @@ def update_checker():
             logger.info("Binance Trade Bot update found.")
 
             message = (
-                "⚠ An update for _Binance Trade Bot_ is available\.\n\n"
-                "Please update by going to *🛠 Maintenance* and pressing the *Update Binance Trade Bot* button\."
+                f"{i18n.t('btb_update_availabe')}\n\n"
+                f"{i18n.t('btb_bot_update_instruction')}"
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
@@ -226,7 +242,7 @@ def get_custom_scripts_keyboard():
     custom_scripts_path = "./config/custom_scripts.json"
     keyboard = []
     custom_script_exist = False
-    message = "No custom script was found inside *BTB\-manager\-telegram*'s `/config/custom_scripts.json` file\."
+    message = i18n.t('script_not_found_in_file_error')
 
     if os.path.exists(custom_scripts_path):
         with open(custom_scripts_path) as f:
@@ -236,12 +252,12 @@ def get_custom_scripts_keyboard():
 
         if len(keyboard) > 1:
             custom_script_exist = True
-            message = "Select one of your custom scripts to execute it\."
+            message = i18n.t('select_script')
     else:
         logger.warning(
             "Unable to find custom_scripts.json file inside BTB-manager-telegram's config/ directory."
         )
-        message = "Unable to find `custom_scripts.json` file inside *BTB\-manager\-telegram*'s `config/` directory\."
+        message = i18n.t('script_not_found_in_folder_error')
 
-    keyboard.append(["Cancel"])
+    keyboard.append([i18n.t('cancel')])
     return keyboard, custom_script_exist, message

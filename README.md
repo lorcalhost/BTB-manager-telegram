@@ -66,6 +66,13 @@ $ python3 -m pip install -r requirements.txt
 
 ⚠ Make sure the correct `rwx` permissions are set and the program is run with correct privileges.
 
+## Language Setting
+You can set the language by setting the `lang` variable in `./config/lang.cfg`
+Check the folder `i18n` for available languages.
+
+### Adding translations
+Copy the `en.yml` file and rename it to e.g. `it.yml` and translate all the included values.
+
 ## Setup
 
 - For a quick Telegram bot setup guide [click here](./docs/telegram-setup.md).
