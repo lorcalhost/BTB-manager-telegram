@@ -12,6 +12,7 @@ exchange_rate_now: '\- Exchange rate now:           `%{rate}` *USD*/*%{coin}*'
 value_change: '\- *Change in value*: `%{change}` *%*'
 value_usd: '\- Value in *USD*: `%{value}` *USD*'
 value_btc: '\- Value in *BTC*: `%{value}` *BTC*'
+bought_for: _Bought for_ `%{value}` *%{coin}*
 one_day_change_btc: '1 day change BTC: `%{value}` %'
 seven_day_change_btc: '1 day change BTC: `%{value}` %'
 error_generating_value: '❌ Something went wrong, unable to generate value at this time\.'
@@ -149,3 +150,4 @@ script_not_found_in_folder_error: "Unable to find `custom_scripts.json` file ins
 bye: 'Bye! I hope we can talk again some day\.'
 start: 'start'
 select_script: 'Select one of your custom scripts to execute it\.'
+python_lib_error: '❌ Unable to find python binary at `%{path}`\.'

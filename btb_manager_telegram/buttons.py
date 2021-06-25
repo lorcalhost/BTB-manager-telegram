@@ -152,7 +152,7 @@ def current_value():
                     f"\t{i18n.t('value_change', change=round((balance * usd_price - buy_price) / buy_price * 100, 2))}\n",
                     f"\t{i18n.t('value_usd', value=round(balance * usd_price, 2))}\n",
                     f"\t{i18n.t('value_btc', value=round(balance * btc_price))}\n\n",
-                    f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
+                    f"{i18n.t('bought_for', value=round(buy_price, 2), coin=bridge)}\n"
                     f"{i18n.t('one_day_change_btc', value=return_rate_1_day)}\n",
                     f"{i18n.t('seven_day_change_btc', value=return_rate_7_day)}\n",
                 ]
@@ -414,7 +414,7 @@ def start_bot():
                     f"{i18n.t('directory_hint')}"
                 )
         else:
-            message = f"❌ Unable to find python binary at `{settings.PYTHON_PATH}`\.\n"
+            message = f"{i18n.t('python_lib_error', path=settings.PYTHON_PATH)}\n"
     return message
 
 
@@ -654,5 +654,4 @@ def panic_btn():
             ]
     except Exception as e:
         logger.error(f"❌ Unable to perform actions on the database: {e}", exc_info=True)
-        con.close()
         return [i18n.t("db_action_error"), -1]
