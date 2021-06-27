@@ -356,21 +356,21 @@ def trade_history():
                     if trade[4] is None:
                         continue
                     date = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
-                    trade = (
-                        i18n.t(
-                            "sold_trade",
+                    if trade[5] is not None:
+                        trade_details = i18n.t(
+                            "sold_bought",
                             sold_trade="Sold" if trade[2] else "Bought",
                             amount1=format_float(trade[4]),
                             coin1=trade[0],
                             amount2=format_float(trade[5]),
                             coin2=trade[1],
                         )
-                        if trade[5] is not None
-                        else ""
-                    )
+                    else:
+                        trade_details = ""
+
                     m_list.append(
                         f"`{date.strftime('%H:%M:%S %d/%m/%Y')}`\n"
-                        f"{trade}\n"
+                        f"{trade_details}\n"
                         f"{i18n.t('trade_status', status=trade[3])}\n\n".replace(
                             ".", "\."
                         )

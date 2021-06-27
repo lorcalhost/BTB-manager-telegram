@@ -56,7 +56,7 @@ def menu(update: Update, _: CallbackContext) -> int:
 
     keyboard = [
         [i18n.t("keyboard.current_value")],
-        [i18n.t("keyboard.progress"), i18n.t("keyboard.current_rations")],
+        [i18n.t("keyboard.progress"), i18n.t("keyboard.current_ratios")],
         [i18n.t("keyboard.check_status"), i18n.t("keyboard.trade_history")],
         [i18n.t("keyboard.maintenance"), i18n.t("keyboard.configurations")],
     ]
@@ -89,7 +89,9 @@ def menu(update: Update, _: CallbackContext) -> int:
         i18n.t("keyboard.great"),
     ]:
         message = i18n.t("select_option")
-        update.message.reply_text(message, reply_markup=reply_markup)
+        update.message.reply_text(
+            message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+        )
 
     elif update.message.text in [
         i18n.t("keyboard.go_back"),
@@ -97,7 +99,9 @@ def menu(update: Update, _: CallbackContext) -> int:
         i18n.t("keyboard.configurations"),
     ]:
         message = i18n.t("select_option")
-        update.message.reply_text(message, reply_markup=reply_markup_config)
+        update.message.reply_text(
+            message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+        )
 
     elif update.message.text in [
         i18n.t("keyboard.maintenance"),
@@ -106,7 +110,9 @@ def menu(update: Update, _: CallbackContext) -> int:
         i18n.t("keyboard.ok_s"),
     ]:
         message = i18n.t("select_option")
-        update.message.reply_text(message, reply_markup=reply_markup_maintenance)
+        update.message.reply_text(
+            message, reply_markup=reply_markup_maintenance, parse_mode="MarkdownV2"
+        )
 
     elif update.message.text == i18n.t("keyboard.current_value"):
         for mes in buttons.current_value():
@@ -149,7 +155,9 @@ def menu(update: Update, _: CallbackContext) -> int:
             )
 
     elif update.message.text == i18n.t("keyboard.check_status"):
-        update.message.reply_text(buttons.check_status(), reply_markup=reply_markup)
+        update.message.reply_text(
+            buttons.check_status(), reply_markup=reply_markup, parse_mode="MarkdownV2"
+        )
 
     elif update.message.text == i18n.t("keyboard.trade_history"):
         for mes in buttons.trade_history():
@@ -165,7 +173,11 @@ def menu(update: Update, _: CallbackContext) -> int:
         )
 
     elif update.message.text == i18n.t("keyboard.stop"):
-        update.message.reply_text(buttons.stop_bot(), reply_markup=reply_markup_config)
+        update.message.reply_text(
+            buttons.stop_bot(),
+            reply_markup=reply_markup_config,
+            parse_mode="MarkdownV2",
+        )
 
     elif update.message.text == i18n.t("keyboard.read_logs"):
         update.message.reply_text(
@@ -589,8 +601,7 @@ def cancel(update: Update, _: CallbackContext) -> int:
     logger.info("Conversation canceled.")
 
     update.message.reply_text(
-        i18n.t("bye"),
-        reply_markup=ReplyKeyboardRemove(),
+        i18n.t("bye"), reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
     )
     return ConversationHandler.END
 
