@@ -94,6 +94,8 @@ def get_binance_trade_bot_process() -> Optional[psutil.Process]:
                 return proc
         except psutil.AccessDenied:
             continue
+        except psutil.ZombieProcess:
+            continue
 
 
 def find_and_kill_binance_trade_bot_process():
