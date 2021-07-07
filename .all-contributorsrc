@@ -116,6 +116,15 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "stgo-eo",
+      "name": "Stephen Goult",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7523722?v=4",
+      "profile": "https://github.com/stgo-eo",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
