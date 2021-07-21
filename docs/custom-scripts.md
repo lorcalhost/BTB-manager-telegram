@@ -19,7 +19,7 @@ For example if one wants a button called `List files` which executes the `ls -la
 }
 ```
 
-Multiple scripts can be setup by adding a new line to the json file like so:
+Multiple scripts can be setup by adding a new line to the json file like so (note the `,` when adding a new line):
 
 ```json
 {
@@ -30,14 +30,12 @@ Multiple scripts can be setup by adding a new line to the json file like so:
 
 ## Further information
 
-By default, all scripts are executed from `BTB-manager-telegram`'s directory.
+By default, all scripts are executed from within `BTB-manager-telegram`'s directory.
 
-It is recommended to create a `custom_scripts` directory in order to avoid confusion:
+It is recommended to use the `custom_scripts` directory in order to avoid confusion:
 
 ```bash
-cd /path/to/the/BTB-manager-telegram
-mkdir custom_scripts
-cd custom_scripts
+cd /path/to/the/BTB-manager-telegram/custom_scripts
 ```
 
 ## Example custom script installation
@@ -50,7 +48,7 @@ Make the script executable by giving execute permissions:
 chmod +x custom_progress.sh
 ```
 
-In our example, the script uses sqlite3, so it is necessary to install it via system package manager:
+In our example, the script uses `sqlite3`, so it is necessary to install it via system package manager:
 
 ```bash
 sudo apt install sqlite3

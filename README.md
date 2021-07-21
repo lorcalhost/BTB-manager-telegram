@@ -133,7 +133,7 @@ You can also add the bot to a group if multiple people need to access this bot. 
 
 ## Support the project
 
-I am currently a broke university student, if you like my work and use it on a daily basis consider supporting the project through a small donation. :smile:
+If you like `BTB-manager-telegram` and use it on a daily basis consider supporting the project through a small donation. :smile:
 
 [:heart: Sponsor on GitHub](https://github.com/sponsors/lorcalhost)
 
