@@ -4,35 +4,35 @@ wait_for_order: '_Waiting for buy order to complete_\.'
 fetch_coin_from_db_error: '❌ Unable to fetch current coin from database\.'
 no_information: '❌ No information about *%{current_coin}* available in the database\.'
 no_current_value_during_trade: '⚠ If you tried using the `Current value` button during a trade please try again after the trade has been completed\.'
-last_update: 'Last update: `%{update}`'
-current_coin: '*Current coin %{coin}:*'
+last_update: "Last update: `%{update}`"
+current_coin: "*Current coin %{coin}:*"
 balance: '\- Balance: `%{balance}` *%{coin}*'
 exchange_rate_purchased: '\- Exchange rate purchased: `%{rate}` *%{bridge}*/*%{coin}*'
 exchange_rate_now: '\- Exchange rate now:           `%{rate}` *USD*/*%{coin}*'
 value_change: '\- *Change in value*: `%{change}` *%*'
 value_usd: '\- Value in *USD*: `%{value}` *USD*'
 value_btc: '\- Value in *BTC*: `%{value}` *BTC*'
-bought_for: '_Bought for_ `%{value}` *%{coin}*'
-one_day_change_btc: '1 day change BTC: `%{value}` %'
-seven_day_change_btc: '7 day change BTC: `%{value}` %'
+bought_for: "_Bought for_ `%{value}` *%{coin}*"
+one_day_change_btc: "1 day change BTC: `%{value}` %"
+seven_day_change_btc: "7 day change BTC: `%{value}` %"
 error_generating_value: '❌ Something went wrong, unable to generate value at this time\.'
 db_action_error: '❌ Unable to perform actions on the database\.'
-coin_progress: 'Current coin amount progress:'
+coin_progress: "Current coin amount progress:"
 amount: '\- Amount: `%{amount}` *%{coin}*'
 price: '\- Price: `%{amount}` *USD*'
 change_over_days: '\- Change: `%{amount}` *%{coin}* `%{percent}` *%* in %{days} days, %{hours} hours'
 trade_datetime: '\- Trade datetime: `%{date}`'
 progress_fetch_error: '❌ Unable to fetch progress information from database\.'
-compared_ratios: '*Coin ratios compared to %{coin} in decreasing order:*'
+compared_ratios: "*Coin ratios compared to %{coin} in decreasing order:*"
 bridge_value: '\- Price: `%{value}` %{bridge}'
 ratio: '\- Ratio: `%{ratio}`'
 ratio_gen_error: '❌ Something went wrong, unable to generate ratios at this time\.'
 logging_enabled_error: '⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.'
-bot_not_running: '⚠ Binance Trade Bot is not running.'
+bot_not_running: '⚠ Binance Trade Bot is not running\.'
 bot_running: '✔ Binance Trade Bot is running\.'
-last_x_trades: 'Last **%{trades}** trades:'
-sold_bought: '*%{sold_trade}* `%{amount1}` *%{coin1}* for `%{amount2}` *%{coin2}*'
-trade_status: 'Status: _*%{status}*_'
+last_x_trades: "Last **%{trades}** trades:"
+sold_bought: "*%{sold_trade}* `%{amount1}` *%{coin1}* for `%{amount2}` *%{coin2}*"
+trade_status: "Status: _*%{status}*_"
 trade_history_error: '❌ Something went wrong, unable to generate trade history at this time\.'
 bot_already_running: '⚠ Binance Trade Bot is already running\.'
 bot_started: '✔ Binance Trade Bot successfully started\.'
@@ -43,25 +43,25 @@ stopped_bot: '✔ Successfully stopped the bot\.'
 stop_error: '❌ Unable to stop Binance Trade Bot\.'
 windows_hint: 'If you are running the telegram bot on Windows make sure to run with administrator privileges\.'
 log_file_error: '❌ Unable to find log file at `%{path}`\.'
-last_4000_characters: 'Last *4000* characters in log file:'
+last_4000_characters: "Last *4000* characters in log file:"
 stop_bot_before_delete: '⚠ Please stop Binance Trade Bot before deleting the database file\.'
-sure_delete: 'Are you sure you want to delete the database file and clear the logs?'
+sure_delete: "Are you sure you want to delete the database file and clear the logs?"
 stop_bot_before_edit_config: '⚠ Please stop Binance Trade Bot before editing user configuration file\.'
-config_file_is: 'Current configuration file is:'
+config_file_is: "Current configuration file is:"
 reply_config: '_*Please reply with a message containing the updated configuration*_\.'
 stop_to_stop: 'Write /stop to stop editing and exit without changes\.'
 config_file_error: '❌ Unable to find user configuration file at `%{path}`\.'
 stop_bot_before_edit_coin_list: '⚠ Please stop Binance Trade Bot before editing the coin list\.'
-coin_list_is: 'Current coin list is:'
+coin_list_is: "Current coin list is:"
 reply_coin_list: '_*Please reply with a message containing the updated coin list*_\.'
 coin_list_error: '❌ Unable to find user configuration file at `%{path}`\.'
 stop_bot_before_export: '⚠ Please stop Binance Trade Bot before exporting the database file\.'
-file_msg: 'Here is your database file:'
+file_msg: "Here is your database file:"
 database_export_error: '❌ Unable to Export the database file\.'
 tg_bot_up_to_date: 'Your BTB Manager Telegram installation is already up to date\.'
 tg_bot_update_availabe: 'An update for BTB Manager Telegram is available\.'
 tg_bot_update_instruction: 'Please update by going to *🛠 Maintenance* and pressing the *⬆ Update Telegram Bot* button\.'
-update_now: 'Would you like to update now?'
+update_now: "Would you like to update now?"
 tg_bot_update_error: 'Error while trying to fetch BTB Manager Telegram version information\.'
 btb_up_to_date: 'Your Binance Trade Bot installation is already up to date\.'
 btb_update_availabe: 'An update for Binance Trade Bot is available\.'
@@ -70,64 +70,64 @@ btb_update_error: 'Error while trying to fetch Binance Trade Bot version informa
 panic_db_error: 'ERROR: Database file not found\.'
 panic_config_error: 'ERROR: `user.cfg` file not found\.'
 holding: 'You are currently holding `%{amount1}` *%{coin1}* bought for `%{amount2}` *%{coin2}*\.'
-rate_when_bought: 'Exchange rate when bought:'
-current_rate: 'Current exchange rate:'
-current_value: 'Current value:'
-change: 'Change:'
-stop_and_sell: 'Would you like to stop _Binance Trade Bot_ and sell at market price?'
+rate_when_bought: "Exchange rate when bought:"
+current_rate: "Current exchange rate:"
+current_value: "Current value:"
+change: "Change:"
+stop_and_sell: "Would you like to stop _Binance Trade Bot_ and sell at market price?"
 open_buy_order: 'You have an open buy order of `%{amount1}` *%{coin1}* for `%{amount2}` *%{coin2}*\.'
-limit_buy_price: 'Limit buy at price:'
-stop_and_cancel: 'Would you like to stop _Binance Trade Bot_ and cancel the open order?'
+limit_buy_price: "Limit buy at price:"
+stop_and_cancel: "Would you like to stop _Binance Trade Bot_ and cancel the open order?"
 order_already_complete: 'Your balance is already in *%{coin}*\.'
-ask_stop_bot: 'Would you like to stop _Binance Trade Bot_?'
+ask_stop_bot: "Would you like to stop _Binance Trade Bot_?"
 open_sell_order: 'You have an open sell order of `%{amount1}` *%{coin1}* for `%{amount2}` *%{coin2}*\.'
-limit_sell_price: 'Limit sell at price:'
+limit_sell_price: "Limit sell at price:"
 panic_btn_error: '❌ Something went wrong, the panic button is not working at this time\.'
 keyboard:
-  begin: 'Begin'
-  current_value: '💵 Current value'
-  progress: '📈 Progress'
-  current_ratios: '➗ Current ratios'
-  trade_history: '⌛ Trade History'
-  panic: '🚨 Panic button'
-  check_status: '🔍 Check bot status'
-  maintenance: '🛠 Maintenance'
-  configurations: '⚙️ Configurations'
-  start: '▶ Start trade bot'
-  start_cmd: '/start'
-  stop: '⏹ Stop trade bot'
-  read_logs: '📜 Read last log lines'
-  delete_db: '❌ Delete database'
-  edit_cfg: '⚙ Edit user.cfg'
-  edit_coin_list: '👛 Edit coin list'
-  export_db: '📤 Export database'
-  back: '⬅️ Back'
-  go_back: 'Go back'
-  update_tgb: '⬆ Update Telegram Bot'
-  update_btb: '⬆ Update Binance Trade Bot'
-  execute_script: '🤖 Execute custom script'
-  stop_sell: '⚠ Stop & sell at market price'
-  stop_cancel: '⚠ Stop & cancel order'
-  ok_s: 'OK 👌'
-  ok: 'OK'
-  great: 'Great 👌'
-  cancel: 'Cancel'
-  fb_cancel: 'cancel'
-  update: 'Update'
-  cancel_update: 'Cancel update'
-  confirm: '⚠ Confirm'
-  stop_bot: '⚠ Stop the bot'
+  begin: "Begin"
+  current_value: "💵 Current value"
+  progress: "📈 Progress"
+  current_ratios: "➗ Current ratios"
+  trade_history: "⌛ Trade History"
+  panic: "🚨 Panic button"
+  check_status: "🔍 Check bot status"
+  maintenance: "🛠 Maintenance"
+  configurations: "⚙️ Configurations"
+  start: "▶ Start trade bot"
+  start_cmd: "/start"
+  stop: "⏹ Stop trade bot"
+  read_logs: "📜 Read last log lines"
+  delete_db: "❌ Delete database"
+  edit_cfg: "⚙ Edit user.cfg"
+  edit_coin_list: "👛 Edit coin list"
+  export_db: "📤 Export database"
+  back: "⬅️ Back"
+  go_back: "Go back"
+  update_tgb: "⬆ Update Telegram Bot"
+  update_btb: "⬆ Update Binance Trade Bot"
+  execute_script: "🤖 Execute custom script"
+  stop_sell: "⚠ Stop & sell at market price"
+  stop_cancel: "⚠ Stop & cancel order"
+  ok_s: "OK 👌"
+  ok: "OK"
+  great: "Great 👌"
+  cancel: "Cancel"
+  fb_cancel: "cancel"
+  update: "Update"
+  cancel_update: "Cancel update"
+  confirm: "⚠ Confirm"
+  stop_bot: "⚠ Stop the bot"
 select_option: 'Please select one of the options\.'
 welcome: 'Welcome to _Binace Trade Bot Manager Telegram_\.'
 developed_by: 'This Telegram bot was developed by @lorcalhost\.'
 project_link: 'Find out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.'
 donation: '*If you like my work please [consider supporting the project through a small donation](https://github.com/sponsors/lorcalhost)\. ❤*'
-stop_cmd: '/stop'
-edited_coin_list: '✔ Successfully edited coin list file to:'
+stop_cmd: "/stop"
+edited_coin_list: "✔ Successfully edited coin list file to:"
 coin_edit_error: '❌ Unable to edit coin list file\.'
 exited_no_change: '👌 Exited without changes\.'
 coin_list_not_modified: 'Your `supported_coin_list` file was *not* modified\.'
-edited_user_config: '✔ Successfully edited user configuration file to:'
+edited_user_config: "✔ Successfully edited user configuration file to:"
 user_config_error: '❌ Unable to edit user configuration file\.'
 user_config_not_modified: 'Your `user.cfg` file was *not* modified\.'
 deleted_db: '✔ Successfully deleted database file\.'
@@ -136,8 +136,8 @@ clear_log_error: '❌ Unable to clear log file\.'
 exit_no_change: '👌 Exited without changes\.'
 db_not_deleted: 'Your database was *not* deleted\.'
 tgb_updating: 'The bot is updating\.'
-wait_then_start: 'Wait a few seconds then start the bot again with /start'
-tgb_update_error: 'Unable to update BTB Manager Telegram'
+wait_then_start: "Wait a few seconds then start the bot again with /start"
+tgb_update_error: "Unable to update BTB Manager Telegram"
 tgb_not_updated: 'BTB Manager Telegram was *not* updated\.'
 btb_updating: 'The bot has been stopped and is now updating\.'
 wait_then_start_manually: 'Wait a few seconds, then restart manually\.'
@@ -148,6 +148,6 @@ script_error: 'Error during script execution\.'
 script_not_found_in_file_error: 'No custom script was found inside *BTB\-manager\-telegram*''s `/config/custom_scripts.json` file\.'
 script_not_found_in_folder_error: 'Unable to find `custom_scripts.json` file inside *BTB\-manager\-telegram*''s `config/` directory\.'
 bye: 'Bye\! I hope we can talk again some day\.'
-start: 'start'
+start: "start"
 select_script: 'Select one of your custom scripts to execute it\.'
 python_lib_error: '❌ Unable to find python binary at `%{path}`\.'
