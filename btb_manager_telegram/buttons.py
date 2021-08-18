@@ -157,7 +157,7 @@ def current_value():
                     f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
                     f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
                     f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n"
-                    f"\t\- Value in *EUR*: `{round(euro, 2)}` *USD*\n"
+                    f"\t\- Value in *EUR*: `{round(euro * usd_price, 2)}` *USD*\n"
                 ]
                 message = telegram_text_truncator(m_list)
                 con.close()
@@ -215,7 +215,7 @@ def check_progress():
                         f"*{coin[0]}*\n"
                         f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
                         f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                        f"\t\- Price: `{round(euro, 2)}` *EUR*\n"
+                        f"\t\- Price: `{round(euro * coin[2], 2)}` *EUR*\n"
                         f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
                         f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
                             ".", "\."
