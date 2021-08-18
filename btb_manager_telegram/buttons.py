@@ -153,11 +153,11 @@ def current_value():
                     f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
                     f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
                     f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
+                    f"\t\- Value in *EUR*: `{round(euro * usd_price * balance, 2)}` *EUR*\n"
                     f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
                     f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
                     f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
                     f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n"
-                    f"\t\- Value in *EUR*: `{round(euro * usd_price * balance, 2)}` *USD*\n"
                 ]
                 message = telegram_text_truncator(m_list)
                 con.close()
