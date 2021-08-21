@@ -3,6 +3,7 @@ import sqlite3
 import subprocess
 from configparser import ConfigParser
 from datetime import datetime
+from forex_python.converter import CurrencyRates
 
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
@@ -142,6 +143,8 @@ def current_value():
 
             # Generate message
             try:
+                c = CurrencyRates()
+                euro = c.get_rate('USD', 'EUR')
                 m_list = [
                     f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
                     f"*Current coin {current_coin}:*\n"
@@ -150,10 +153,11 @@ def current_value():
                     f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
                     f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
                     f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
+                    f"\t\- Value in *EUR*: `{round(euro * usd_price * balance, 2)}` *EUR*\n"
                     f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
                     f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
                     f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
-                    f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n"
+                    f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n"
                 ]
                 message = telegram_text_truncator(m_list)
                 con.close()
@@ -203,13 +207,15 @@ def check_progress():
                         pre_last_trade_date = datetime.strptime(
                             coin[4], "%Y-%m-%d %H:%M:%S.%f"
                         )
-
+                    c = CurrencyRates()
+                    euro = c.get_rate('USD', 'EUR')
                     time_passed = last_trade_date - pre_last_trade_date
                     last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
                     m_list.append(
                         f"*{coin[0]}*\n"
                         f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
                         f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
+                        f"\t\- Price: `{round(euro * coin[2], 2)}` *EUR*\n"
                         f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
                         f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
                             ".", "\."

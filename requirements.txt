@@ -4,3 +4,4 @@ psutil==5.8.0
 python-telegram-bot==13.7
 pyyaml==5.4.1
 requests==2.26.0
+forex_python
