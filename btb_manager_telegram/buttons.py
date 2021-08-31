@@ -223,12 +223,12 @@ def check_progress():
                         pre_last_trade_date = datetime.strptime(
                             coin[4], "%Y-%m-%d %H:%M:%S.%f"
                         )
+                        time_passed = last_trade_date - pre_last_trade_date
+                        last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
                         if load_custom_currency()['Custom_Currency_Enabled'] == True:
                             custom_currency = load_custom_currency()['Currency']
                             c = CurrencyRates()
                             custom = c.get_rate('USD', custom_currency)
-                            time_passed = last_trade_date - pre_last_trade_date
-                            last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
                             m_list.append(
                             f"*{coin[0]}*\n"
                             f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
@@ -240,8 +240,6 @@ def check_progress():
                             )
                         )
                         else:
-                            time_passed = last_trade_date - pre_last_trade_date
-                            last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
                             m_list.append(
                             f"*{coin[0]}*\n"
                             f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
