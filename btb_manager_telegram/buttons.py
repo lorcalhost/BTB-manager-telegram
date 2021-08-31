@@ -14,6 +14,7 @@ from btb_manager_telegram.utils import (
     is_btb_bot_update_available,
     is_tg_bot_update_available,
     telegram_text_truncator,
+    load_custom_currency
 )
 
 
@@ -143,22 +144,38 @@ def current_value():
 
             # Generate message
             try:
-                c = CurrencyRates()
-                GBPo = c.get_rate('USD', 'GBP')
-                m_list = [
-                    f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
-                    f"*Current coin {current_coin}:*\n"
-                    f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
-                    f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n"
-                    f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
-                    f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
-                    f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
-                    f"\t\- Value in *GBP*: `{round(GBPo * usd_price * balance, 2)}` *GBP*\n"
-                    f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
-                    f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
-                    f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
-                    f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n"
-                ]
+                if load_custom_currency()['Custom_Currency_Enabled'] == True:
+                    custom_currency = load_custom_currency()['Currency']
+                    c = CurrencyRates()
+                    custom = c.get_rate('USD', custom_currency)
+                    m_list = [
+                        f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
+                        f"*Current coin {current_coin}:*\n"
+                        f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
+                        f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n"
+                        f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
+                        f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
+                        f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
+                        f"\t\- Value in *{custom_currency}*: `{round(custom * usd_price * balance, 2)}` *{custom_currency}*\n"
+                        f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
+                        f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
+                        f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
+                        f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n"
+                    ]
+                else:
+                    m_list = [
+                        f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
+                        f"*Current coin {current_coin}:*\n"
+                        f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
+                        f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n"
+                        f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
+                        f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
+                        f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
+                        f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
+                        f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
+                        f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
+                        f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n"
+                    ]
                 message = telegram_text_truncator(m_list)
                 con.close()
             except Exception as e:
