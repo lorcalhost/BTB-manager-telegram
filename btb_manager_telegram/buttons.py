@@ -223,34 +223,34 @@ def check_progress():
                         pre_last_trade_date = datetime.strptime(
                             coin[4], "%Y-%m-%d %H:%M:%S.%f"
                         )
-                    if load_custom_currency()['Custom_Currency_Enabled'] == True:
-                        custom_currency = load_custom_currency()['Currency']
-                        c = CurrencyRates()
-                        custom = c.get_rate('USD', custom_currency)
-                        time_passed = last_trade_date - pre_last_trade_date
-                        last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
-                        m_list.append(
-                        f"*{coin[0]}*\n"
-                        f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
-                        f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                        f"\t\- Price: `{round(custom_currency * coin[2], 2)}` *{custom}*\n"
-                        f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
-                        f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
-                            ".", "\."
+                        if load_custom_currency()['Custom_Currency_Enabled'] == True:
+                            custom_currency = load_custom_currency()['Currency']
+                            c = CurrencyRates()
+                            custom = c.get_rate('USD', custom_currency)
+                            time_passed = last_trade_date - pre_last_trade_date
+                            last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
+                            m_list.append(
+                            f"*{coin[0]}*\n"
+                            f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
+                            f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
+                            f"\t\- Price: `{round(custom_currency * coin[2], 2)}` *{custom}*\n"
+                            f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
+                            f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
+                                ".", "\."
+                            )
                         )
-                    )
-                    else:
-                        time_passed = last_trade_date - pre_last_trade_date
-                        last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
-                        m_list.append(
-                        f"*{coin[0]}*\n"
-                        f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
-                        f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                        f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
-                        f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
-                            ".", "\."
+                        else:
+                            time_passed = last_trade_date - pre_last_trade_date
+                            last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
+                            m_list.append(
+                            f"*{coin[0]}*\n"
+                            f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
+                            f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
+                            f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
+                            f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
+                                ".", "\."
+                            )
                         )
-                    )
 
                 message = telegram_text_truncator(m_list)
                 con.close()
