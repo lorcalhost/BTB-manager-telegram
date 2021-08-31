@@ -143,7 +143,7 @@ def current_value():
 
             # Generate message
             try:
-                if load_custom_currency()['Custom_Currency'] == True:
+                if load_custom_currency()['Custom_Currency_Enabled'] == True:
                     custom_currency = load_custom_currency()['Currency']
                     c = CurrencyRates()
                     custom = c.get_rate('USD', custom_currency)
