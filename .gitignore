@@ -141,3 +141,4 @@ supported_coin_list.backup
 logs/
 .history/
 custom_scripts.json
+config/custom.json
