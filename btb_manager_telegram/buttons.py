@@ -14,8 +14,8 @@ from btb_manager_telegram.utils import (
     is_btb_bot_update_available,
     is_tg_bot_update_available,
     telegram_text_truncator,
-    load_custom_currency
 )
+
 
 def current_value():
     logger.info("Current value button pressed.")
@@ -143,38 +143,22 @@ def current_value():
 
             # Generate message
             try:
-                if load_custom_currency()['Custom_Currency_Enabled'] == True:
-                    custom_currency = load_custom_currency()['Currency']
-                    c = CurrencyRates()
-                    custom = c.get_rate('USD', custom_currency)
-                    m_list = [
-                        f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
-                        f"*Current coin {current_coin}:*\n"
-                        f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
-                        f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n"
-                        f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
-                        f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
-                        f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
-                        f"\t\- Value in *{custom_currency}*: `{round(custom * usd_price * balance, 2)}` *{custom_currency}*\n"
-                        f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
-                        f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
-                        f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
-                        f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n"
-                    ]
-                else:
-                    m_list = [
-                        f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
-                        f"*Current coin {current_coin}:*\n"
-                        f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
-                        f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n"
-                        f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
-                        f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
-                        f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
-                        f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
-                        f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
-                        f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
-                        f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n"
-                    ]
+                c = CurrencyRates()
+                GBPo = c.get_rate('USD', 'GBP')
+                m_list = [
+                    f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
+                    f"*Current coin {current_coin}:*\n"
+                    f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
+                    f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n"
+                    f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
+                    f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
+                    f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
+                    f"\t\- Value in *GBP*: `{round(GBPo * usd_price * balance, 2)}` *GBP*\n"
+                    f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
+                    f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
+                    f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
+                    f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n"
+                ]
                 message = telegram_text_truncator(m_list)
                 con.close()
             except Exception as e:
@@ -224,15 +208,14 @@ def check_progress():
                             coin[4], "%Y-%m-%d %H:%M:%S.%f"
                         )
                     c = CurrencyRates()
-                    custom_currency = load_custom_currency()['Currency']
-                    custom = c.get_rate('USD', custom_currency)
+                    GBPo = c.get_rate('USD', 'GBP')
                     time_passed = last_trade_date - pre_last_trade_date
                     last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
                     m_list.append(
                         f"*{coin[0]}*\n"
                         f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
                         f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                        f"\t\- Price: `{round(custom_currency * coin[2], 2)}` *{custom}*\n"
+                        f"\t\- Price: `{round(GBPo * coin[2], 2)}` *GBP*\n"
                         f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
                         f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
                             ".", "\."
@@ -323,62 +306,6 @@ def current_ratios():
                 con.close()
                 return [
                     "❌ Something went wrong, unable to generate ratios at this time\.",
-                    "⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.",
-                ]
-        except Exception as e:
-            logger.error(
-                f"❌ Unable to perform actions on the database: {e}", exc_info=True
-            )
-            message = ["❌ Unable to perform actions on the database\."]
-    return message
-
-
-def next_coin():
-    logger.info("Next coin button pressed.")
-
-    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
-    user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
-    message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
-    if os.path.exists(db_file_path):
-        try:
-            # Get bridge currency symbol
-            with open(user_cfg_file_path) as cfg:
-                config = ConfigParser()
-                config.read_file(cfg)
-                bridge = config.get("binance_user_config", "bridge")
-                scout_multiplier = config.get("binance_user_config", "scout_multiplier")
-
-            con = sqlite3.connect(db_file_path)
-            cur = con.cursor()
-
-            # Get prices and percentages for a jump to the next coin
-            try:
-                cur.execute(
-                    f"""SELECT p.to_coin_id as other_coin, sh.other_coin_price, (current_coin_price - 0.001 * '{scout_multiplier}' * current_coin_price) / sh.target_ratio AS 'price_needs_to_drop_to', ((current_coin_price - 0.001 * '{scout_multiplier}' * current_coin_price) / sh.target_ratio) / sh.other_coin_price as 'percentage' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id = (SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC, percentage DESC LIMIT (SELECT count(DISTINCT pairs.to_coin_id) FROM pairs JOIN coins ON coins.symbol = pairs.to_coin_id WHERE coins.enabled = 1 AND pairs.from_coin_id=(SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1));"""
-                )
-                query = cur.fetchall()
-
-                m_list = []
-                for coin in query:
-                    percentage = round(coin[3] * 100, 2)
-                    m_list.append(
-                        f"*{coin[0]} \(`{format_float(percentage)}`%\)*\n"
-                        f"\t\- Current Price: `{format_float(round(coin[1], 8))}` {bridge}\n"
-                        f"\t\- Target Price: `{format_float(round(coin[2], 8))}` {bridge}\n\n".replace(
-                            ".", "\."
-                        )
-                    )
-
-                message = telegram_text_truncator(m_list)
-                con.close()
-            except Exception as e:
-                logger.error(
-                    f"❌ Something went wrong, unable to generate next coin at this time: {e}",
-                    exc_info=True,
-                )
-                con.close()
-                return [
-                    "❌ Something went wrong, unable to generate next coin at this time\.",
                     "⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.",
                 ]
         except Exception as e:
