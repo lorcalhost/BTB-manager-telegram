@@ -54,8 +54,8 @@ def menu(update: Update, _: CallbackContext) -> int:
     # ]
 
     keyboard = [
-        ["💵 Current value"],
-        ["📈 Progress", "➗ Current ratios"],
+        ["💵 Current value", "📈 Progress"],
+        ["➗ Current ratios", "🔀 Next coin"],
         ["🔍 Check bot status", "⌛ Trade History"],
         ["🛠 Maintenance", "⚙️ Configurations"],
     ]
@@ -130,6 +130,12 @@ def menu(update: Update, _: CallbackContext) -> int:
 
     elif update.message.text == "➗ Current ratios":
         for mes in buttons.current_ratios():
+            update.message.reply_text(
+                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            )
+
+    elif update.message.text == "🔀 Next coin":
+        for mes in buttons.next_coin():
             update.message.reply_text(
                 mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
@@ -589,7 +595,7 @@ def cancel(update: Update, _: CallbackContext) -> int:
 
 MENU_HANDLER = MessageHandler(
     Filters.regex(
-        "^(Begin|💵 Current value|🚨 Panic button|📈 Progress|➗ Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|"
+        "^(Begin|💵 Current value|🚨 Panic button|📈 Progress|➗ Current ratios|🔀 Next coin|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|"
         "⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|"
         "⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|⬆ Update Telegram Bot|⬆ Update Binance Trade Bot|"
         "🤖 Execute custom script|⬅️ Back|Go back|OK|Cancel update|Cancel|OK 👌|Great 👌)$"
