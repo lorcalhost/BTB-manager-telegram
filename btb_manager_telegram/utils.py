@@ -254,5 +254,4 @@ def load_custom_currency():
         with open('config/custom.json') as json_file:
             return json.load(json_file)
     except:
-        print('config/custom.json not found')
         return {"Custom_Currency_Enabled": 0}
