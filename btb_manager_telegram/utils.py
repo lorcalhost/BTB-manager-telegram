@@ -251,4 +251,4 @@ def get_custom_scripts_keyboard():
 
 def load_custom_currency():
     with open('config/custom.json') as json_file:
-        return json.load(json_file)['Currency']
+        return json.load(json_file)
