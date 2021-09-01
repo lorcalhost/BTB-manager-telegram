@@ -247,3 +247,11 @@ def get_custom_scripts_keyboard():
 
     keyboard.append(["Cancel"])
     return keyboard, custom_script_exist, message
+
+
+def load_custom_currency():
+    try:
+        with open('config/custom.json') as json_file:
+            return json.load(json_file)
+    except:
+        return {"Custom_Currency_Enabled": 0}
