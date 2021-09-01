@@ -3,6 +3,7 @@ import sqlite3
 import subprocess
 from configparser import ConfigParser
 from datetime import datetime
+from dateutil import tz
 from forex_python.converter import CurrencyRates
 
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
@@ -16,6 +17,16 @@ from btb_manager_telegram.utils import (
     telegram_text_truncator,
     load_custom_currency
 )
+
+if load_custom_currency()['Custom_Timezone_Enabled']:
+    # INPUT AVAILABLE from: pytz.all_timezones
+    # common : "Europe/London" "Europe/Paris" "Europe/Madrid" 'America/New_York'...
+    TIMEZONE_WANTED = load_custom_currency()['Timezone']
+    FROM_ZONE = tz.gettz('UTC')
+else:
+    TIMEZONE_WANTED = 'UTC'
+    FROM_ZONE = tz.gettz('UTC')
+TO_ZONE = tz.gettz(TIMEZONE_WANTED)
 
 
 def current_value():
@@ -97,7 +108,6 @@ def current_value():
                 if btc_price is None:
                     btc_price = 0
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
-
                 return_rate_1_day, return_rate_7_day = 0, 0
                 balance_1_day, usd_price_1_day, balance_7_day, usd_price_7_day = (
                     0,
@@ -227,6 +237,8 @@ def check_progress():
                             coin[4], "%Y-%m-%d %H:%M:%S.%f"
                         )
                     time_passed = last_trade_date - pre_last_trade_date
+                    last_trade_date = last_trade_date.replace(tzinfo=FROM_ZONE)
+                    last_trade_date = last_trade_date.astimezone(TO_ZONE)
                     last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
                     if load_custom_currency()['Custom_Currency_Enabled'] == True:
                         c = CurrencyRates()
@@ -436,6 +448,8 @@ def trade_history():
                     if trade[4] is None:
                         continue
                     date = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
+                    date = date.replace(tzinfo=FROM_ZONE)
+                    date = date.astimezone(TO_ZONE)
                     m_list.append(
                         f"`{date.strftime('%H:%M:%S %d/%m/%Y')}`\n"
                         f"*{'Sold' if trade[2] else 'Bought'}* `{format_float(trade[4])}` *{trade[0]}*{f' for `{format_float(trade[5])}` *{trade[1]}*' if trade[5] is not None else ''}\n"

@@ -1,4 +1,6 @@
 {
     "Custom_Currency_Enabled": 1,
-    "Currency": "GBP"
+    "Currency": "GBP",
+    "Custom_Timezone_Enabled": 1,
+    "Timezone": "Europe/London"
 }
