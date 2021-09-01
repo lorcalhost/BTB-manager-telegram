@@ -142,3 +142,4 @@ logs/
 .history/
 custom_scripts.json
 config/custom.json
+.vscode/launch.json
