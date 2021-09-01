@@ -176,6 +176,11 @@ def current_value():
                             7,
                             f"\t\- Value in *{custom_currency_data['Custom_Currency']}*: `{round(custom_currency_data['Converted_Rate'] * usd_price * balance, 2)}` *{custom_currency_data['Custom_Currency']}*\n",
                         )
+                    else:
+                        m_list.insert(
+                            7,
+                            f"\t\- *Forex Error*\n",
+                        )
 
                 message = telegram_text_truncator(m_list)
                 con.close()
