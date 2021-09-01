@@ -249,7 +249,7 @@ def get_custom_scripts_keyboard():
     return keyboard, custom_script_exist, message
 
 
-def load_custom_currency():
+def load_custom_settings():
     try:
         with open('config/custom.json') as json_file:
             return json.load(json_file)

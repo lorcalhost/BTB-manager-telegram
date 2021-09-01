@@ -15,13 +15,13 @@ from btb_manager_telegram.utils import (
     is_btb_bot_update_available,
     is_tg_bot_update_available,
     telegram_text_truncator,
-    load_custom_currency
+    load_custom_settings
 )
 
-if load_custom_currency()['Custom_Timezone_Enabled']:
+if load_custom_settings()['Custom_Timezone_Enabled']:
     # INPUT AVAILABLE from: pytz.all_timezones
     # common : "Europe/London" "Europe/Paris" "Europe/Madrid" 'America/New_York'...
-    TIMEZONE_WANTED = load_custom_currency()['Timezone']
+    TIMEZONE_WANTED = load_custom_settings()['Timezone']
     FROM_ZONE = tz.gettz('UTC')
 else:
     TIMEZONE_WANTED = 'UTC'
@@ -154,8 +154,8 @@ def current_value():
 
             # Generate message
             try:
-                if load_custom_currency()['Custom_Currency_Enabled'] == True:
-                    custom_currency = load_custom_currency()['Currency']
+                if load_custom_settings()['Custom_Currency_Enabled'] == True:
+                    custom_currency = load_custom_settings()['Currency']
                     print('get currency rates')
                     c = CurrencyRates()
                     custom = c.get_rate('USD', custom_currency)
@@ -240,9 +240,9 @@ def check_progress():
                     last_trade_date = last_trade_date.replace(tzinfo=FROM_ZONE)
                     last_trade_date = last_trade_date.astimezone(TO_ZONE)
                     last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
-                    if load_custom_currency()['Custom_Currency_Enabled'] == True:
+                    if load_custom_settings()['Custom_Currency_Enabled'] == True:
                         c = CurrencyRates()
-                        custom_currency = load_custom_currency()['Currency']
+                        custom_currency = load_custom_settings()['Currency']
                         custom = c.get_rate('USD', custom_currency)                        
                         m_list.append(
                             f"*{coin[0]}*\n"
