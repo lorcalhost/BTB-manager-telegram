@@ -252,6 +252,7 @@ def check_progress():
                                 f"*{coin[0]}*\n"
                                 f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
                                 f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
+                                f"\t\- *Forex Error*\n",
                                 f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
                                 f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
                                     ".", "\."
