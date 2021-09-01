@@ -4,7 +4,8 @@ import subprocess
 from configparser import ConfigParser
 from datetime import datetime
 from dateutil import tz
-from forex_python.converter import CurrencyRates
+
+# from forex_python.converter import CurrencyRates
 
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
@@ -15,17 +16,18 @@ from btb_manager_telegram.utils import (
     is_btb_bot_update_available,
     is_tg_bot_update_available,
     telegram_text_truncator,
-    load_custom_settings
+    load_custom_settings,
+    convert_custom_currency,
 )
 
-if load_custom_settings()['Custom_Timezone_Enabled']:
+if load_custom_settings()["Custom_Timezone_Enabled"]:
     # INPUT AVAILABLE from: pytz.all_timezones
     # common : "Europe/London" "Europe/Paris" "Europe/Madrid" 'America/New_York'...
-    TIMEZONE_WANTED = load_custom_settings()['Timezone']
-    FROM_ZONE = tz.gettz('UTC')
+    TIMEZONE_WANTED = load_custom_settings()["Timezone"]
+    FROM_ZONE = tz.gettz("UTC")
 else:
-    TIMEZONE_WANTED = 'UTC'
-    FROM_ZONE = tz.gettz('UTC')
+    TIMEZONE_WANTED = "UTC"
+    FROM_ZONE = tz.gettz("UTC")
 TO_ZONE = tz.gettz(TIMEZONE_WANTED)
 
 
@@ -154,40 +156,26 @@ def current_value():
 
             # Generate message
             try:
-                if load_custom_settings()['Custom_Currency_Enabled'] == True:
-                    custom_currency = load_custom_settings()['Currency']
-                    print('get currency rates')
-                    c = CurrencyRates()
-                    custom = c.get_rate('USD', custom_currency)
-                    print(c.get_rate('USD', custom_currency))
-                    m_list = [
-                        f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
-                        f"*Current coin {current_coin}:*\n"
-                        f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
-                        f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n"
-                        f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
-                        f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
-                        f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
-                        f"\t\- Value in *{custom_currency}*: `{round(custom * usd_price * balance, 2)}` *{custom_currency}*\n"
-                        f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
-                        f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
-                        f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
-                        f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n"
-                    ]
-                else:
-                    m_list = [
-                        f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
-                        f"*Current coin {current_coin}:*\n"
-                        f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
-                        f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n"
-                        f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
-                        f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
-                        f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
-                        f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
-                        f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
-                        f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
-                        f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n"
-                    ]
+                m_list = [
+                    f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n",
+                    f"*Current coin {current_coin}:*\n",
+                    f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n",
+                    f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n",
+                    f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n",
+                    f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n",
+                    f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n",
+                    f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n",
+                    f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n",
+                    f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n",
+                    f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n",
+                ]
+                if load_custom_settings()["Custom_Currency_Enabled"] == True:
+                    custom_currency_data = convert_custom_currency()
+                    m_list.insert(
+                        7,
+                        f"\t\- Value in *{custom_currency_data['Custom_Curreny']}*: `{round(custom_currency_data['Converted_Rate'] * usd_price * balance, 2)}` *{custom_currency_data['Custom_Curreny']}*\n",
+                    )
+
                 message = telegram_text_truncator(m_list)
                 con.close()
             except Exception as e:
@@ -240,10 +228,10 @@ def check_progress():
                     last_trade_date = last_trade_date.replace(tzinfo=FROM_ZONE)
                     last_trade_date = last_trade_date.astimezone(TO_ZONE)
                     last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
-                    if load_custom_settings()['Custom_Currency_Enabled'] == True:
+                    if load_custom_settings()["Custom_Currency_Enabled"] == True:
                         c = CurrencyRates()
-                        custom_currency = load_custom_settings()['Currency']
-                        custom = c.get_rate('USD', custom_currency)                        
+                        custom_currency = load_custom_settings()["Currency"]
+                        custom = c.get_rate("USD", custom_currency)
                         m_list.append(
                             f"*{coin[0]}*\n"
                             f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
@@ -412,7 +400,6 @@ def next_coin():
             )
             message = ["❌ Unable to perform actions on the database\."]
     return message
-
 
 
 def check_status():
