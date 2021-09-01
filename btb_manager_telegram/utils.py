@@ -260,7 +260,9 @@ def load_custom_settings():
 
 def convert_custom_currency():
     custom_currency = load_custom_settings()["Currency"]
-    print("get currency rates")
     c = CurrencyRates()
-    custom_rate = c.get_rate("USD", custom_currency)
-    return {"Custom_Curreny": custom_currency, "Converted_Rate": custom_rate}
+    try:
+        custom_rate = c.get_rate("USD", custom_currency)
+        return {"Custom_Currency": custom_currency, "Converted_Rate": custom_rate}
+    except:
+        return False

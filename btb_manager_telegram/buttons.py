@@ -170,11 +170,12 @@ def current_value():
                     f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n",
                 ]
                 if load_custom_settings()["Custom_Currency_Enabled"] == True:
-                    custom_currency_data = convert_custom_currency()
-                    m_list.insert(
-                        7,
-                        f"\t\- Value in *{custom_currency_data['Custom_Curreny']}*: `{round(custom_currency_data['Converted_Rate'] * usd_price * balance, 2)}` *{custom_currency_data['Custom_Curreny']}*\n",
-                    )
+                    if convert_custom_currency() != False:
+                        custom_currency_data = convert_custom_currency()
+                        m_list.insert(
+                            7,
+                            f"\t\- Value in *{custom_currency_data['Custom_Currency']}*: `{round(custom_currency_data['Converted_Rate'] * usd_price * balance, 2)}` *{custom_currency_data['Custom_Currency']}*\n",
+                        )
 
                 message = telegram_text_truncator(m_list)
                 con.close()
@@ -229,29 +230,28 @@ def check_progress():
                     last_trade_date = last_trade_date.astimezone(TO_ZONE)
                     last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
                     if load_custom_settings()["Custom_Currency_Enabled"] == True:
-                        c = CurrencyRates()
-                        custom_currency = load_custom_settings()["Currency"]
-                        custom = c.get_rate("USD", custom_currency)
-                        m_list.append(
-                            f"*{coin[0]}*\n"
-                            f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
-                            f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                            f"\t\- Price: `{round(custom * coin[2], 2)}` *GBP*\n"
-                            f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
-                            f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
-                                ".", "\."
+                        if convert_custom_currency() != False:
+                            custom_currency_data = convert_custom_currency()
+                            m_list.append(
+                                f"*{coin[0]}*\n"
+                                f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
+                                f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
+                                f"\t\- Price: `{round(custom_currency_data['Converted_Rate'] * coin[2], 2)}` *{custom_currency_data['Custom_Currency']}*\n"
+                                f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
+                                f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
+                                    ".", "\."
+                                )
                             )
-                        )
-                    else:
-                        m_list.append(
-                            f"*{coin[0]}*\n"
-                            f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
-                            f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                            f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
-                            f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
-                                ".", "\."
+                        else:
+                            m_list.append(
+                                f"*{coin[0]}*\n"
+                                f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
+                                f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
+                                f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
+                                f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
+                                    ".", "\."
+                                )
                             )
-                        )
                 message = telegram_text_truncator(m_list)
                 con.close()
             except Exception as e:
