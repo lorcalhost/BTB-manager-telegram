@@ -3,6 +3,7 @@ import sqlite3
 import subprocess
 from configparser import ConfigParser
 from datetime import datetime
+from dateutil import tz
 from forex_python.converter import CurrencyRates
 
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
@@ -16,6 +17,8 @@ from btb_manager_telegram.utils import (
     telegram_text_truncator,
 )
 
+TO_ZONE = tz.gettz('Europe/Paris')
+FROM_ZONE = from_zone = tz.gettz('UTC')
 
 def current_value():
     logger.info("Current value button pressed.")
@@ -96,7 +99,8 @@ def current_value():
                 if btc_price is None:
                     btc_price = 0
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
-
+                last_update = last_update.replace(tzinfo=FROM_ZONE)
+                last_update = last_update.astimezone(TO_ZONE)
                 return_rate_1_day, return_rate_7_day = 0, 0
                 balance_1_day, usd_price_1_day, balance_7_day, usd_price_7_day = (
                     0,
@@ -143,8 +147,12 @@ def current_value():
 
             # Generate message
             try:
-                c = CurrencyRates()
-                euro = c.get_rate('USD', 'EUR')
+                try:
+                    c = CurrencyRates()
+                    euro = c.get_rate('USD', 'EUR')
+                except Exception as e:
+                    logger.info(e)
+                    euro = 0.85
                 m_list = [
                     f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
                     f"*Current coin {current_coin}:*\n"
@@ -207,9 +215,15 @@ def check_progress():
                         pre_last_trade_date = datetime.strptime(
                             coin[4], "%Y-%m-%d %H:%M:%S.%f"
                         )
-                    c = CurrencyRates()
-                    euro = c.get_rate('USD', 'EUR')
+                    try:
+                        c = CurrencyRates()
+                        euro = c.get_rate('USD', 'EUR')
+                    except Exception as e:
+                        logger.info(e)
+                        euro = 0.85
                     time_passed = last_trade_date - pre_last_trade_date
+                    last_trade_date = last_trade_date.replace(tzinfo=FROM_ZONE)
+                    last_trade_date = last_trade_date.astimezone(TO_ZONE)
                     last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
                     m_list.append(
                         f"*{coin[0]}*\n"
@@ -281,6 +295,8 @@ def current_ratios():
 
                 # Generate message
                 last_update = datetime.strptime(query[0][0], "%Y-%m-%d %H:%M:%S.%f")
+                last_update = last_update.replace(tzinfo=FROM_ZONE)
+                last_update = last_update.astimezone(TO_ZONE)
                 query = sorted(query, key=lambda k: k[-1], reverse=True)
 
                 m_list = [
@@ -405,6 +421,8 @@ def trade_history():
                     if trade[4] is None:
                         continue
                     date = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
+                    date = date.replace(tzinfo=FROM_ZONE)
+                    date = date.astimezone(TO_ZONE)
                     m_list.append(
                         f"`{date.strftime('%H:%M:%S %d/%m/%Y')}`\n"
                         f"*{'Sold' if trade[2] else 'Bought'}* `{format_float(trade[4])}` *{trade[0]}*{f' for `{format_float(trade[5])}` *{trade[1]}*' if trade[5] is not None else ''}\n"
