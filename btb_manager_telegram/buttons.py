@@ -146,8 +146,10 @@ def current_value():
             try:
                 if load_custom_currency()['Custom_Currency_Enabled'] == True:
                     custom_currency = load_custom_currency()['Currency']
+                    print('get currency rates')
                     c = CurrencyRates()
                     custom = c.get_rate('USD', custom_currency)
+                    print(c.get_rate('USD', custom_currency))
                     m_list = [
                         f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
                         f"*Current coin {current_coin}:*\n"
