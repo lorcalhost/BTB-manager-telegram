@@ -485,9 +485,9 @@ def panic(update: Update, _: CallbackContext) -> int:
 
         # Get last trade
         cur.execute(
-            """SELECT alt_coin_id, crypto_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1;"""
+            """SELECT alt_coin_id, crypto_coin_id, crypto_starting_balance FROM trade_history ORDER BY datetime DESC LIMIT 1;"""
         )
-        alt_coin_id, crypto_coin_id = cur.fetchone()
+        alt_coin_id, crypto_coin_id, crypto_amount = cur.fetchone()
 
         # Get Binance api keys and tld
         user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
@@ -498,36 +498,49 @@ def panic(update: Update, _: CallbackContext) -> int:
             api_secret_key = config.get("binance_user_config", "api_secret_key")
             tld = config.get("binance_user_config", "tld")
 
-        if update.message.text != "⚠ Stop & sell at market price":
+        if update.message.text == "⚠ Stop & sell at market price":
             params = {
                 "symbol": f"{alt_coin_id}{crypto_coin_id}",
                 "side": "SELL",
                 "type": "MARKET",
+                "quantity": crypto_amount,
             }
-            message = send_signed_request(
-                api_key,
-                api_secret_key,
-                f"https://api.binance.{tld}",
-                "POST",
-                "/api/v3/order",
-                payload=params,
+            message = escape_markdown(
+                "`"
+                + send_signed_request(
+                    api_key,
+                    api_secret_key,
+                    f"https://api.binance.{tld}",
+                    "POST",
+                    "/api/v3/order",
+                    payload=params,
+                )
+                + "`",
+                version=2,
             )
 
-        if update.message.text != "⚠ Stop & cancel order":
+        if update.message.text == "⚠ Stop & cancel order":
             params = {"symbol": f"{alt_coin_id}{crypto_coin_id}"}
-            message = send_signed_request(
-                api_key,
-                api_secret_key,
-                f"https://api.binance.{tld}",
-                "DELETE",
-                "/api/v3/openOrders",
-                payload=params,
+            message = escape_markdown(
+                "`"
+                + send_signed_request(
+                    api_key,
+                    api_secret_key,
+                    f"https://api.binance.{tld}",
+                    "DELETE",
+                    "/api/v3/openOrders",
+                    payload=params,
+                )
+                + "`",
+                version=2,
             )
 
-        if update.message.text != "⚠ Stop the bot":
-            message = "Killed _Binance Trade Bot_!"
+        if update.message.text == "⚠ Stop the bot":
+            message = "Killed _Binance Trade Bot_\!"
     else:
-        message = "👌 Exited without changes\.\n" "Binance Trade Bot was *not* updated\."
+        message = (
+            "👌 Exited without closing position\.\n" "The panic button was not used\."
+        )
 
     update.message.reply_text(
         message, reply_markup=reply_markup, parse_mode="MarkdownV2"

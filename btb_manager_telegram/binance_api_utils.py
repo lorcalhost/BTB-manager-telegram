@@ -36,11 +36,12 @@ def send_signed_request(key, secret, base_url, http_method, url_path, payload={}
     else:
         query_string = f"timestamp={get_timestamp()}"
 
-    url = f'{base_url}{url_path}?{query_string}&signature="{hashing(secret, query_string)}'
-    print(f"{http_method} {url}")
+    url = (
+        f"{base_url}{url_path}?{query_string}&signature={hashing(secret, query_string)}"
+    )
     params = {"url": url, "params": {}}
     response = dispatch_request(key, http_method)(**params)
-    return response.json()
+    return str(response.json())
 
 
 def get_current_price(ticker, bridge):
