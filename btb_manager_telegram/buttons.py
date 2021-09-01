@@ -108,8 +108,6 @@ def current_value():
                 if btc_price is None:
                     btc_price = 0
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
-                last_update = last_update.replace(tzinfo=FROM_ZONE)
-                last_update = last_update.astimezone(TO_ZONE)
                 return_rate_1_day, return_rate_7_day = 0, 0
                 balance_1_day, usd_price_1_day, balance_7_day, usd_price_7_day = (
                     0,
