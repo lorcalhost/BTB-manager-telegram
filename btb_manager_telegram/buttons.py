@@ -323,8 +323,6 @@ def current_ratios():
 
                 # Generate message
                 last_update = datetime.strptime(query[0][0], "%Y-%m-%d %H:%M:%S.%f")
-                last_update = last_update.replace(tzinfo=FROM_ZONE)
-                last_update = last_update.astimezone(TO_ZONE)
                 query = sorted(query, key=lambda k: k[-1], reverse=True)
 
                 m_list = [
