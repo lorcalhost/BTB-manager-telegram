@@ -1,7 +1,6 @@
 import os
 import sqlite3
 import subprocess
-import ast
 from configparser import ConfigParser
 from datetime import datetime
 from dateutil import tz
