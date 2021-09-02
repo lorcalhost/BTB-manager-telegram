@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import subprocess
+import ast
 from configparser import ConfigParser
 from datetime import datetime
 from dateutil import tz
@@ -230,31 +231,30 @@ def check_progress():
                             coin[4], "%Y-%m-%d %H:%M:%S.%f"
                         )
                     time_passed = last_trade_date - pre_last_trade_date
+                    sub_list = [
+                        f"*{coin[0]}*\n",
+                        f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n",
+                        f"\t\- Price: `{round(coin[2], 2)}` *USD*\n",
+                        f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n",
+                        f"\t\- Trade datetime: `{last_trade_date.replace(tzinfo=FROM_ZONE).astimezone(TO_ZONE).strftime('%H:%M:%S %d/%m/%Y')}`\n\n".replace(
+                            ".", "\."
+                        ),
+                    ]
                     if load_custom_settings()["Custom_Currency_Enabled"] == True:
                         if convert_custom_currency() != False:
                             custom_currency_data = convert_custom_currency()
-                            m_list.append(
-                                f"*{coin[0]}*\n"
-                                f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
-                                f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                                f"\t\- Price: `{round(custom_currency_data['Converted_Rate'] * coin[2], 2)}` *{custom_currency_data['Custom_Currency']}*\n"
-                                f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
-                                f"\t\- Trade datetime: `{last_trade_date.replace(tzinfo=FROM_ZONE).astimezone(TO_ZONE).strftime('%H:%M:%S %d/%m/%Y')}`\n\n".replace(
-                                    ".", "\."
-                                )
+                            sub_list.insert(
+                                3,
+                                f"\t\- Price: `{round(custom_currency_data['Converted_Rate'] * coin[2], 2)}` *{custom_currency_data['Custom_Currency']}*\n",
                             )
                         else:
-                            m_list.append(
-                                f"*{coin[0]}*\n"
-                                f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
-                                f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
+                            sub_list.insert(
+                                3,
                                 f"\t\- *Forex Error*\n",
-                                f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
-                                f"\t\- Trade datetime: `{last_trade_date.replace(tzinfo=FROM_ZONE).astimezone(TO_ZONE).strftime('%H:%M:%S %d/%m/%Y')}`\n\n".replace(
-                                    ".", "\."
-                                ),
                             )
-                message = telegram_text_truncator(m_list)
+                    m_list.append(sub_list)
+                flat_m_list = ["".join(x) for x in m_list]
+                message = telegram_text_truncator(flat_m_list)
                 con.close()
             except Exception as e:
                 logger.error(
