@@ -316,7 +316,7 @@ def current_ratios():
                 query = sorted(query, key=lambda k: k[-1], reverse=True)
 
                 m_list = [
-                    f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
+                    f"\nLast update: `{last_update.replace(tzinfo=FROM_ZONE).astimezone(TO_ZONE).strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
                     f"*Coin ratios compared to {current_coin} in decreasing order:*\n".replace(
                         ".", "\."
                     )
