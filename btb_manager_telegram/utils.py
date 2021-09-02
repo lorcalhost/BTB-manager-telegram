@@ -1,7 +1,6 @@
 import json
 import os
 import subprocess
-from configparser import ConfigParser
 from time import sleep
 from typing import List, Optional
 
@@ -14,14 +13,8 @@ import i18n
 from btb_manager_telegram import logger, scheduler, settings
 
 
-def setup_i18n():
-    config = ConfigParser()
-
-    with open("./config/lang.cfg") as cfg:
-        config.read_file(cfg)
-
-    settings.LANG = config.get("user_lang_setting", "lang")
-    i18n.set("locale", settings.LANG)
+def setup_i18n(lang):
+    i18n.set("locale", lang)
     i18n.set("fallback", "en")
     i18n.set("skip_locale_root_data", True)
     i18n.set("filename_format", "{locale}.{format}")

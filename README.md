@@ -67,11 +67,11 @@ $ python3 -m pip install -r requirements.txt
 ⚠ Make sure the correct `rwx` permissions are set and the program is run with correct privileges.
 
 ## Language Setting
-You can set the language by setting the `lang` variable in `./config/lang.cfg`
-Check the folder `i18n` for available languages.
+You can set the language by using the `-l, --language` command line parameter.
+For help and available options run ` python3 -m btb_manager_telegram -h`. Default is english.
 
 ### Adding translations
-Copy the `en.yml` file and rename it to e.g. `it.yml` and translate all the included values.
+Copy the `i18n/en.yml` file and rename it to e.g. `i18n/it.yml` and translate all the included values.
 
 ## Setup
 
