@@ -54,7 +54,7 @@ config_file_error: '❌ Unable to find user configuration file at `%{path}`\.'
 stop_bot_before_edit_coin_list: '⚠ Please stop Binance Trade Bot before editing the coin list\.'
 coin_list_is: "Current coin list is:"
 reply_coin_list: '_*Please reply with a message containing the updated coin list*_\.'
-coin_list_error: '❌ Unable to find user configuration file at `%{path}`\.'
+coin_list_error: '❌ Unable to find coin list file at `%{path}`\.'
 stop_bot_before_export: '⚠ Please stop Binance Trade Bot before exporting the database file\.'
 file_msg: "Here is your database file:"
 database_export_error: '❌ Unable to Export the database file\.'
@@ -133,7 +133,6 @@ user_config_not_modified: 'Your `user.cfg` file was *not* modified\.'
 deleted_db: '✔ Successfully deleted database file\.'
 delete_db_error: '❌ Unable to delete database file\.'
 clear_log_error: '❌ Unable to clear log file\.'
-exit_no_change: '👌 Exited without changes\.'
 db_not_deleted: 'Your database was *not* deleted\.'
 tgb_updating: 'The bot is updating\.'
 wait_then_start: "Wait a few seconds then start the bot again with /start"

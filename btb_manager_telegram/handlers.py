@@ -368,7 +368,7 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
             message = i18n.t("user_config_error")
     else:
         message = (
-            f"{i18n.t('exited_no_changes')}\n" f"{i18n.t('user_config_not_modified')}"
+            f"{i18n.t('exited_no_change')}\n" f"{i18n.t('user_config_not_modified')}"
         )
 
     keyboard = [[i18n.t("keyboard.go_back")]]
@@ -403,7 +403,7 @@ def delete_db(update: Update, _: CallbackContext) -> int:
             message = i18n.t("clear_log_error")
 
     else:
-        message = f"{i18n.t('exit_no_change')}\n" f"{i18n.t('db_not_deleted')}"
+        message = f"{i18n.t('exited_no_change')}\n" f"{i18n.t('db_not_deleted')}"
 
     keyboard = [[i18n.t("keyboard.ok")]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
@@ -439,7 +439,7 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
     else:
-        message = f"{i18n.t('exited_no_changes')}\n" f"{i18n.t('tgb_not_updated')}"
+        message = f"{i18n.t('exited_no_change')}\n" f"{i18n.t('tgb_not_updated')}"
         keyboard = [[i18n.t("keyboard.ok_s")]]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         update.message.reply_text(
@@ -476,7 +476,7 @@ def update_btb(update: Update, _: CallbackContext) -> int:
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
     else:
-        message = f"{i18n.t('exited_no_changes')}\n" f"{i18n.t('btb_bot_updated')}"
+        message = f"{i18n.t('exited_no_change')}\n" f"{i18n.t('btb_bot_updated')}"
         update.message.reply_text(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
@@ -541,7 +541,7 @@ def panic(update: Update, _: CallbackContext) -> int:
         if update.message.text != i18n.t("keyboard.stop_bot"):
             message = i18n.t("killed_bot")
     else:
-        message = f"{i18n.t('exit_no_change')}\n" f"{i18n.t('btb_not_updated')}"
+        message = f"{i18n.t('exited_no_change')}\n" f"{i18n.t('btb_not_updated')}"
 
     update.message.reply_text(
         message, reply_markup=reply_markup, parse_mode="MarkdownV2"
