@@ -55,8 +55,8 @@ def menu(update: Update, _: CallbackContext) -> int:
     # ]
 
     keyboard = [
-        [i18n.t("keyboard.current_value")],
-        [i18n.t("keyboard.progress"), i18n.t("keyboard.current_ratios")],
+        [i18n.t("keyboard.current_value"), i18n.t("keyboard.progress")],
+        [i18n.t("keyboard.current_ratios"), i18n.t("keyboard.next_coin")],
         [i18n.t("keyboard.check_status"), i18n.t("keyboard.trade_history")],
         [i18n.t("keyboard.maintenance"), i18n.t("keyboard.configurations")],
     ]
@@ -150,6 +150,12 @@ def menu(update: Update, _: CallbackContext) -> int:
 
     elif update.message.text == i18n.t("keyboard.current_ratios"):
         for mes in buttons.current_ratios():
+            update.message.reply_text(
+                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            )
+
+    elif update.message.text == i18n.t("keyboard.next_coin"):
+        for mes in buttons.next_coin():
             update.message.reply_text(
                 mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
@@ -608,7 +614,7 @@ def cancel(update: Update, _: CallbackContext) -> int:
 
 MENU_HANDLER = MessageHandler(
     Filters.regex(
-        f"^({i18n.t('keyboard.begin')}|{i18n.t('keyboard.current_value')}|{i18n.t('keyboard.panic')}|{i18n.t('keyboard.progress')}|{i18n.t('keyboard.current_ratios')}|{i18n.t('keyboard.check_status')}|{i18n.t('keyboard.trade_history')}|{i18n.t('keyboard.maintenance')}|"
+        f"^({i18n.t('keyboard.begin')}|{i18n.t('keyboard.current_value')}|{i18n.t('keyboard.panic')}|{i18n.t('keyboard.progress')}|{i18n.t('keyboard.current_ratios')}|{i18n.t('keyboard.next_coin')}|{i18n.t('keyboard.check_status')}|{i18n.t('keyboard.trade_history')}|{i18n.t('keyboard.maintenance')}|"
         f"{i18n.t('keyboard.configurations')}|{i18n.t('keyboard.start')}|{i18n.t('keyboard.stop')}|{i18n.t('keyboard.read_logs')}|{i18n.t('keyboard.delete_db')}|"
         f"{i18n.t('keyboard.edit_cfg')}|{i18n.t('keyboard.edit_coin_list')}|{i18n.t('keyboard.export_db')}|{i18n.t('keyboard.update_tgb')}|{i18n.t('keyboard.update_btb')}|"
         f"{i18n.t('keyboard.execute_script')}|{i18n.t('keyboard.back')}|{i18n.t('keyboard.go_back')}|{i18n.t('keyboard.ok')}|{i18n.t('keyboard.cancel_update')}|{i18n.t('keyboard.cancel')}|{i18n.t('keyboard.ok_s')}|{i18n.t('keyboard.great')})$"

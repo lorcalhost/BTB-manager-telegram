@@ -22,7 +22,6 @@ As of now the bot is able to perform the following actions:
 - [x] 📤 Export database file
 - [x] ⬆ **Update** _Binance Trade Bot_ (and notify when new update is available)
 - [x] ⬆ **Update** _Binance Trade Bot Manager Telegram_ (and notify when new update is available)
-- [x] 🚨 Panic button (Kills _Binance Trade Bot Manager Telegram_ and cancels all open orders / sells at market price)
 - [x] [User defined custom scripts](./docs/custom-scripts.md)
 
 </br>
