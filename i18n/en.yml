@@ -151,3 +151,7 @@ bye: 'Bye\! I hope we can talk again some day\.'
 start: "start"
 select_script: 'Select one of your custom scripts to execute it\.'
 python_lib_error: '❌ Unable to find python binary at `%{path}`\.'
+database_not_found: '⚠ Unable to find database file at `%{path}`\.'
+next_coin_error: '❌ Something went wrong, unable to generate next coin at this time\.'
+current_price: '\- Current Price: `%{price}` %{coin}'
+target_price: '\- Target Price: `%{price}` %{coin}'

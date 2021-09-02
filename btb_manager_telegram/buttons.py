@@ -328,7 +328,7 @@ def next_coin():
 
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
-    message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
+    message = [f"{i18n.t('database_not_found', path=db_file_path)}"]
     if os.path.exists(db_file_path):
         try:
             # Get bridge currency symbol
@@ -353,8 +353,8 @@ def next_coin():
                     percentage = round(coin[3] * 100, 2)
                     m_list.append(
                         f"*{coin[0]} \(`{format_float(percentage)}`%\)*\n"
-                        f"\t\- Current Price: `{format_float(round(coin[1], 8))}` {bridge}\n"
-                        f"\t\- Target Price: `{format_float(round(coin[2], 8))}` {bridge}\n\n".replace(
+                        f"\t{i18n.t('current_price', price=format_float(round(coin[1], 8)), coin=bridge)}\n"
+                        f"\t{i18n.t('target_price', price=format_float(round(coin[2], 8)), coin=bridge)}\n\n".replace(
                             ".", "\."
                         )
                     )
@@ -368,14 +368,14 @@ def next_coin():
                 )
                 con.close()
                 return [
-                    "❌ Something went wrong, unable to generate next coin at this time\.",
-                    "⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.",
+                    i18n.t("next_coin_error"),
+                    i18n.t("logging_enabled_error"),
                 ]
         except Exception as e:
             logger.error(
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
-            message = ["❌ Unable to perform actions on the database\."]
+            message = [i18n.t("db_action_error")]
     return message
 
 
