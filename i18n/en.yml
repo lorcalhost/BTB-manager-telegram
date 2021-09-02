@@ -117,6 +117,7 @@ keyboard:
   cancel_update: "Cancel update"
   confirm: "⚠ Confirm"
   stop_bot: "⚠ Stop the bot"
+  next_coin: "🔀 Next coin"
 select_option: 'Please select one of the options\.'
 welcome: 'Welcome to _Binace Trade Bot Manager Telegram_\.'
 developed_by: 'This Telegram bot was developed by @lorcalhost\.'
