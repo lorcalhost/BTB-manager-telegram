@@ -49,7 +49,11 @@ def pre_run_main() -> None:
         "-t", "--token", type=str, help="(optional) Telegram bot token", default=None
     )
     parser.add_argument(
-        "-l", "--language", type=str, help="(optional) Select a language. Available: 'en'", default="en"
+        "-l",
+        "--language",
+        type=str,
+        help="(optional) Select a language. Available: 'en'",
+        default="en",
     )
     parser.add_argument(
         "-c", "--chat_id", type=str, help="(optional) Telegram chat id", default=None
