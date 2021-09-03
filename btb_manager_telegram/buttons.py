@@ -180,15 +180,10 @@ def current_value():
                             7,
                             f"\t\- *Forex Error*\n",
                         )
-                if load_custom_settings()["Total_Binance_Wallet_Ballance"] == True:
-                    m_list.insert(
-                        9,
-                        f"*Binance Wallet:*\n"
-                        f"\t\- Estimated Balance *GBP*: `{format_float(get_wallet_balance())}`\n\n",
-                    )
 
                 message = telegram_text_truncator(m_list)
                 con.close()
+
             except Exception as e:
                 logger.error(
                     f"❌ Something went wrong, unable to generate value at this time: {e}",
@@ -203,6 +198,17 @@ def current_value():
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
             message = ["❌ Unable to perform actions on the database\."]
+    return message
+
+
+def wallet_value():
+    m_list = [
+        # f"\nLast update: `{last_update.replace(tzinfo=FROM_ZONE).astimezone(TO_ZONE).strftime('%H:%M:%S %d/%m/%Y')}`\n\n",
+        f"*Binance Wallet:*\n",
+        f"\t\- Estimated Balance *GBP*: `{format_float(get_wallet_balance())}`\n\n",
+    ]
+    message = telegram_text_truncator(m_list)
+
     return message
 
 

@@ -39,6 +39,7 @@ from btb_manager_telegram.utils import (
     get_custom_scripts_keyboard,
     kill_btb_manager_telegram_process,
     telegram_text_truncator,
+    load_custom_settings
 )
 
 
@@ -99,6 +100,12 @@ def menu(update: Update, _: CallbackContext) -> int:
             update.message.reply_text(
                 mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
+        if load_custom_settings()["Total_Binance_Wallet_Ballance"] == True:
+            for mes in buttons.wallet_value():
+                update.message.reply_text(
+                    mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                )
+        
 
     elif update.message.text == "🚨 Panic button":
         message, status = buttons.panic_btn()
