@@ -7,7 +7,7 @@ from dateutil import tz
 
 
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
-from btb_manager_telegram.binance_api_utils import get_current_price
+from btb_manager_telegram.binance_api_utils import get_current_price, get_wallet_balance
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
     format_float,
@@ -180,6 +180,12 @@ def current_value():
                             7,
                             f"\t\- *Forex Error*\n",
                         )
+                if load_custom_settings()["Total_Binance_Wallet_Ballance"] == True:
+                    m_list.insert(
+                        9,
+                        f"*Binance Wallet:*\n"
+                        f"\t\- Estimated Balance *GBP*: `{format_float(get_wallet_balance())}`\n\n",
+                    )
 
                 message = telegram_text_truncator(m_list)
                 con.close()

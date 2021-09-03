@@ -2,6 +2,14 @@ import hashlib
 import hmac
 import time
 from urllib.parse import urlencode
+import os
+from configparser import ConfigParser
+from binance import Client
+
+
+from btb_manager_telegram import (
+    settings,
+)
 
 import requests
 
@@ -48,3 +56,36 @@ def get_current_price(ticker, bridge):
         f"https://api.binance.com/api/v3/avgPrice?symbol={ticker}{bridge}"
     ).json()
     return eval(response["price"])
+
+
+def get_wallet_balance():
+    user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    with open(user_cfg_file_path) as cfg:
+        config = ConfigParser()
+        config.read_file(cfg)
+        api_key = config.get("binance_user_config", "api_key")
+        api_secret_key = config.get("binance_user_config", "api_secret_key")
+
+        client = Client(api_key, api_secret_key)
+
+        client.API_URL = "https://api.binance.com/api"
+
+    balances = [
+        coin
+        for coin in client.get_account()["balances"]
+        if coin["free"] != "0.00000000" and coin["free"] != "0.00"
+    ]
+    for item in balances:
+        if item["asset"] != "USDT":
+            priceToBTC = client.get_avg_price(symbol=item["asset"] + "BTC")["price"]
+            item["totalInBTC"] = round(float(priceToBTC), 8) * round(
+                float(item["free"]), 8
+            )
+            btcgpb = client.get_avg_price(symbol="BTCGBP")["price"]
+            total = float(btcgpb) * float(item["totalInBTC"])
+            item["totalInGBP"] = round(total, 2)
+    walletIngbp = []
+    for item in balances:
+        if item["asset"] != "USDT":
+            walletIngbp.append(item["totalInGBP"])
+    return sum(walletIngbp)

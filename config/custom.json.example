@@ -2,5 +2,6 @@
     "Custom_Currency_Enabled": 1,
     "Currency": "GBP",
     "Custom_Timezone_Enabled": 1,
-    "Timezone": "Europe/London"
+    "Timezone": "Europe/London",
+    "Total_Binance_Wallet_Ballance": 0
 }
