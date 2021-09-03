@@ -238,6 +238,9 @@ def check_progress():
 
                 # Generate message
                 m_list = ["Current coin amount progress:\n\n"]
+                if load_custom_settings()["Custom_Currency_Enabled"] == True:
+                    if convert_custom_currency() != False:
+                        custom_currency_data = convert_custom_currency()
                 for coin in query:
                     last_trade_date = datetime.strptime(coin[5], "%Y-%m-%d %H:%M:%S.%f")
                     if coin[4] is None:
@@ -259,17 +262,15 @@ def check_progress():
                         ),
                     ]
                     if load_custom_settings()["Custom_Currency_Enabled"] == True:
-                        if convert_custom_currency() != False:
-                            custom_currency_data = convert_custom_currency()
-                            sub_list.insert(
-                                3,
-                                f"\t\- Price: `{round(custom_currency_data['Converted_Rate'] * coin[2], 2)}` *{custom_currency_data['Custom_Currency']}*\n",
-                            )
-                        else:
-                            sub_list.insert(
-                                3,
-                                f"\t\- *Forex Error*\n",
-                            )
+                        sub_list.insert(
+                            3,
+                            f"\t\- Price: `{round(custom_currency_data['Converted_Rate'] * coin[2], 2)}` *{custom_currency_data['Custom_Currency']}*\n",
+                        )
+                    else:
+                        sub_list.insert(
+                            3,
+                            f"\t\- *Forex Error*\n",
+                        )
                     m_list.append(sub_list)
                 flat_m_list = ["".join(x) for x in m_list]
                 message = telegram_text_truncator(flat_m_list)
