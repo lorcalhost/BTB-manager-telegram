@@ -100,7 +100,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             update.message.reply_text(
                 mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
-        if load_custom_settings()["Total_Binance_Wallet_Ballance"] == True:
+        if load_custom_settings()["Total_Binance_Wallet_Balance"] == True:
             for mes in buttons.wallet_value():
                 update.message.reply_text(
                     mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
