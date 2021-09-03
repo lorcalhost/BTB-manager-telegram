@@ -3,6 +3,7 @@ import sqlite3
 import subprocess
 from configparser import ConfigParser
 from datetime import datetime
+from operator import itemgetter
 
 import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
@@ -349,6 +350,7 @@ def next_coin():
                 query = cur.fetchall()
 
                 m_list = []
+                query = sorted(query, key=itemgetter(3), reverse=True)
                 for coin in query:
                     percentage = round(coin[3] * 100, 2)
                     m_list.append(
