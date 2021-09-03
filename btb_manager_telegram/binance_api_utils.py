@@ -69,7 +69,6 @@ def get_wallet_balance():
         client = Client(api_key, api_secret_key)
 
         client.API_URL = "https://api.binance.com/api"
-
     balances = [
         coin
         for coin in client.get_account()["balances"]
@@ -81,11 +80,15 @@ def get_wallet_balance():
             item["totalInBTC"] = round(float(priceToBTC), 8) * round(
                 float(item["free"]), 8
             )
-            btcgpb = client.get_avg_price(symbol="BTCGBP")["price"]
-            total = float(btcgpb) * float(item["totalInBTC"])
+            btcusd = client.get_avg_price(symbol="BTCUSDT")["price"]
+            total = float(btcusd) * float(item["totalInBTC"])
             item["totalInGBP"] = round(total, 2)
-    walletIngbp = []
+    walletInusd = []
     for item in balances:
         if item["asset"] != "USDT":
-            walletIngbp.append(item["totalInGBP"])
-    return sum(walletIngbp)
+            walletInusd.append(item["totalInGBP"])
+
+    return {
+        "timestamp": client.get_account()["updateTime"],
+        "walletInusd": sum(walletInusd),
+    }

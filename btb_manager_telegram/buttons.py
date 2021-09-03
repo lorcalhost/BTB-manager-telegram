@@ -202,10 +202,17 @@ def current_value():
 
 
 def wallet_value():
+    wallet_data = get_wallet_balance()
+    ts = wallet_data["timestamp"] / 1000.0
+    if load_custom_settings()["Custom_Currency_Enabled"] == True:
+        if convert_custom_currency() != False:
+            custom_currency_data = convert_custom_currency()
+    else:
+        custom_currency_data = {"Custom_Currency": "USD", "Converted_Rate": 1}
     m_list = [
-        # f"\nLast update: `{last_update.replace(tzinfo=FROM_ZONE).astimezone(TO_ZONE).strftime('%H:%M:%S %d/%m/%Y')}`\n\n",
+        f"\nLast update: `{str(datetime.fromtimestamp(ts).strftime('%H:%M:%S %d/%m/%Y'))}`\n\n",
         f"*Binance Wallet:*\n",
-        f"\t\- Estimated Balance *GBP*: `{format_float(get_wallet_balance())}`\n\n",
+        f"\t\- Estimated Balance: `{wallet_data['walletInusd'] * custom_currency_data['Converted_Rate']:.2f}` *{custom_currency_data['Custom_Currency']}*\n\n",
     ]
     message = telegram_text_truncator(m_list)
 
