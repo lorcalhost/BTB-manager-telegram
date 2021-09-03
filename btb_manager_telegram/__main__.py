@@ -19,6 +19,7 @@ from btb_manager_telegram import (
     settings,
 )
 from btb_manager_telegram.utils import (
+    setup_i18n,
     setup_root_path_constant,
     setup_telegram_constants,
     update_checker,
@@ -48,6 +49,13 @@ def pre_run_main() -> None:
         "-t", "--token", type=str, help="(optional) Telegram bot token", default=None
     )
     parser.add_argument(
+        "-l",
+        "--language",
+        type=str,
+        help="(optional) Select a language. Available: 'en'",
+        default="en",
+    )
+    parser.add_argument(
         "-c", "--chat_id", type=str, help="(optional) Telegram chat id", default=None
     )
     parser.add_argument(
@@ -68,8 +76,10 @@ def pre_run_main() -> None:
     settings.PYTHON_PATH = args.python_path
     settings.TOKEN = args.token
     settings.CHAT_ID = args.chat_id
+    settings.LANG = args.language
     settings.RAW_ARGS = " ".join(sys.argv[1:])
 
+    setup_i18n(settings.LANG)
     setup_root_path_constant()
 
     if settings.TOKEN is None or settings.CHAT_ID is None:

@@ -65,6 +65,13 @@ $ python3 -m pip install -r requirements.txt
 
 ⚠ Make sure the correct `rwx` permissions are set and the program is run with correct privileges.
 
+## Language Setting
+You can set the language by using the `-l, --language` command line parameter.
+For help and available options run ` python3 -m btb_manager_telegram -h`. Default is english.
+
+### Adding translations
+Copy the `i18n/en.yml` file and rename it to e.g. `i18n/it.yml` and translate all the included values.
+
 ## Setup
 
 - For a quick Telegram bot setup guide [click here](./docs/telegram-setup.md).
