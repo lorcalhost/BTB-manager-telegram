@@ -17,17 +17,14 @@ from btb_manager_telegram.utils import (
     telegram_text_truncator,
     load_custom_settings,
     convert_custom_currency,
+    custom_timezone,
 )
 
-if load_custom_settings()["Custom_Timezone_Enabled"]:
-    # INPUT AVAILABLE from: pytz.all_timezones
-    # common : "Europe/London" "Europe/Paris" "Europe/Madrid" 'America/New_York'...
-    TIMEZONE_WANTED = load_custom_settings()["Timezone"]
-    FROM_ZONE = tz.gettz("UTC")
-else:
-    TIMEZONE_WANTED = "UTC"
-    FROM_ZONE = tz.gettz("UTC")
-TO_ZONE = tz.gettz(TIMEZONE_WANTED)
+try:
+    FROM_ZONE = custom_timezone()["from_zone"]
+    TO_ZONE = custom_timezone()["to_zone"]
+except:
+    print("custom_timezone_key_not_set")
 
 
 def current_value():

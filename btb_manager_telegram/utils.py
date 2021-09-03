@@ -3,7 +3,10 @@ import os
 import subprocess
 from time import sleep
 from typing import List, Optional
+from dateutil.tz.tz import gettz
 from forex_python.converter import CurrencyRates
+from dateutil import tz
+
 
 import psutil
 import telegram
@@ -266,3 +269,19 @@ def convert_custom_currency():
         return {"Custom_Currency": custom_currency, "Converted_Rate": custom_rate}
     except:
         return False
+
+
+def custom_timezone():
+    from_zone = tz.gettz("UTC")
+    if load_custom_settings()["Custom_Timezone_Enabled"]:
+        # INPUT AVAILABLE from: pytz.all_timezones
+        # common : "Europe/London" "Europe/Paris" "Europe/Madrid" 'America/New_York'...
+        return {
+            "from_zone": from_zone,
+            "to_zone": tz.gettz(load_custom_settings()["Timezone"]),
+        }
+    else:
+        return {
+            "from_zone": from_zone,
+            "to_zone": tz.gettz("UTC"),
+        }
