@@ -102,7 +102,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             )
         try:
             if load_custom_settings()["Total_Binance_Wallet_Balance"] == True:
-                for mes in buttons.wallet_value():
+                for mes in buttons.binanace_wallet_value():
                     update.message.reply_text(
                         mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
                     )

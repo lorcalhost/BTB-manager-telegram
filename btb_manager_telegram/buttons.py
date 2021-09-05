@@ -198,7 +198,7 @@ def current_value():
     return message
 
 
-def wallet_value():
+def binanace_wallet_value():
     wallet_data = get_wallet_balance()
     ts = wallet_data["timestamp"]
     if load_custom_settings()["Custom_Currency_Enabled"] == True:
