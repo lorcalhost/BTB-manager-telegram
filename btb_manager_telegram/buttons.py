@@ -211,6 +211,12 @@ def binanace_wallet_value():
         f"*Binance Wallet:*\n",
         f"\t\- Estimated Balance: `{wallet_data['walletInusd'] * custom_currency_data['Converted_Rate']:.2f}` *{custom_currency_data['Custom_Currency']}*\n\n",
     ]
+
+    for coins in wallet_data["individualCoins"]:
+        m_list.append(
+                f"*{coins['asset']}:*\n"
+                f"\t\- Estimated Balance: `{coins['totalInUSD'] * custom_currency_data['Converted_Rate']:.2f}` *{custom_currency_data['Custom_Currency']}*\n\n"
+        )
     message = telegram_text_truncator(m_list)
 
     return message
