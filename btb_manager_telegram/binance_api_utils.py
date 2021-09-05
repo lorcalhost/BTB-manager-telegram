@@ -75,7 +75,7 @@ def get_wallet_balance():
         if coin["free"] != "0.00000000" and coin["free"] != "0.00"
     ]
     for item in balances:
-        if item["asset"] != "USDT" and item["asset"] != "BUSD":
+        try:
             priceToBTC = client.get_avg_price(symbol=item["asset"] + "BTC")["price"]
             item["totalInBTC"] = round(float(priceToBTC), 8) * round(
                 float(item["free"]), 8
@@ -83,9 +83,12 @@ def get_wallet_balance():
             btcusd = client.get_avg_price(symbol="BTCUSDT")["price"]
             total = float(btcusd) * float(item["totalInBTC"])
             item["totalInGBP"] = round(total, 2)
+        except Exception as e:
+            print(item["asset"] + " cannot be converted")
+
     walletInusd = []
     for item in balances:
-        if item["asset"] != "USDT":
+        if "totalInGBP" in item:
             walletInusd.append(item["totalInGBP"])
 
     return {
