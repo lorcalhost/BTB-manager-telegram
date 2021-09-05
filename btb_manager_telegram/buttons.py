@@ -214,7 +214,7 @@ def binanace_wallet_value():
 
     # coins = sorted(wallet_data["individualCoins"]['totalInUSD'], reverse=True)
 
-    for coin in sorted(wallet_data["individualCoins"]):
+    for coin in wallet_data["individualCoins"]:
         m_list.append(
             f"\t\- {coin['asset']}: `{coin['totalInUSD'] * custom_currency_data['Converted_Rate']:.2f}` *{custom_currency_data['Custom_Currency']}*\n"
         )
