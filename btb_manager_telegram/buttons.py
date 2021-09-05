@@ -200,7 +200,7 @@ def current_value():
 
 def wallet_value():
     wallet_data = get_wallet_balance()
-    ts = wallet_data["timestamp"] / 1000.0
+    ts = wallet_data["timestamp"]
     if load_custom_settings()["Custom_Currency_Enabled"] == True:
         if convert_custom_currency() != False:
             custom_currency_data = convert_custom_currency()
