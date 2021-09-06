@@ -165,7 +165,7 @@ def current_value():
                     f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n",
                     f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n",
                 ]
-                if load_custom_settings()["Custom_Currency_Enabled"] == True:
+                if load_custom_settings()["Custom_Currency_Enabled"]:
                     if convert_custom_currency() != False:
                         custom_currency_data = convert_custom_currency()
                         m_list.insert(
@@ -201,7 +201,7 @@ def current_value():
 def binanace_wallet_value():
     wallet_data = get_wallet_balance()
     ts = wallet_data["timestamp"]
-    if load_custom_settings()["Custom_Currency_Enabled"] == True:
+    if load_custom_settings()["Custom_Currency_Enabled"]:
         if convert_custom_currency() != False:
             custom_currency_data = convert_custom_currency()
     else:
@@ -235,7 +235,7 @@ def check_progress():
 
                 # Generate message
                 m_list = ["Current coin amount progress:\n\n"]
-                if load_custom_settings()["Custom_Currency_Enabled"] == True:
+                if load_custom_settings()["Custom_Currency_Enabled"]:
                     if convert_custom_currency() != False:
                         custom_currency_data = convert_custom_currency()
                 for coin in query:
