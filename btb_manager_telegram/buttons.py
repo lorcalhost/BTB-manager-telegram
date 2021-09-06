@@ -3,9 +3,11 @@ import sqlite3
 import subprocess
 from configparser import ConfigParser
 from datetime import datetime
+from dateutil import tz
+
 
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
-from btb_manager_telegram.binance_api_utils import get_current_price
+from btb_manager_telegram.binance_api_utils import get_current_price, get_wallet_balance
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
     format_float,
@@ -13,7 +15,16 @@ from btb_manager_telegram.utils import (
     is_btb_bot_update_available,
     is_tg_bot_update_available,
     telegram_text_truncator,
+    load_custom_settings,
+    convert_custom_currency,
+    custom_timezone,
 )
+
+try:
+    FROM_ZONE = custom_timezone()["from_zone"]
+    TO_ZONE = custom_timezone()["to_zone"]
+except:
+    print("custom_timezone_key_not_set")
 
 
 def current_value():
@@ -95,7 +106,6 @@ def current_value():
                 if btc_price is None:
                     btc_price = 0
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
-
                 return_rate_1_day, return_rate_7_day = 0, 0
                 balance_1_day, usd_price_1_day, balance_7_day, usd_price_7_day = (
                     0,
@@ -143,20 +153,34 @@ def current_value():
             # Generate message
             try:
                 m_list = [
-                    f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
-                    f"*Current coin {current_coin}:*\n"
-                    f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
-                    f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n"
-                    f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
-                    f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
-                    f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
-                    f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
-                    f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n"
-                    f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
-                    f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n"
+                    f"\nLast update: `{last_update.replace(tzinfo=FROM_ZONE).astimezone(TO_ZONE).strftime('%H:%M:%S %d/%m/%Y')}`\n\n",
+                    f"*Current coin {current_coin}:*\n",
+                    f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n",
+                    f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n",
+                    f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n",
+                    f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n",
+                    f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n",
+                    f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n",
+                    f"_Bought for_ `{round(buy_price, 2)}` *{bridge}*\n",
+                    f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n",
+                    f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n\n",
                 ]
+                if load_custom_settings()["Custom_Currency_Enabled"]:
+                    if convert_custom_currency() != False:
+                        custom_currency_data = convert_custom_currency()
+                        m_list.insert(
+                            7,
+                            f"\t\- Value in *{custom_currency_data['Custom_Currency']}*: `{round(custom_currency_data['Converted_Rate'] * usd_price * balance, 2)}` *{custom_currency_data['Custom_Currency']}*\n",
+                        )
+                    else:
+                        m_list.insert(
+                            7,
+                            f"\t\- *Forex Error*\n",
+                        )
+
                 message = telegram_text_truncator(m_list)
                 con.close()
+
             except Exception as e:
                 logger.error(
                     f"❌ Something went wrong, unable to generate value at this time: {e}",
@@ -171,6 +195,29 @@ def current_value():
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
             message = ["❌ Unable to perform actions on the database\."]
+    return message
+
+
+def binanace_wallet_value():
+    wallet_data = get_wallet_balance()
+    ts = wallet_data["timestamp"]
+    if load_custom_settings()["Custom_Currency_Enabled"]:
+        if convert_custom_currency() != False:
+            custom_currency_data = convert_custom_currency()
+    else:
+        custom_currency_data = {"Custom_Currency": "USD", "Converted_Rate": 1}
+    m_list = [
+        f"\nLast update: `{str(datetime.fromtimestamp(ts).strftime('%H:%M:%S %d/%m/%Y'))}`\n\n",
+        f"*Binance Wallet:*\n",
+        f"\t\- Estimated Balance: `{wallet_data['walletInusd'] * custom_currency_data['Converted_Rate']:.2f}` *{custom_currency_data['Custom_Currency']}*\n\n",
+    ]
+
+    for coin in wallet_data["individualCoins"]:
+        m_list.append(
+            f"\t\- {coin['asset']}: `{coin['totalInUSD'] * custom_currency_data['Converted_Rate']:.2f}` *{custom_currency_data['Custom_Currency']}*\n"
+        )
+    message = telegram_text_truncator(m_list)
+
     return message
 
 
@@ -193,6 +240,9 @@ def check_progress():
 
                 # Generate message
                 m_list = ["Current coin amount progress:\n\n"]
+                if load_custom_settings()["Custom_Currency_Enabled"]:
+                    if convert_custom_currency() != False:
+                        custom_currency_data = convert_custom_currency()
                 for coin in query:
                     last_trade_date = datetime.strptime(coin[5], "%Y-%m-%d %H:%M:%S.%f")
                     if coin[4] is None:
@@ -203,20 +253,29 @@ def check_progress():
                         pre_last_trade_date = datetime.strptime(
                             coin[4], "%Y-%m-%d %H:%M:%S.%f"
                         )
-
                     time_passed = last_trade_date - pre_last_trade_date
-                    last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
-                    m_list.append(
-                        f"*{coin[0]}*\n"
-                        f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
-                        f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                        f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
-                        f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
+                    sub_list = [
+                        f"*{coin[0]}*\n",
+                        f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n",
+                        f"\t\- Price: `{round(coin[2], 2)}` *USD*\n",
+                        f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n",
+                        f"\t\- Trade datetime: `{last_trade_date.replace(tzinfo=FROM_ZONE).astimezone(TO_ZONE).strftime('%H:%M:%S %d/%m/%Y')}`\n\n".replace(
                             ".", "\."
+                        ),
+                    ]
+                    if load_custom_settings()["Custom_Currency_Enabled"] == True:
+                        sub_list.insert(
+                            3,
+                            f"\t\- Price: `{round(custom_currency_data['Converted_Rate'] * coin[2], 2)}` *{custom_currency_data['Custom_Currency']}*\n",
                         )
-                    )
-
-                message = telegram_text_truncator(m_list)
+                    else:
+                        sub_list.insert(
+                            3,
+                            f"\t\- *Forex Error*\n",
+                        )
+                    m_list.append(sub_list)
+                flat_m_list = ["".join(x) for x in m_list]
+                message = telegram_text_truncator(flat_m_list)
                 con.close()
             except Exception as e:
                 logger.error(
@@ -278,7 +337,7 @@ def current_ratios():
                 query = sorted(query, key=lambda k: k[-1], reverse=True)
 
                 m_list = [
-                    f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
+                    f"\nLast update: `{last_update.replace(tzinfo=FROM_ZONE).astimezone(TO_ZONE).strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
                     f"*Coin ratios compared to {current_coin} in decreasing order:*\n".replace(
                         ".", "\."
                     )
@@ -399,6 +458,8 @@ def trade_history():
                     if trade[4] is None:
                         continue
                     date = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
+                    date = date.replace(tzinfo=FROM_ZONE)
+                    date = date.astimezone(TO_ZONE)
                     m_list.append(
                         f"`{date.strftime('%H:%M:%S %d/%m/%Y')}`\n"
                         f"*{'Sold' if trade[2] else 'Bought'}* `{format_float(trade[4])}` *{trade[0]}*{f' for `{format_float(trade[5])}` *{trade[1]}*' if trade[5] is not None else ''}\n"

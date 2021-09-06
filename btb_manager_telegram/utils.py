@@ -3,6 +3,10 @@ import os
 import subprocess
 from time import sleep
 from typing import List, Optional
+from dateutil.tz.tz import gettz
+from forex_python.converter import CurrencyRates
+from dateutil import tz
+
 
 import psutil
 import telegram
@@ -247,3 +251,37 @@ def get_custom_scripts_keyboard():
 
     keyboard.append(["Cancel"])
     return keyboard, custom_script_exist, message
+
+
+def load_custom_settings():
+    try:
+        with open("config/custom.json") as json_file:
+            return json.load(json_file)
+    except:
+        return {"Custom_Currency_Enabled": 0}
+
+
+def convert_custom_currency():
+    custom_currency = load_custom_settings()["Currency"]
+    c = CurrencyRates()
+    try:
+        custom_rate = c.get_rate("USD", custom_currency)
+        return {"Custom_Currency": custom_currency, "Converted_Rate": custom_rate}
+    except:
+        return False
+
+
+def custom_timezone():
+    from_zone = tz.gettz("UTC")
+    if load_custom_settings()["Custom_Timezone_Enabled"]:
+        # INPUT AVAILABLE from: pytz.all_timezones
+        # common : "Europe/London" "Europe/Paris" "Europe/Madrid" 'America/New_York'...
+        return {
+            "from_zone": from_zone,
+            "to_zone": tz.gettz(load_custom_settings()["Timezone"]),
+        }
+    else:
+        return {
+            "from_zone": from_zone,
+            "to_zone": tz.gettz("UTC"),
+        }
