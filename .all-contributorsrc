@@ -79,6 +79,52 @@
         "ideas",
         "code"
       ]
+    },
+    {
+      "login": "sydekumf",
+      "name": "Florian Sydekum",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3983052?v=4",
+      "profile": "https://github.com/sydekumf",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "tntwist",
+      "name": "Nico L.",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6589385?v=4",
+      "profile": "https://github.com/tntwist",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "SeriousSeal",
+      "name": "SeriousSeal",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57253532?v=4",
+      "profile": "https://github.com/SeriousSeal",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "titulebolide",
+      "name": "titulebolide",
+      "avatar_url": "https://avatars.githubusercontent.com/u/44905741?v=4",
+      "profile": "https://github.com/titulebolide",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "stgo-eo",
+      "name": "Stephen Goult",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7523722?v=4",
+      "profile": "https://github.com/stgo-eo",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

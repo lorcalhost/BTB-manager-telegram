@@ -56,14 +56,37 @@ def current_value():
             # Get balance, current coin price in USD, current coin price in BTC
             try:
                 cur.execute(
-                    f"""SELECT balance, usd_price, btc_price, datetime FROM 'coin_value' WHERE coin_id = '{current_coin}' ORDER BY datetime DESC LIMIT 1;"""
+                    f"""SELECT balance, usd_price, btc_price, datetime
+                        FROM 'coin_value'
+                        WHERE coin_id = '{current_coin}'
+                        ORDER BY datetime DESC LIMIT 1;"""
                 )
                 query = cur.fetchone()
+
+                cur.execute(
+                    """SELECT cv.balance, cv.usd_price
+                        FROM coin_value as cv
+                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
+                        AND cv.datetime > (SELECT th.datetime FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
+                        ORDER BY cv.datetime ASC LIMIT 1;"""
+                )
+                query_1_day = cur.fetchone()
+
+                cur.execute(
+                    """SELECT cv.balance, cv.usd_price
+                        FROM coin_value as cv
+                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
+                        AND cv.datetime > (SELECT th.datetime FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
+                        ORDER BY cv.datetime ASC LIMIT 1;"""
+                )
+                query_7_day = cur.fetchone()
+
                 if query is None:
                     return [
                         f"❌ No information about *{current_coin}* available in the database\.",
                         "⚠ If you tried using the `Current value` button during a trade please try again after the trade has been completed\.",
                     ]
+
                 balance, usd_price, btc_price, last_update = query
                 if balance is None:
                     balance = 0
@@ -72,6 +95,40 @@ def current_value():
                 if btc_price is None:
                     btc_price = 0
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
+
+                return_rate_1_day, return_rate_7_day = 0, 0
+                balance_1_day, usd_price_1_day, balance_7_day, usd_price_7_day = (
+                    0,
+                    0,
+                    0,
+                    0,
+                )
+
+                if (
+                    query_1_day is not None
+                    and all(elem is not None for elem in query_1_day)
+                    and usd_price != 0
+                ):
+                    balance_1_day, usd_price_1_day = query_1_day
+                    return_rate_1_day = round(
+                        (balance * usd_price - balance_1_day * usd_price_1_day)
+                        / (balance_1_day * usd_price_1_day)
+                        * 100,
+                        2,
+                    )
+
+                if (
+                    query_7_day is not None
+                    and all(elem is not None for elem in query_7_day)
+                    and usd_price != 0
+                ):
+                    balance_7_day, usd_price_7_day = query_7_day
+                    return_rate_7_day = round(
+                        (balance * usd_price - balance_7_day * usd_price_7_day)
+                        / (balance_7_day * usd_price_7_day)
+                        * 100,
+                        2,
+                    )
             except Exception as e:
                 logger.error(
                     f"❌ Unable to fetch current coin information from database: {e}",
@@ -89,15 +146,15 @@ def current_value():
                     f"\nLast update: `{last_update.strftime('%H:%M:%S %d/%m/%Y')}`\n\n"
                     f"*Current coin {current_coin}:*\n"
                     f"\t\- Balance: `{format_float(balance)}` *{current_coin}*\n"
-                    f"\t\- Current coin exchange rate: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
-                    f"\t\- Value in *GBP*: `{round((balance * usd_price)*0.71, 2)}` *GBP*\n"
+                    f"\t\- Exchange rate purchased: `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}* \n"
+                    f"\t\- Exchange rate now: `{format_float(usd_price)}` *USD*/*{current_coin}*\n"
+                    f"\t\- Change in value: `{round((balance * usd_price - buy_price) / buy_price * 100, 2)}` *%*\n"
+		    f"\t\- Value in *GBP*: `{round((balance * usd_price)*0.71, 2)}` *GBP*\n"
                     f"\t\- Value in *USD*: `{round(balance * usd_price, 2)}` *USD*\n"
                     f"\t\- Value in *BTC*: `{format_float(balance * btc_price)}` *BTC*\n\n"
-                    f"_Initially bought for_ `{round(buy_price, 2)}` *{bridge}* / `{round(buy_price*0.71, 2)}` *GBP*\n"
-                    f"_Exchange rate when purchased:_ `{format_float(buy_price / alt_amount)}` *{bridge}*/*{current_coin}*\n"
-                    f"{f'*Change in value*: `{round((usd_price - (buy_price / alt_amount)) / (buy_price / alt_amount) * 100, 2)}` *%*' if bridge in ['USDT', 'BUSD'] else ''}".replace(
-                        ".", "\."
-                    )
+                    f"_Bought for_ `{round(buy_price, 2)}` *{bridge}* / `{round(buy_price*0.71, 2)}` *GBP*\n"
+                    f"_*1 day* value change USD_: `{return_rate_1_day}` *%*\n"
+                    f"_*7 days* value change USD_: `{return_rate_7_day}` *%*\n"
                 ]
                 message = telegram_text_truncator(m_list)
                 con.close()
@@ -131,22 +188,31 @@ def check_progress():
             # Get progress information
             try:
                 cur.execute(
-                    """SELECT th1.alt_coin_id AS coin, th1.alt_trade_amount AS amount, th1.crypto_trade_amount AS priceInUSD,(th1.alt_trade_amount - ( SELECT th2.alt_trade_amount FROM trade_history th2 WHERE th2.state = 'COMPLETE' AND th2.alt_coin_id = th1.alt_coin_id AND th1.datetime > th2.datetime AND th2.selling = 0 ORDER BY th2.datetime DESC LIMIT 1)) AS change, datetime FROM trade_history th1 WHERE th1.state = 'COMPLETE' AND th1.selling = 0 ORDER BY th1.datetime DESC LIMIT 15"""
+                    """SELECT th1.alt_coin_id AS coin, th1.alt_trade_amount AS amount, th1.crypto_trade_amount AS priceInUSD,(th1.alt_trade_amount - ( SELECT th2.alt_trade_amount FROM trade_history th2 WHERE th2.state = 'COMPLETE' AND th2.alt_coin_id = th1.alt_coin_id AND th1.datetime > th2.datetime AND th2.selling = 0 ORDER BY th2.datetime DESC LIMIT 1)) AS change, (SELECT th2.datetime FROM trade_history th2 WHERE th2.state = 'COMPLETE' AND th2.alt_coin_id = th1.alt_coin_id AND th1.datetime > th2.datetime AND th2.selling = 0 ORDER BY th2.datetime DESC LIMIT 1) AS pre_last_trade_date, datetime FROM trade_history th1 WHERE th1.state = 'COMPLETE' AND th1.selling = 0 ORDER BY th1.datetime DESC LIMIT 15"""
                 )
                 query = cur.fetchall()
 
                 # Generate message
                 m_list = ["Current coin amount progress:\n\n"]
                 for coin in query:
-                    last_trade_date = datetime.strptime(
-                        coin[4], "%Y-%m-%d %H:%M:%S.%f"
-                    ).strftime("%H:%M:%S %d/%m/%Y")
+                    last_trade_date = datetime.strptime(coin[5], "%Y-%m-%d %H:%M:%S.%f")
+                    if coin[4] is None:
+                        pre_last_trade_date = datetime.strptime(
+                            coin[5], "%Y-%m-%d %H:%M:%S.%f"
+                        )
+                    else:
+                        pre_last_trade_date = datetime.strptime(
+                            coin[4], "%Y-%m-%d %H:%M:%S.%f"
+                        )
+
+                    time_passed = last_trade_date - pre_last_trade_date
+                    last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
                     m_list.append(
                         f"*{coin[0]}*\n"
                         f"\t\- Amount: `{format_float(coin[1])}` *{coin[0]}*\n"
                         f"\t\- Price: `{round(coin[2]*0.71, 2)}` *GBP*\n"
                         f"\t\- Price: `{round(coin[2], 2)}` *USD*\n"
-                        f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}*' if coin[3] is not None else f'`{coin[3]}`'}\n"
+                        f"\t\- Change: {f'`{format_float(coin[3])}` *{coin[0]}* `{round(coin[3] / (coin[1] - coin[3]) * 100, 2)}` *%* in {time_passed.days} days, {time_passed.seconds // 3600} hours' if coin[3] is not None else f'`{coin[3]}`'}\n"
                         f"\t\- Trade datetime: `{last_trade_date}`\n\n".replace(
                             ".", "\."
                         )
@@ -182,6 +248,7 @@ def current_ratios():
                 config = ConfigParser()
                 config.read_file(cfg)
                 bridge = config.get("binance_user_config", "bridge")
+                scout_multiplier = config.get("binance_user_config", "scout_multiplier")
 
             con = sqlite3.connect(db_file_path)
             cur = con.cursor()
@@ -204,7 +271,7 @@ def current_ratios():
             # Get prices and ratios of all alt coins
             try:
                 cur.execute(
-                    f"""SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ( ( ( current_coin_price / other_coin_price ) - 0.001 * 5 * ( current_coin_price / other_coin_price ) ) - sh.target_ratio ) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs WHERE pairs.from_coin_id='{current_coin}');"""
+                    f"""SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ( ( ( current_coin_price / other_coin_price ) - 0.001 * '{scout_multiplier}' * ( current_coin_price / other_coin_price ) ) - sh.target_ratio ) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs JOIN coins ON coins.symbol = pairs.to_coin_id WHERE coins.enabled = 1 AND pairs.from_coin_id='{current_coin}');"""
                 )
                 query = cur.fetchall()
 
@@ -235,6 +302,62 @@ def current_ratios():
                 con.close()
                 return [
                     "❌ Something went wrong, unable to generate ratios at this time\.",
+                    "⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.",
+                ]
+        except Exception as e:
+            logger.error(
+                f"❌ Unable to perform actions on the database: {e}", exc_info=True
+            )
+            message = ["❌ Unable to perform actions on the database\."]
+    return message
+
+
+def next_coin():
+    logger.info("Next coin button pressed.")
+
+    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+    user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    message = [f"⚠ Unable to find database file at `{db_file_path}`\."]
+    if os.path.exists(db_file_path):
+        try:
+            # Get bridge currency symbol
+            with open(user_cfg_file_path) as cfg:
+                config = ConfigParser()
+                config.read_file(cfg)
+                bridge = config.get("binance_user_config", "bridge")
+                scout_multiplier = config.get("binance_user_config", "scout_multiplier")
+
+            con = sqlite3.connect(db_file_path)
+            cur = con.cursor()
+
+            # Get prices and percentages for a jump to the next coin
+            try:
+                cur.execute(
+                    f"""SELECT p.to_coin_id as other_coin, sh.other_coin_price, (current_coin_price - 0.001 * '{scout_multiplier}' * current_coin_price) / sh.target_ratio AS 'price_needs_to_drop_to', ((current_coin_price - 0.001 * '{scout_multiplier}' * current_coin_price) / sh.target_ratio) / sh.other_coin_price as 'percentage' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id = (SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC, percentage DESC LIMIT (SELECT count(DISTINCT pairs.to_coin_id) FROM pairs JOIN coins ON coins.symbol = pairs.to_coin_id WHERE coins.enabled = 1 AND pairs.from_coin_id=(SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1));"""
+                )
+                query = cur.fetchall()
+
+                m_list = []
+                for coin in query:
+                    percentage = round(coin[3] * 100, 2)
+                    m_list.append(
+                        f"*{coin[0]} \(`{format_float(percentage)}`%\)*\n"
+                        f"\t\- Current Price: `{format_float(round(coin[1], 8))}` {bridge}\n"
+                        f"\t\- Target Price: `{format_float(round(coin[2], 8))}` {bridge}\n\n".replace(
+                            ".", "\."
+                        )
+                    )
+
+                message = telegram_text_truncator(m_list)
+                con.close()
+            except Exception as e:
+                logger.error(
+                    f"❌ Something went wrong, unable to generate next coin at this time: {e}",
+                    exc_info=True,
+                )
+                con.close()
+                return [
+                    "❌ Something went wrong, unable to generate next coin at this time\.",
                     "⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.",
                 ]
         except Exception as e:
@@ -308,20 +431,23 @@ def start_bot():
 
     message = "⚠ Binance Trade Bot is already running\."
     if not get_binance_trade_bot_process():
-        if os.path.exists(os.path.join(settings.ROOT_PATH, "binance_trade_bot/")):
-            subprocess.call(
-                f"cd {settings.ROOT_PATH} && $(which python3) -m binance_trade_bot &",
-                shell=True,
-            )
-            if get_binance_trade_bot_process():
-                message = "✔ Binance Trade Bot successfully started\."
+        if os.path.isfile(settings.PYTHON_PATH):
+            if os.path.exists(os.path.join(settings.ROOT_PATH, "binance_trade_bot/")):
+                subprocess.call(
+                    f"cd {settings.ROOT_PATH} && {settings.PYTHON_PATH} -m binance_trade_bot &",
+                    shell=True,
+                )
+                if get_binance_trade_bot_process():
+                    message = "✔ Binance Trade Bot successfully started\."
+                else:
+                    message = "❌ Unable to start Binance Trade Bot\."
             else:
-                message = "❌ Unable to start Binance Trade Bot\."
+                message = (
+                    f"❌ Unable to find _Binance Trade Bot_ installation at `{settings.ROOT_PATH}`\.\n"
+                    f"Make sure the `binance-trade-bot` and `BTB-manager-telegram` are in the same parent directory\."
+                )
         else:
-            message = (
-                f"❌ Unable to find _Binance Trade Bot_ installation at `{settings.ROOT_PATH}`\.\n"
-                f"Make sure the `binance-trade-bot` and `BTB-manager-telegram` are in the same parent directory\."
-            )
+            message = f"❌ Unable to find python binary at `{settings.PYTHON_PATH}`\.\n"
     return message
 
 

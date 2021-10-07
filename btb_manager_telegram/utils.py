@@ -7,7 +7,6 @@ from typing import List, Optional
 import psutil
 import telegram
 import yaml
-from numpy import format_float_positional
 from telegram import Bot
 
 from btb_manager_telegram import logger, scheduler, settings
@@ -94,6 +93,8 @@ def get_binance_trade_bot_process() -> Optional[psutil.Process]:
             ) and proc.cwd() == bot_path:
                 return proc
         except psutil.AccessDenied:
+            continue
+        except psutil.ZombieProcess:
             continue
 
 
@@ -218,7 +219,7 @@ def update_reminder(self, message):
 
 
 def format_float(num):
-    return format_float_positional(num, trim="-")
+    return f"{num:0.8f}".rstrip("0").rstrip(".")
 
 
 def get_custom_scripts_keyboard():
@@ -235,7 +236,7 @@ def get_custom_scripts_keyboard():
             for script_name in scripts:
                 keyboard.append([script_name])
 
-        if len(keyboard) > 1:
+        if len(keyboard) >= 1:
             custom_script_exist = True
             message = "Select one of your custom scripts to execute it\."
     else:

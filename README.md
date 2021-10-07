@@ -22,7 +22,6 @@ As of now the bot is able to perform the following actions:
 - [x] 📤 Export database file
 - [x] ⬆ **Update** _Binance Trade Bot_ (and notify when new update is available)
 - [x] ⬆ **Update** _Binance Trade Bot Manager Telegram_ (and notify when new update is available)
-- [x] 🚨 Panic button (Kills _Binance Trade Bot Manager Telegram_ and cancels all open orders / sells at market price)
 - [x] [User defined custom scripts](./docs/custom-scripts.md)
 
 </br>
@@ -85,6 +84,9 @@ $ python3 -m btb_manager_telegram
 
 # If the bot is running on a server you may want to keep it running even after ssh connection is closed by using nohup
 $ nohup python3 -m btb_manager_telegram &
+
+# If you are using a virtual environment for the binance trade bot you can specify the Python binary path
+$ python3 -m btb_manager_telegram --python_path=/home/pi/binance-trade-bot/venv/bin/python
 ```
 
 Make sure [Binance Trade Bot]'s `apprise.yml` file is correctly setup before running.  
@@ -94,7 +96,9 @@ If _Binance Trade Bot_ and _BTB-Manager-Telegram_ were **not** installed in the 
 
 ```console
 optional arguments:
-  -p PATH, --path PATH  (optional) binance-trade-bot installation absolute path
+  -p PATH, --path PATH  (optional) binance-trade-bot installation path
+  -y PYTHON, --python_path PYTHON_PATH
+                        (optional) Python binary to be used for the BTB. If unset, uses the same executable (and thus virtual env if any) than the telegram bot.
   -t TOKEN, --token TOKEN
                         (optional) Telegram bot token
   -c CHAT_ID, --chat_id CHAT_ID
@@ -128,7 +132,7 @@ You can also add the bot to a group if multiple people need to access this bot. 
 
 ## Support the project
 
-I am currently a broke university student, if you like my work and use it on a daily basis consider supporting the project through a small donation. :smile:
+If you like `BTB-manager-telegram` and use it on a daily basis consider supporting the project through a small donation. :smile:
 
 [:heart: Sponsor on GitHub](https://github.com/sponsors/lorcalhost)
 
@@ -177,6 +181,13 @@ This project follows the [all-contributors] specification.
     <td align="center"><a href="https://github.com/pwnfoo"><img src="https://avatars.githubusercontent.com/u/9546091?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sachin S. Kamath</b></sub></a><br /><a href="#ideas-pwnfoo" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=pwnfoo" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/kydrenw"><img src="https://avatars.githubusercontent.com/u/4505155?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Hoang Dinh</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Akydrenw" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/idkravitz"><img src="https://avatars.githubusercontent.com/u/200144?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dmitry Kravtsov</b></sub></a><br /><a href="#ideas-idkravitz" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=idkravitz" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/sydekumf"><img src="https://avatars.githubusercontent.com/u/3983052?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Florian Sydekum</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=sydekumf" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/tntwist"><img src="https://avatars.githubusercontent.com/u/6589385?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nico L.</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Atntwist" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/SeriousSeal"><img src="https://avatars.githubusercontent.com/u/57253532?v=4?s=100" width="100px;" alt=""/><br /><sub><b>SeriousSeal</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=SeriousSeal" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/titulebolide"><img src="https://avatars.githubusercontent.com/u/44905741?v=4?s=100" width="100px;" alt=""/><br /><sub><b>titulebolide</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=titulebolide" title="Code">💻</a> <a href="#ideas-titulebolide" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/stgo-eo"><img src="https://avatars.githubusercontent.com/u/7523722?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Stephen Goult</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Astgo-eo" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 

@@ -1,9 +1,10 @@
 import json
 import os
+import shutil
 import sqlite3
 import subprocess
+import sys
 from configparser import ConfigParser
-from shutil import copyfile
 
 from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
@@ -53,8 +54,8 @@ def menu(update: Update, _: CallbackContext) -> int:
     # ]
 
     keyboard = [
-        ["💵 Current value"],
-        ["📈 Progress", "➗ Current ratios"],
+        ["💵 Current value", "📈 Progress"],
+        ["➗ Current ratios", "🔀 Next coin"],
         ["🔍 Check bot status", "⌛ Trade History"],
         ["🛠 Maintenance", "⚙️ Configurations"],
     ]
@@ -129,6 +130,12 @@ def menu(update: Update, _: CallbackContext) -> int:
 
     elif update.message.text == "➗ Current ratios":
         for mes in buttons.current_ratios():
+            update.message.reply_text(
+                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            )
+
+    elif update.message.text == "🔀 Next coin":
+        for mes in buttons.next_coin():
             update.message.reply_text(
                 mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
@@ -299,7 +306,7 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
         )
         coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
         try:
-            copyfile(coin_file_path, f"{coin_file_path}.backup")
+            shutil.copyfile(coin_file_path, f"{coin_file_path}.backup")
             with open(coin_file_path, "w") as f:
                 f.write(update.message.text + "\n")
         except Exception as e:
@@ -329,7 +336,7 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
         )
         user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
         try:
-            copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
+            shutil.copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
             with open(user_cfg_file_path, "w") as f:
                 f.write(update.message.text + "\n\n\n")
         except Exception as e:
@@ -361,7 +368,7 @@ def delete_db(update: Update, _: CallbackContext) -> int:
         db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
         log_file_path = os.path.join(settings.ROOT_PATH, "logs/crypto_trading.log")
         try:
-            copyfile(db_file_path, f"{db_file_path}.backup")
+            shutil.copyfile(db_file_path, f"{db_file_path}.backup")
             os.remove(db_file_path)
         except Exception as e:
             logger.error(f"❌ Unable to delete database file: {e}", exc_info=True)
@@ -399,9 +406,10 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
         try:
+            manager_python_path = sys.executable
             subprocess.call(
-                f"git pull && $(which python3) -m pip install -r requirements.txt --upgrade && "
-                f'$(which python3) -m btb_manager_telegram -p "{settings.ROOT_PATH}" &',
+                f"git pull && {manager_python_path} -m pip install -r requirements.txt --upgrade && "
+                f"{manager_python_path} -m btb_manager_telegram {settings.RAW_ARGS} &",
                 shell=True,
             )
             kill_btb_manager_telegram_process()
@@ -443,7 +451,7 @@ def update_btb(update: Update, _: CallbackContext) -> int:
             subprocess.call(
                 f"cd {settings.ROOT_PATH} && "
                 f"git pull && "
-                f"$(which python3) -m pip install -r requirements.txt --upgrade",
+                f"{settings.PYTHON_PATH} -m pip install -r requirements.txt --upgrade",
                 shell=True,
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = False
@@ -587,7 +595,7 @@ def cancel(update: Update, _: CallbackContext) -> int:
 
 MENU_HANDLER = MessageHandler(
     Filters.regex(
-        "^(Begin|💵 Current value|🚨 Panic button|📈 Progress|➗ Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|"
+        "^(Begin|💵 Current value|🚨 Panic button|📈 Progress|➗ Current ratios|🔀 Next coin|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|"
         "⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|"
         "⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|⬆ Update Telegram Bot|⬆ Update Binance Trade Bot|"
         "🤖 Execute custom script|⬅️ Back|Go back|OK|Cancel update|Cancel|OK 👌|Great 👌)$"

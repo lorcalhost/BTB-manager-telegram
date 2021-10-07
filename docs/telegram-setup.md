@@ -24,7 +24,7 @@ urls:
 ```
 
 Note:  
-_Binance Trade Bot Manager Telegram_ you can also decide to put a group chat id instead of a personal `chat_id`.
+_Binance Trade Bot Manager Telegram_ also supports usage of a group chat id instead of a personal `chat_id`.
 
 [@botfather]: https://t.me/botfather
 [@userinfobot]: https://t.me/userinfobot
