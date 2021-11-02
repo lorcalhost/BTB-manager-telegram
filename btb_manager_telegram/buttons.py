@@ -66,18 +66,18 @@ def current_value():
                 cur.execute(
                     """SELECT cv.balance, cv.usd_price
                         FROM coin_value as cv
-                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
-                        AND cv.datetime > (SELECT th.datetime FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
-                        ORDER BY cv.datetime ASC LIMIT 1;"""
+                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
+                        AND cv.datetime < (SELECT th.datetime FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
+                        ORDER BY cv.datetime DESC LIMIT 1;"""
                 )
                 query_1_day = cur.fetchone()
 
                 cur.execute(
                     """SELECT cv.balance, cv.usd_price
                         FROM coin_value as cv
-                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
-                        AND cv.datetime > (SELECT th.datetime FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
-                        ORDER BY cv.datetime ASC LIMIT 1;"""
+                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
+                        AND cv.datetime < (SELECT th.datetime FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
+                        ORDER BY cv.datetime DESC LIMIT 1;"""
                 )
                 query_7_day = cur.fetchone()
 
