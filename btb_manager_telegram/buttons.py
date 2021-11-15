@@ -66,18 +66,18 @@ def current_value():
                 cur.execute(
                     """SELECT cv.balance, cv.usd_price
                         FROM coin_value as cv
-                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
-                        AND cv.datetime < (SELECT th.datetime FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
-                        ORDER BY cv.datetime DESC LIMIT 1;"""
+                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
+                        AND cv.datetime > (SELECT th.datetime FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
+                        ORDER BY cv.datetime ASC LIMIT 1;"""
                 )
                 query_1_day = cur.fetchone()
 
                 cur.execute(
                     """SELECT cv.balance, cv.usd_price
                         FROM coin_value as cv
-                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
-                        AND cv.datetime < (SELECT th.datetime FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
-                        ORDER BY cv.datetime DESC LIMIT 1;"""
+                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
+                        AND cv.datetime > (SELECT th.datetime FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
+                        ORDER BY cv.datetime ASC LIMIT 1;"""
                 )
                 query_7_day = cur.fetchone()
 
@@ -229,7 +229,7 @@ def check_progress():
             logger.error(
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
-            message = ["❌ Unable to perform actions on the database {e}\."]
+            message = ["❌ Unable to perform actions on the database\."]
     return message
 
 
@@ -323,13 +323,13 @@ def current_ratios():
                 con.close()
                 return [
                     "❌ Something went wrong, unable to generate ratios at this time\.",
-                    f"⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.{e}",
+                    "⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.",
                 ]
         except Exception as e:
             logger.error(
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
-            message = ["❌ Unable to perform actions on the database {e}\."]
+            message = ["❌ Unable to perform actions on the database\."]
     return message
 
 
@@ -358,7 +358,7 @@ def next_coin():
                     ratio_calc = "default"
                 if ratio_calc=="scout_margin":
                     scout_multiplier=float(scout_multiplier)/100.0
-                    
+
             con = sqlite3.connect(db_file_path)
             cur = con.cursor()
 
@@ -380,19 +380,17 @@ def next_coin():
                         f"""SELECT p.to_coin_id as other_coin, sh.other_coin_price, (current_coin_price - 0.001 * '{scout_multiplier}' * current_coin_price) / sh.target_ratio AS 'price_needs_to_drop_to', ((current_coin_price - 0.001 * '{scout_multiplier}' * current_coin_price) / sh.target_ratio) / sh.other_coin_price as 'percentage' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id = (SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC, percentage DESC LIMIT (SELECT count(DISTINCT pairs.to_coin_id) FROM pairs JOIN coins ON coins.symbol = pairs.to_coin_id WHERE coins.enabled = 1 AND pairs.from_coin_id=(SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1));"""
                     )
                 query = cur.fetchall()
-                
                 m_list = []
                 for coin in query:
                     percentage = round(coin[3] * 100, 2)
-                    
                     m_list.append(
                         f"*{coin[0]} \(`{format_float(percentage)}`%\)*\n"
-                        f"\t\- Current Price: `{format_float(round(coin[1], 8))}`  {bridge}\n"
-                        f"\t\- Target Price: `{format_float(round(coin[2], 8))}`  {bridge}\n\n".replace(
+                        f"\t\- Current Price: `{format_float(round(coin[1], 8))}` {bridge}\n"
+                        f"\t\- Target Price: `{format_float(round(coin[2], 8))}` {bridge}\n\n".replace(
                             ".", "\."
                         )
                     )
-                    
+
                 message = telegram_text_truncator(m_list)
                 con.close()
             except Exception as e:
@@ -403,13 +401,13 @@ def next_coin():
                 con.close()
                 return [
                     "❌ Something went wrong, unable to generate next coin at this time\.",
-                    f"⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.{e}",
+                    "⚠ Please make sure logging for _Binance Trade Bot_ is enabled\.",
                 ]
         except Exception as e:
             logger.error(
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
-            message = ["❌ Unable to perform actions on the database {e}\."]
+            message = ["❌ Unable to perform actions on the database\."]
     return message
 
 
