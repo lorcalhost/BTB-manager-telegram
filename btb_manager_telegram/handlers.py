@@ -366,10 +366,14 @@ def delete_db(update: Update, _: CallbackContext) -> int:
     if update.message.text != "Go back":
         message = "✔ Successfully deleted database file\."
         db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        paperwallet_file_path = os.path.join(settings.ROOT_PATH, "data/paper_wallet.json")
         log_file_path = os.path.join(settings.ROOT_PATH, "logs/crypto_trading.log")
         try:
             shutil.copyfile(db_file_path, f"{db_file_path}.backup")
             os.remove(db_file_path)
+            if os.path.isfile(paperwallet_file_path):
+                shutil.copyfile(paperwallet_file_path, f"{paperwallet_file_path}.backup")
+                os.remove(paperwallet_file_path)
         except Exception as e:
             logger.error(f"❌ Unable to delete database file: {e}", exc_info=True)
             message = "❌ Unable to delete database file\."
