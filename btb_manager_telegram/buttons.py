@@ -251,15 +251,15 @@ def current_ratios():
                     scout_margin = float(config.get("binance_user_config", "scout_margin"))/100.0
                     use_margin = config.get("binance_user_config", "scout_margin")
                 except Exception as e:
-                    logger.error(f"No margin ratio config found, fall back to default")
                     use_margin = "no"
-                    scout_margin = 0
                 try: # scout_margin TnTwist
                     ratio_calc = config.get("binance_user_config", "ratio_calc")
                 except Exception as e:
                     ratio_calc = "default"
                 if ratio_calc=="scout_margin":
                     scout_multiplier=float(scout_multiplier)/100.0
+                if use_margin=="no" and ratio_calc=="scout_margin":
+                    logger.error(f"Margin ratio not used, use default ratio")
                     
             con = sqlite3.connect(db_file_path)
             cur = con.cursor()
@@ -350,15 +350,16 @@ def next_coin():
                     scout_margin = float(config.get("binance_user_config", "scout_margin"))/100.0
                     use_margin = config.get("binance_user_config", "scout_margin")
                 except Exception as e:
-                    logger.error(f"No margin ratio config found, fall back to default")
                     use_margin = "no"
                 try: # scout_margin TnTwist
                     ratio_calc = config.get("binance_user_config", "ratio_calc")
                 except Exception as e:
                     ratio_calc = "default"
                 if ratio_calc=="scout_margin":
-                    scout_multiplier=float(scout_multiplier)/100.0
-                    
+                    scout_multiplier=float(scout_multiplier)/100.0                    
+                if use_margin=="no" and ratio_calc=="scout_margin":
+                    logger.error(f"Margin ratio not used, use default ratio")
+
             con = sqlite3.connect(db_file_path)
             cur = con.cursor()
 
