@@ -82,7 +82,6 @@ order_already_complete: 'Ващ баланс уже в *%{coin}*\.'
 ask_stop_bot: "Хотите остановить _Binance Trade Bot_?"
 open_sell_order: 'У Вас есть открытый ордер на продажу `%{amount1}` *%{coin1}* за `%{amount2}` *%{coin2}*\.'
 limit_sell_price: "Лимитная продажа по цене:"
-panic_btn_error: '❌ Something went wrong, the panic button is not working at this time\.'
 panic_btn_error: '❌ Что-то пошло не так, кнопка тревоги не работает сейчас\.'
 keyboard:
   begin: "Начать"
@@ -117,6 +116,7 @@ keyboard:
   cancel_update: "Отменить обновление"
   confirm: "⚠ Подтвердить"
   stop_bot: "⚠ Остановить бота"
+  next_coin: "🔀 Следующая монета"
 select_option: 'Пожалуйста, выберите один из вариантов\.'
 welcome: 'Добро пожаловать в _Binace Trade Bot Manager Telegram_\.'
 developed_by: 'Этот бот Telegram был разработан @lorcalhost\.'
