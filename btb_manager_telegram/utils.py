@@ -22,18 +22,37 @@ def setup_i18n(lang):
     i18n.load_path.append("./i18n")
 
 
-def i18n_sane(key, **kwargs):
+def format_float(num):
+    return f"{num:0.8f}".rstrip("0").rstrip(".")
+
+
+def i18n_format(key, **kwargs):
+    for k,val in kwargs.items():
+        try:
+            float(val)
+            val = format_float(val)
+        except:
+            pass
+        kwargs[k] = escape_markdown(str(val), version=2)
+    return i18n.t(key, **kwargs)
+
+
+def escape_tg(message):
     escape_char = (".", "-", "?", "!")
-    mes_raw = i18n.t(key, **{i: escape_markdown(kwargs[i], version=2) for i in kwargs})
-    mes = mes_raw[0]
-    is_escaped = mes_raw[0] == "\\"
-    for cur_char in mes_raw[1:]:
+    escaped_message = ""
+    is_escaped = False
+    for cur_char in message:
         if cur_char in escape_char and not is_escaped:
-            mes += "\\"
-        mes += cur_char
+            escaped_message += "\\"
+        escaped_message += cur_char
         is_escaped = cur_char == "\\" and not is_escaped
-    print(mes)
-    return mes
+    return escaped_message
+
+def reply_text_escape(reply_text_fun):
+    def reply_text_escape_fun(message, **kwargs):
+        print(message)
+        return reply_text_fun(escape_tg(message), **kwargs)
+    return reply_text_escape_fun
 
 
 def setup_root_path_constant():
@@ -240,11 +259,6 @@ def update_reminder(self, message):
         1,
         update_reminder,
     )
-
-
-def format_float(num):
-    return f"{num:0.8f}".rstrip("0").rstrip(".").replace(".", "\.").replace("-", "\-")
-
 
 def get_custom_scripts_keyboard():
     logger.info("Getting list of custom scripts.")
