@@ -133,7 +133,7 @@ user_config_not_modified: 'La configuration *n''a pas* été modifiée.'
 deleted_db: '✔ La base de donnée a été supprimée.'
 delete_db_error: '❌ Impossible de supprimer la base de données.'
 clear_log_error: '❌ Impossible de supprimer les logs.'
-db_not_deleted: 'La base de données *n`a pas* été supprimée.'
+db_not_deleted: 'La base de données *n''a pas* été supprimée.'
 tgb_updating: 'Le bot télégram se met à jour.'
 wait_then_start: "Attendez quelques secondes et relancez le bot avec /start"
 tgb_update_error: 'Impossible de mettre à jour le bot télégram.'
