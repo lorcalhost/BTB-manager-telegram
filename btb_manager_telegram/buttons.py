@@ -22,7 +22,7 @@ def current_value():
     logger.info("Current value button pressed.")
 
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
-    message = [i18n.t("no_db", path=db_file_path)]
+    message = [i18n.t("database_not_found", path=escape_tg(db_file_path))]
     if os.path.exists(db_file_path):
         try:
             con = sqlite3.connect(db_file_path)
@@ -178,7 +178,7 @@ def check_progress():
     logger.info("Progress button pressed.")
 
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
-    message = [i18n.t("no_db", path=db_file_path)]
+    message = [i18n.t("database_not_found", path=escape_tg(db_file_path))]
     if os.path.exists(db_file_path):
         try:
             con = sqlite3.connect(db_file_path)
@@ -248,7 +248,7 @@ def current_ratios():
 
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
-    message = [i18n.t("no_db", path=db_file_path)]
+    message = [i18n.t("database_not_found", path=escape_tg(db_file_path))]
     if os.path.exists(db_file_path):
         try:
             # Get bridge currency symbol
@@ -386,7 +386,7 @@ def trade_history():
     logger.info("Trade history button pressed.")
 
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
-    message = [i18n.t("no_db", path=db_file_path)]
+    message = [i18n.t("database_not_found", path=escape_tg(db_file_path))]
     if os.path.exists(db_file_path):
         try:
             con = sqlite3.connect(db_file_path)
@@ -507,7 +507,7 @@ def delete_db():
             message = i18n.t("sure_delete")
             delete = True
         else:
-            message = f"{i18n.t('no_db', path=escape_tg(db_file_path))}"
+            message = f"{i18n.t('database_not_found', path=escape_tg(db_file_path))}"
     print(message)
     return [message, delete]
 

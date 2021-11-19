@@ -1,4 +1,3 @@
-no_db: '⚠ Unable to find database file at "%{path}"\.'
 order_placed: 'A buy order of `%{order_size}` *%{bridge}* is currently placed on coin *%{current_coin}*\.'
 wait_for_order: '_Waiting for buy order to complete_\.'
 fetch_coin_from_db_error: '❌ Unable to fetch current coin from database\.'
