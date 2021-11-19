@@ -11,10 +11,10 @@ from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
     format_float,
     get_binance_trade_bot_process,
+    i18n_sane,
     is_btb_bot_update_available,
     is_tg_bot_update_available,
     telegram_text_truncator,
-    i18n_sane
 )
 
 
@@ -580,7 +580,9 @@ def update_tg_bot():
     to_update = is_tg_bot_update_available()
     if to_update is not None:
         if to_update:
-            message = f"{i18n_sane('tg_bot_update_availabe')}\n" f"{i18n_sane('update_now')}"
+            message = (
+                f"{i18n_sane('tg_bot_update_availabe')}\n" f"{i18n_sane('update_now')}"
+            )
             upd = True
     else:
         message = i18n_sane("tg_bot_update_error")
@@ -596,7 +598,9 @@ def update_btb():
     if to_update is not None:
         if to_update:
             upd = True
-            message = f"{i18n_sane('btb_update_availabe')}\n" f"{i18n_sane('update_now')}"
+            message = (
+                f"{i18n_sane('btb_update_availabe')}\n" f"{i18n_sane('update_now')}"
+            )
     else:
         message = i18n_sane("btb_update_error")
     return [message, upd]

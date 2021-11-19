@@ -8,9 +8,9 @@ import psutil
 import telegram
 import yaml
 from telegram import Bot
+from telegram.utils.helpers import escape_markdown
 
 import i18n
-from telegram.utils.helpers import escape_markdown
 from btb_manager_telegram import logger, scheduler, settings
 
 
@@ -23,20 +23,18 @@ def setup_i18n(lang):
 
 
 def i18n_sane(key, **kwargs):
-    escape_char=('.', '-','?','!')
-    mes_raw =  i18n.t(
-        key,
-        **{i:escape_markdown(kwargs[i], version=2) for i in kwargs}
-    )
+    escape_char = (".", "-", "?", "!")
+    mes_raw = i18n.t(key, **{i: escape_markdown(kwargs[i], version=2) for i in kwargs})
     mes = mes_raw[0]
-    is_escaped = mes_raw[0] == '\\'
+    is_escaped = mes_raw[0] == "\\"
     for cur_char in mes_raw[1:]:
         if cur_char in escape_char and not is_escaped:
-            mes += '\\'
+            mes += "\\"
         mes += cur_char
-        is_escaped = (cur_char == '\\' and not is_escaped)
+        is_escaped = cur_char == "\\" and not is_escaped
     print(mes)
     return mes
+
 
 def setup_root_path_constant():
     if settings.ROOT_PATH is None:

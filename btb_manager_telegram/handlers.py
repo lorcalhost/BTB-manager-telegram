@@ -38,9 +38,9 @@ from btb_manager_telegram.binance_api_utils import send_signed_request
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
     get_custom_scripts_keyboard,
+    i18n_sane,
     kill_btb_manager_telegram_process,
     telegram_text_truncator,
-    i18n_sane
 )
 
 
@@ -125,9 +125,15 @@ def menu(update: Update, _: CallbackContext) -> int:
         message, status = buttons.panic_btn()
         if status in [BOUGHT, BUYING, SOLD, SELLING]:
             if status == BOUGHT:
-                kb = [[i18n_sane("keyboard.stop_sell")], [i18n_sane("keyboard.go_back")]]
+                kb = [
+                    [i18n_sane("keyboard.stop_sell")],
+                    [i18n_sane("keyboard.go_back")],
+                ]
             elif status in [BUYING, SELLING]:
-                kb = [[i18n_sane("keyboard.stop_cancel")], [i18n_sane("keyboard.go_back")]]
+                kb = [
+                    [i18n_sane("keyboard.stop_cancel")],
+                    [i18n_sane("keyboard.go_back")],
+                ]
             elif status == SOLD:
                 kb = [[i18n_sane("keyboard.stop")], [i18n_sane("keyboard.go_back")]]
 
@@ -325,7 +331,7 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
     logger.info(f"Editing coin list. ({update.message.text})")
 
     if update.message.text != "/stop":
-        message = i18n_sane('edited_coin_list', file=update.message.text)
+        message = i18n_sane("edited_coin_list", file=update.message.text)
         coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
         try:
             shutil.copyfile(coin_file_path, f"{coin_file_path}.backup")
@@ -336,7 +342,8 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
             message = i18n_sane("coin_edit_error")
     else:
         message = (
-            f"{i18n_sane('exited_no_change')}\n" f"{i18n_sane('coin_list_not_modified')}"
+            f"{i18n_sane('exited_no_change')}\n"
+            f"{i18n_sane('coin_list_not_modified')}"
         )
 
     keyboard = [[i18n_sane("keyboard.go_back")]]
@@ -352,7 +359,7 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
     logger.info(f"Editing user configuration. ({update.message.text})")
 
     if update.message.text != i18n_sane("stop_cmd"):
-        message = i18n_sane('edited_user_config', file=update.message.text)
+        message = i18n_sane("edited_user_config", file=update.message.text)
         user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
         try:
             shutil.copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
@@ -365,7 +372,8 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
             message = i18n_sane("user_config_error")
     else:
         message = (
-            f"{i18n_sane('exited_no_change')}\n" f"{i18n_sane('user_config_not_modified')}"
+            f"{i18n_sane('exited_no_change')}\n"
+            f"{i18n_sane('user_config_not_modified')}"
         )
 
     keyboard = [[i18n_sane("keyboard.go_back")]]
@@ -457,7 +465,9 @@ def update_btb(update: Update, _: CallbackContext) -> int:
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
     if update.message.text != i18n_sane("keyboard.cancel_update"):
-        message = f"{i18n_sane('btb_updating')}\n" f"{i18n_sane('wait_then_start_manually')}"
+        message = (
+            f"{i18n_sane('btb_updating')}\n" f"{i18n_sane('wait_then_start_manually')}"
+        )
         update.message.reply_text(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
@@ -568,7 +578,7 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
                     f"Unable to find script named {update.message.text} in custom_scripts.json file: {e}",
                     exc_info=True,
                 )
-                message = i18n_sane('script_not_found', name=update.message.text)
+                message = i18n_sane("script_not_found", name=update.message.text)
                 update.message.reply_text(
                     message, reply_markup=reply_markup, parse_mode="MarkdownV2"
                 )
@@ -626,7 +636,9 @@ EDIT_COIN_LIST_HANDLER = MessageHandler(Filters.regex("(.*?)"), edit_coin)
 EDIT_USER_CONFIG_HANDLER = MessageHandler(Filters.regex("(.*?)"), edit_user_config)
 
 DELETE_DB_HANDLER = MessageHandler(
-    Filters.regex(f"^({i18n_sane('keyboard.confirm')}|{i18n_sane('keyboard.go_back')})$"),
+    Filters.regex(
+        f"^({i18n_sane('keyboard.confirm')}|{i18n_sane('keyboard.go_back')})$"
+    ),
     delete_db,
 )
 
