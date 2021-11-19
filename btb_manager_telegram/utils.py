@@ -228,7 +228,10 @@ def update_reminder(self, message):
 
 
 def format_float(num):
-    return f"{num:0.8f}".rstrip("0").rstrip(".")
+    return f"{num:0.8f}".rstrip("0").rstrip(".").replace(".", "\.").replace("-", "\-")
+
+def escape_tg(s):
+    return s.replace('.', '\.').replace('-', '\-').replace('_','\_')
 
 
 def get_custom_scripts_keyboard():

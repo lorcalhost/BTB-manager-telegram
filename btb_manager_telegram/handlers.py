@@ -40,6 +40,7 @@ from btb_manager_telegram.utils import (
     get_custom_scripts_keyboard,
     kill_btb_manager_telegram_process,
     telegram_text_truncator,
+    escape_tg
 )
 
 
@@ -327,8 +328,8 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
         message = (
             f"{i18n.t('keyboard.edited_coin_list')}\n\n"
             f"```\n"
-            f"{update.message.text}\n"
-            f"```".replace(".", "\.")
+            f"{escape_tg(update.message.text)}\n"
+            f"```"
         )
         coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
         try:
@@ -359,8 +360,8 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
         message = (
             f"{i18n.t('edited_user_config')}\n\n"
             f"```\n"
-            f"{update.message.text}\n"
-            f"```".replace(".", "\.")
+            f"{escape_tg(update.message.text)}\n"
+            f"```"
         )
         user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
         try:

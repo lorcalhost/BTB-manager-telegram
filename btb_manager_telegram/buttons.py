@@ -14,6 +14,7 @@ from btb_manager_telegram.utils import (
     is_btb_bot_update_available,
     is_tg_bot_update_available,
     telegram_text_truncator,
+    escape_tg
 )
 
 
@@ -45,7 +46,7 @@ def current_value():
                 if state == "ORDERED":
                     return [
                         f"{i18n.t('order_placed', order_size=format_float(order_size), bridge=bridge, current_coin=current_coin)}\n\n"
-                        f"{i18n.t('wait_for_order')}".replace(".", "\.")
+                        f"{i18n.t('wait_for_order')}"
                     ]
             except Exception as e:
                 logger.error(
@@ -222,9 +223,7 @@ def check_progress():
                         f"\t{i18n.t('amount', amount=format_float(coin[1]), coin=coin[0])}\n"
                         f"\t{i18n.t('price', amount=round(coin[2], 2))}\n"
                         f"\t{change}\n"
-                        f"\t{i18n.t('trade_datetime', date=last_trade_date)}\n\n".replace(
-                            ".", "\."
-                        )
+                        f"\t{i18n.t('trade_datetime', date=escape_tg(last_trade_date))}\n\n"
                     )
 
                 message = telegram_text_truncator(m_list)
@@ -290,17 +289,13 @@ def current_ratios():
 
                 m_list = [
                     f"\n{i18n.t('last_update', update=last_update.strftime('%H:%M:%S %d/%m/%Y'))}\n\n"
-                    f"{i18n.t('compared_ratios', coin=current_coin)}\n".replace(
-                        ".", "\."
-                    )
+                    f"{i18n.t('compared_ratios', coin=escape_tg(current_coin))}\n"
                 ]
                 for coin in query:
                     m_list.append(
                         f"*{coin[1]}*:\n"
                         f"\t{i18n.t('bridge_value', value=coin[2], bridge=bridge)}\n"
-                        f"\t{i18n.t('ratio', ratio=format_float(coin[3]))}\n\n".replace(
-                            ".", "\."
-                        )
+                        f"\t{i18n.t('ratio', ratio=escape_tg(format_float(coin[3])))}\n\n"
                     )
 
                 message = telegram_text_truncator(m_list)
@@ -355,9 +350,7 @@ def next_coin():
                     m_list.append(
                         f"*{coin[0]} \(`{format_float(percentage)}`%\)*\n"
                         f"\t{i18n.t('current_price', price=format_float(round(coin[1], 8)), coin=bridge)}\n"
-                        f"\t{i18n.t('target_price', price=format_float(round(coin[2], 8)), coin=bridge)}\n\n".replace(
-                            ".", "\."
-                        )
+                        f"\t{i18n.t('target_price', price=format_float(round(coin[2], 8)), coin=bridge)}\n\n"
                     )
 
                 message = telegram_text_truncator(m_list)
@@ -428,9 +421,7 @@ def trade_history():
                     m_list.append(
                         f"`{date.strftime('%H:%M:%S %d/%m/%Y')}`\n"
                         f"{trade_details}\n"
-                        f"{i18n.t('trade_status', status=trade[3])}\n\n".replace(
-                            ".", "\."
-                        )
+                        f"{i18n.t('trade_status', status=trade[3])}\n\n"
                     )
 
                 message = telegram_text_truncator(m_list)
@@ -492,10 +483,10 @@ def read_log():
     logger.info("Read log button pressed.")
 
     log_file_path = os.path.join(settings.ROOT_PATH, "logs/crypto_trading.log")
-    message = f"{i18n.t('log_file_error', path=log_file_path)}".replace(".", "\.")
+    message = f"{i18n.t('log_file_error', path=escape_tg(log_file_path))}"
     if os.path.exists(log_file_path):
         with open(log_file_path) as f:
-            file_content = f.read().replace(".", "\.")[-4000:]
+            file_content = escape_tg(f.read())[-4000:]
             message = (
                 f"{i18n.t('last_4000_characters')}\n\n"
                 f"```\n"
@@ -516,7 +507,8 @@ def delete_db():
             message = i18n.t("sure_delete")
             delete = True
         else:
-            message = f"{i18n.t('no_db', path=db_file_path)}".replace(".", "\.")
+            message = f"{i18n.t('no_db', path=escape_tg(db_file_path))}"
+    print(message)
     return [message, delete]
 
 
@@ -532,16 +524,14 @@ def edit_user_cfg():
                 message = (
                     f"{i18n.t('config_file_is')}\n\n"
                     f"```\n"
-                    f"{f.read()}\n"
+                    f"{escape_tg(f.read())}\n"
                     f"```\n\n"
                     f"{i18n.t('reply_config')}\n\n"
-                    f"{i18n.t('stop_to_stop')}".replace(".", "\.")
+                    f"{i18n.t('stop_to_stop')}"
                 )
                 edit = True
         else:
-            message = f"{i18n.t('config_file_error', path=user_cfg_file_path)}".replace(
-                ".", "\."
-            )
+            message = f"{i18n.t('config_file_error', path=escape_tg(user_cfg_file_path))}"
     return [message, edit]
 
 
@@ -556,15 +546,13 @@ def edit_coin():
             with open(coin_file_path) as f:
                 message = (
                     f"{i18n.t('coin_list_is')}\n\n"
-                    f"```\n{f.read()}\n```\n\n"
+                    f"```\n{escape_tg(f.read())}\n```\n\n"
                     f"{i18n.t('reply_coin_list')}\n\n"
-                    f"{i18n.t('stop_to_stop')}".replace(".", "\.")
+                    f"{i18n.t('stop_to_stop')}"
                 )
                 edit = True
         else:
-            message = f"{i18n.t('coin_list_error', path=coin_file_path)}".replace(
-                ".", "\."
-            )
+            message = f"{i18n.t('coin_list_error', path=escape_tg(coin_file_path))}"
     return [message, edit]
 
 
@@ -650,29 +638,29 @@ def panic_btn():
                 if state == "COMPLETE":
                     con.close()
                     return [
-                        f"{i18n.t('holding', amount1=round(alt_trade_amount, 6), coin1=alt_coin_id, amount2=round(crypto_trade_amount, 2), coin2=crypto_coin_id)}\n\n "
+                        f"{i18n.t('holding', amount1=format_float(round(alt_trade_amount, 6)), coin1=alt_coin_id, amount2=format_float(round(crypto_trade_amount, 2)), coin2=crypto_coin_id)}\n\n "
                         f"{i18n.t('rate_when_bought')}\n"
-                        f"`{round(price_old, 4)}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
+                        f"`{format_float(round(price_old, 4))}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
                         f"{i18n.t('current_rate')}\n"
-                        f"`{round(price_now, 4)}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
+                        f"`{format_float(round(price_now, 4))}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
                         f"{i18n.t('current_value')}\n"
-                        f"`{round(price_now * alt_trade_amount, 4)}` *{crypto_coin_id}*\n\n"
+                        f"`{format_float(round(price_now * alt_trade_amount, 4))}` *{crypto_coin_id}*\n\n"
                         f"{i18n.t('change')}\n"
-                        f"`{round((price_now - price_old) / price_old * 100, 2)}` *%*\n\n"
-                        f"{i18n.t('stop_and_sell')}".replace(".", "\."),
+                        f"`{format_float(round((price_now - price_old) / price_old * 100, 2))}` *%*\n\n"
+                        f"{i18n.t('stop_and_sell')}",
                         BOUGHT,
                     ]
                 else:
                     con.close()
                     return [
-                        f"{i18n.t('open_buy_order', amount1=alt_trade_amount, coin1=alt_coin_id, amount2=crypto_trade_amount, coin2=crypto_coin_id)}\n\n"
+                        f"{i18n.t('open_buy_order', amount1=format_float(alt_trade_amount), coin1=alt_coin_id, amount2=format_float(crypto_trade_amount), coin2=crypto_coin_id)}\n\n"
                         f"{i18n.t('limit_buy_price')}\n"
-                        f"`{round(price_old, 4)}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
+                        f"`{format_float(round(price_old, 4))}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
                         f"{i18n.t('current_rate')}\n"
-                        f"`{round(price_now, 4)}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
+                        f"`{format_float(round(price_now, 4))}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
                         f"{i18n.t('change')}\n"
-                        f"`{round((price_now - price_old) / price_old * 100, 2)}` *%*\n\n"
-                        f"{i18n.t('stop_and_cancel')}".replace(".", "\."),
+                        f"`{format_float(round((price_now - price_old) / price_old * 100, 2))}` *%*\n\n"
+                        f"{i18n.t('stop_and_cancel')}",
                         BUYING,
                     ]
             else:
@@ -688,14 +676,14 @@ def panic_btn():
                     price_now = get_current_price(alt_coin_id, crypto_coin_id)
                     con.close()
                     return [
-                        f"{i18n.t('open_sell_order', amount1=alt_trade_amount, coin1=alt_coin_id, amount2=crypto_trade_amount, coin2=crypto_coin_id)}\n\n"
+                        f"{i18n.t('open_sell_order', amount1=format_float(alt_trade_amount), coin1=alt_coin_id, amount2=format_float(crypto_trade_amount), coin2=crypto_coin_id)}\n\n"
                         f"{i18n.t('limit_sell_price')}\n"
-                        f"`{round(price_old, 4)}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
+                        f"`{format_float(round(price_old, 4))}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
                         f"{i18n.t('current_rate')}\n"
-                        f"`{round(price_now, 4)}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
+                        f"`{format_float(round(price_now, 4))}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
                         f"{i18n.t('change')}\n"
-                        f"`{round((price_now - price_old) / price_old * 100, 2)}` *%*\n\n"
-                        f"{i18n.t('stop_and_cancel')}".replace(".", "\."),
+                        f"`{format_float(round((price_now - price_old) / price_old * 100, 2))}` *%*\n\n"
+                        f"{i18n.t('stop_and_cancel')}",
                         SELLING,
                     ]
 
