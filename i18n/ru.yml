@@ -145,7 +145,7 @@ btb_not_updated: 'Binance Trade Bot *не* был обновлен\.'
 killed_bot: '_Binance Trade Bot_ убит\!'
 script_not_found: 'Невозможно найти пользовательский скрипт с именем %{name} в файле custom_scripts.json\.'
 script_error: 'Ошибка при выполнении скрипта\.'
-script_not_found_in_file_error: 'В файле *BTB\-manager\-telegram*' `/config/custom_scripts.json` не обнаружен пользовательский скрипт\.'
+script_not_found_in_file_error: 'В файле *BTB\-manager\-telegram* `/config/custom_scripts.json` не обнаружен пользовательский скрипт\.'
 script_not_found_in_folder_error: 'Невозможно найти `custom_scripts.json` файл внутри папки *BTB\-manager\-telegram*'' `config/`\.'
 bye: 'Пока\! Я надеюсь, что мы сможем снова поговорить когда-нибудь\.'
 start: "start"
