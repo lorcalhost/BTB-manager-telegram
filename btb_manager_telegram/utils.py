@@ -27,7 +27,7 @@ def format_float(num):
 
 
 def i18n_format(key, **kwargs):
-    for k,val in kwargs.items():
+    for k, val in kwargs.items():
         try:
             float(val)
             val = format_float(val)
@@ -48,10 +48,11 @@ def escape_tg(message):
         is_escaped = cur_char == "\\" and not is_escaped
     return escaped_message
 
+
 def reply_text_escape(reply_text_fun):
     def reply_text_escape_fun(message, **kwargs):
-        print(message)
         return reply_text_fun(escape_tg(message), **kwargs)
+
     return reply_text_escape_fun
 
 
@@ -259,6 +260,7 @@ def update_reminder(self, message):
         1,
         update_reminder,
     )
+
 
 def get_custom_scripts_keyboard():
     logger.info("Getting list of custom scripts.")

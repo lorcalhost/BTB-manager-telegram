@@ -475,7 +475,9 @@ def stop_bot():
         if not get_binance_trade_bot_process():
             message = i18n_format("stopped_bot")
         else:
-            message = f"{i18n_format('stop_error')}\n\n" f"{i18n_format('windows_hint')}"
+            message = (
+                f"{i18n_format('stop_error')}\n\n" f"{i18n_format('windows_hint')}"
+            )
     return message
 
 
@@ -581,7 +583,8 @@ def update_tg_bot():
     if to_update is not None:
         if to_update:
             message = (
-                f"{i18n_format('tg_bot_update_availabe')}\n" f"{i18n_format('update_now')}"
+                f"{i18n_format('tg_bot_update_availabe')}\n"
+                f"{i18n_format('update_now')}"
             )
             upd = True
     else:

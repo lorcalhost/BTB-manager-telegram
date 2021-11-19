@@ -40,8 +40,8 @@ from btb_manager_telegram.utils import (
     get_custom_scripts_keyboard,
     i18n_format,
     kill_btb_manager_telegram_process,
+    reply_text_escape,
     telegram_text_truncator,
-    reply_text_escape
 )
 
 
@@ -85,7 +85,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         maintenance_keyboard, resize_keyboard=True
     )
 
-    #modify reply_text function to have it escaping characters
+    # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     if update.message.text in [
@@ -258,7 +258,9 @@ def menu(update: Update, _: CallbackContext) -> int:
     elif update.message.text == i18n_format("keyboard.update_tgb"):
         message, status = buttons.update_tg_bot()
         if status:
-            kb = [[i18n_format("keyboard.update"), i18n_format("keyboard.cancel_update")]]
+            kb = [
+                [i18n_format("keyboard.update"), i18n_format("keyboard.cancel_update")]
+            ]
             reply_text_escape_fun(
                 message,
                 reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
@@ -275,7 +277,9 @@ def menu(update: Update, _: CallbackContext) -> int:
     elif update.message.text == i18n_format("keyboard.update_btb"):
         message, status = buttons.update_btb()
         if status:
-            kb = [[i18n_format("keyboard.update"), i18n_format("keyboard.cancel_update")]]
+            kb = [
+                [i18n_format("keyboard.update"), i18n_format("keyboard.cancel_update")]
+            ]
             reply_text_escape_fun(
                 message,
                 reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
@@ -311,7 +315,7 @@ def menu(update: Update, _: CallbackContext) -> int:
 def start(update: Update, _: CallbackContext) -> int:
     logger.info("Started conversation.")
 
-    #modify reply_text function to have it escaping characters
+    # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     keyboard = [[i18n_format("keyboard.begin")]]
@@ -337,7 +341,7 @@ def start(update: Update, _: CallbackContext) -> int:
 def edit_coin(update: Update, _: CallbackContext) -> int:
     logger.info(f"Editing coin list. ({update.message.text})")
 
-    #modify reply_text function to have it escaping characters
+    # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     if update.message.text != "/stop":
@@ -358,9 +362,7 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
 
     keyboard = [[i18n_format("keyboard.go_back")]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-    reply_text_escape_fun(
-        message, reply_markup=reply_markup, parse_mode="MarkdownV2"
-    )
+    reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
 
     return MENU
 
@@ -368,7 +370,7 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
 def edit_user_config(update: Update, _: CallbackContext) -> int:
     logger.info(f"Editing user configuration. ({update.message.text})")
 
-    #modify reply_text function to have it escaping characters
+    # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     if update.message.text != i18n_format("stop_cmd"):
@@ -391,9 +393,7 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
 
     keyboard = [[i18n_format("keyboard.go_back")]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-    reply_text_escape_fun(
-        message, reply_markup=reply_markup, parse_mode="MarkdownV2"
-    )
+    reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
 
     return MENU
 
@@ -403,7 +403,7 @@ def delete_db(update: Update, _: CallbackContext) -> int:
         f"Asking if the user really wants to delete the db. ({update.message.text})"
     )
 
-    #modify reply_text function to have it escaping characters
+    # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     if update.message.text != i18n_format("keyboard.go_back"):
@@ -428,13 +428,13 @@ def delete_db(update: Update, _: CallbackContext) -> int:
             message = i18n_format("clear_log_error")
 
     else:
-        message = f"{i18n_format('exited_no_change')}\n" f"{i18n_format('db_not_deleted')}"
+        message = (
+            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('db_not_deleted')}"
+        )
 
     keyboard = [[i18n_format("keyboard.ok")]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-    reply_text_escape_fun(
-        message, reply_markup=reply_markup, parse_mode="MarkdownV2"
-    )
+    reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
 
     return MENU
 
@@ -442,7 +442,7 @@ def delete_db(update: Update, _: CallbackContext) -> int:
 def update_tg_bot(update: Update, _: CallbackContext) -> int:
     logger.info(f"Updating BTB Manager Telegram. ({update.message.text})")
 
-    #modify reply_text function to have it escaping characters
+    # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     if update.message.text != i18n_format("keyboard.cancel_update"):
@@ -467,7 +467,9 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
     else:
-        message = f"{i18n_format('exited_no_change')}\n" f"{i18n_format('tgb_not_updated')}"
+        message = (
+            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('tgb_not_updated')}"
+        )
         keyboard = [[i18n_format("keyboard.ok_s")]]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         reply_text_escape_fun(
@@ -480,7 +482,7 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
 def update_btb(update: Update, _: CallbackContext) -> int:
     logger.info(f"Updating Binance Trade Bot. ({update.message.text})")
 
-    #modify reply_text function to have it escaping characters
+    # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     keyboard = [[i18n_format("keyboard.ok_s")]]
@@ -488,7 +490,8 @@ def update_btb(update: Update, _: CallbackContext) -> int:
 
     if update.message.text != i18n_format("keyboard.cancel_update"):
         message = (
-            f"{i18n_format('btb_updating')}\n" f"{i18n_format('wait_then_start_manually')}"
+            f"{i18n_format('btb_updating')}\n"
+            f"{i18n_format('wait_then_start_manually')}"
         )
         reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -509,7 +512,9 @@ def update_btb(update: Update, _: CallbackContext) -> int:
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
     else:
-        message = f"{i18n_format('exited_no_change')}\n" f"{i18n_format('btb_bot_updated')}"
+        message = (
+            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('btb_bot_updated')}"
+        )
         reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
@@ -520,7 +525,7 @@ def update_btb(update: Update, _: CallbackContext) -> int:
 def panic(update: Update, _: CallbackContext) -> int:
     logger.info(f"Panic Button is doing its job. ({update.message.text})")
 
-    #modify reply_text function to have it escaping characters
+    # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     keyboard = [[i18n_format("keyboard.great")]]
@@ -577,18 +582,18 @@ def panic(update: Update, _: CallbackContext) -> int:
         if update.message.text != i18n_format("keyboard.stop_bot"):
             message = i18n_format("killed_bot")
     else:
-        message = f"{i18n_format('exited_no_change')}\n" f"{i18n_format('btb_not_updated')}"
+        message = (
+            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('btb_not_updated')}"
+        )
 
-    reply_text_escape_fun(
-        message, reply_markup=reply_markup, parse_mode="MarkdownV2"
-    )
+    reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
     return MENU
 
 
 def execute_custom_script(update: Update, _: CallbackContext) -> int:
     logger.info(f"Going to 🤖 execute custom script. ({update.message.text})")
 
-    #modify reply_text function to have it escaping characters
+    # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     keyboard = [[i18n_format("keyboard.ok_s")]]
@@ -639,7 +644,7 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
 def cancel(update: Update, _: CallbackContext) -> int:
     logger.info("Conversation canceled.")
 
-    #modify reply_text function to have it escaping characters
+    # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     reply_text_escape_fun(
