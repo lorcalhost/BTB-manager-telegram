@@ -627,7 +627,7 @@ MENU_HANDLER = MessageHandler(
 )
 
 ENTRY_POINT_HANDLER = CommandHandler(
-    i18n.t("start"), start, Filters.chat(chat_id=eval(settings.CHAT_ID))
+    "start", start, Filters.chat(chat_id=eval(settings.CHAT_ID))
 )
 
 EDIT_COIN_LIST_HANDLER = MessageHandler(Filters.regex("(.*?)"), edit_coin)
@@ -662,4 +662,4 @@ PANIC_BUTTON_HANDLER = MessageHandler(
 
 CUSTOM_SCRIPT_HANDLER = MessageHandler(Filters.regex("(.*?)"), execute_custom_script)
 
-FALLBACK_HANDLER = CommandHandler(i18n.t("keyboard.fb_cancel"), cancel)
+FALLBACK_HANDLER = CommandHandler("cancel", cancel)

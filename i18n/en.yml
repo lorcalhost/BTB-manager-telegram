@@ -112,7 +112,6 @@ keyboard:
   ok: "OK"
   great: "Great 👌"
   cancel: "Cancel"
-  fb_cancel: "cancel"
   update: "Update"
   cancel_update: "Cancel update"
   confirm: "⚠ Confirm"
@@ -148,7 +147,6 @@ script_error: 'Error during script execution\.'
 script_not_found_in_file_error: 'No custom script was found inside *BTB\-manager\-telegram*''s `/config/custom_scripts.json` file\.'
 script_not_found_in_folder_error: 'Unable to find `custom_scripts.json` file inside *BTB\-manager\-telegram*''s `config/` directory\.'
 bye: 'Bye\! I hope we can talk again some day\.'
-start: "start"
 select_script: 'Select one of your custom scripts to execute it\.'
 python_lib_error: '❌ Unable to find python binary at `%{path}`\.'
 database_not_found: '⚠ Unable to find database file at `%{path}`\.'
