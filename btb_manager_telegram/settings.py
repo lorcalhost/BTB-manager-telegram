@@ -2,6 +2,7 @@ ROOT_PATH = None
 PYTHON_PATH = None
 TOKEN = None
 CHAT_ID = None
+LANG = None
 RAW_ARGS = ""
 
 TG_UPDATE_BROADCASTED_BEFORE = False
