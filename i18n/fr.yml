@@ -123,11 +123,11 @@ developed_by: 'Ce bot est développé collaborativement par lorcalhost, NovusEdg
 project_link: 'Retrouvez le projet [ici](https://github.com/lorcalhost/BTB-manager-telegram).'
 donation: '*Si vous appréciez mon travail, [supportez moi avec un petit don](https://github.com/sponsors/lorcalhost). ❤*'
 stop_cmd: "/stop"
-edited_coin_list: "✔ La liste de monnaies a été changé en : \n\n```\n%{file}\n```"
+edited_coin_list: "✔ La liste de monnaies a été changé en :"
 coin_edit_error: '❌ Impossible d''éditer la liste de monnaies.'
 exited_no_change: '👌 Sorti sans modifications.'
 coin_list_not_modified: 'La liste de monnaies *n''a pas* été modifiée.'
-edited_user_config: "✔ La configuration a été changé en : \n\n```\n%{file}\n```"
+edited_user_config: "✔ La configuration a été changé en :"
 user_config_error: '❌ Impossible d''éditer la configuration.'
 user_config_not_modified: 'La configuration *n''a pas* été modifiée.'
 deleted_db: '✔ La base de donnée a été supprimée.'

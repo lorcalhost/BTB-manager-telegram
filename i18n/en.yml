@@ -123,11 +123,11 @@ developed_by: 'This Telegram bot was developed by @lorcalhost.'
 project_link: 'Find out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram).'
 donation: '*If you like my work please [consider supporting the project through a small donation](https://github.com/sponsors/lorcalhost). ❤*'
 stop_cmd: "/stop"
-edited_coin_list: "✔ Successfully edited coin list file to: \n\n```\n%{file}\n```"
+edited_coin_list: "✔ Successfully edited coin list file to:"
 coin_edit_error: '❌ Unable to edit coin list file.'
 exited_no_change: '👌 Exited without changes.'
 coin_list_not_modified: 'Your `supported_coin_list` file was *not* modified.'
-edited_user_config: "✔ Successfully edited user configuration file to: \n\n```\n%{file}\n```"
+edited_user_config: "✔ Successfully edited user configuration file to:"
 user_config_error: '❌ Unable to edit user configuration file.'
 user_config_not_modified: 'Your `user.cfg` file was *not* modified.'
 deleted_db: '✔ Successfully deleted database file.'

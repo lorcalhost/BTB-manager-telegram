@@ -345,7 +345,12 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     if update.message.text != "/stop":
-        message = i18n_format("edited_coin_list", file=update.message.text)
+        message = (
+            f"{i18n_format('edited_coin_list')}\n\n"
+            f"```\n"
+            f"{update.message.text}\n"
+            f"```"
+        )
         coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
         try:
             shutil.copyfile(coin_file_path, f"{coin_file_path}.backup")
@@ -373,8 +378,13 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
     # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
-    if update.message.text != i18n_format("stop_cmd"):
-        message = i18n_format("edited_user_config", file=update.message.text)
+    if update.message.text != "/stop":
+        message = (
+            f"{i18n_format('edited_user_config')}\n\n"
+            f"```\n"
+            f"{update.message.text}\n"
+            f"```"
+        )
         user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
         try:
             shutil.copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
