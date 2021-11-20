@@ -8,6 +8,7 @@ import psutil
 import telegram
 import yaml
 from telegram import Bot
+from telegram.utils.helpers import escape_markdown
 
 import i18n
 from btb_manager_telegram import logger, scheduler, settings
@@ -19,6 +20,40 @@ def setup_i18n(lang):
     i18n.set("skip_locale_root_data", True)
     i18n.set("filename_format", "{locale}.{format}")
     i18n.load_path.append("./i18n")
+
+
+def format_float(num):
+    return f"{num:0.8f}".rstrip("0").rstrip(".")
+
+
+def i18n_format(key, **kwargs):
+    for k, val in kwargs.items():
+        try:
+            float(val)
+            val = format_float(val)
+        except:
+            pass
+        kwargs[k] = escape_markdown(str(val), version=2)
+    return i18n.t(key, **kwargs)
+
+
+def escape_tg(message):
+    escape_char = (".", "-", "?", "!")
+    escaped_message = ""
+    is_escaped = False
+    for cur_char in message:
+        if cur_char in escape_char and not is_escaped:
+            escaped_message += "\\"
+        escaped_message += cur_char
+        is_escaped = cur_char == "\\" and not is_escaped
+    return escaped_message
+
+
+def reply_text_escape(reply_text_fun):
+    def reply_text_escape_fun(message, **kwargs):
+        return reply_text_fun(escape_tg(message), **kwargs)
+
+    return reply_text_escape_fun
 
 
 def setup_root_path_constant():
@@ -166,8 +201,8 @@ def update_checker():
             logger.info("BTB Manager Telegram update found.")
 
             message = (
-                f"{i18n.t('tg_bot_update_availabe')}\n\n"
-                f"{i18n.t('tg_bot_update_instruction')}"
+                f"{i18n_sane('tg_bot_update_availabe')}\n\n"
+                f"{i18n_sane('tg_bot_update_instruction')}"
             )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
@@ -187,8 +222,8 @@ def update_checker():
             logger.info("Binance Trade Bot update found.")
 
             message = (
-                f"{i18n.t('btb_update_availabe')}\n\n"
-                f"{i18n.t('btb_bot_update_instruction')}"
+                f"{i18n_sane('btb_update_availabe')}\n\n"
+                f"{i18n_sane('btb_bot_update_instruction')}"
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
@@ -227,20 +262,13 @@ def update_reminder(self, message):
     )
 
 
-def format_float(num):
-    return f"{num:0.8f}".rstrip("0").rstrip(".").replace(".", "\.").replace("-", "\-")
-
-def escape_tg(s):
-    return s.replace('.', '\.').replace('-', '\-').replace('_','\_')
-
-
 def get_custom_scripts_keyboard():
     logger.info("Getting list of custom scripts.")
 
     custom_scripts_path = "./config/custom_scripts.json"
     keyboard = []
     custom_script_exist = False
-    message = i18n.t("script_not_found_in_file_error")
+    message = i18n_sane("script_not_found_in_file_error")
 
     if os.path.exists(custom_scripts_path):
         with open(custom_scripts_path) as f:
@@ -250,12 +278,12 @@ def get_custom_scripts_keyboard():
 
         if len(keyboard) >= 1:
             custom_script_exist = True
-            message = i18n.t("select_script")
+            message = i18n_sane("select_script")
     else:
         logger.warning(
             "Unable to find custom_scripts.json file inside BTB-manager-telegram's config/ directory."
         )
-        message = i18n.t("script_not_found_in_folder_error")
+        message = i18n_sane("script_not_found_in_folder_error")
 
-    keyboard.append([i18n.t("cancel")])
+    keyboard.append([i18n_sane("cancel")])
     return keyboard, custom_script_exist, message
