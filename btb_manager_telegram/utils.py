@@ -38,7 +38,7 @@ def i18n_format(key, **kwargs):
 
 
 def escape_tg(message):
-    escape_char = (".", "-", "?", "!")
+    escape_char = (".", "-", "?", "!", ">")
     escaped_message = ""
     is_escaped = False
     for cur_char in message:
@@ -206,7 +206,7 @@ def update_checker():
             )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
-            bot.send_message(settings.CHAT_ID, message, parse_mode="MarkdownV2")
+            bot.send_message(settings.CHAT_ID, escape_tg(message), parse_mode="MarkdownV2")
             sleep(1)
             bot.close()
             sleep(1)
@@ -227,7 +227,7 @@ def update_checker():
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
-            bot.send_message(settings.CHAT_ID, message, parse_mode="MarkdownV2")
+            bot.send_message(settings.CHAT_ID, escape_tg(message), parse_mode="MarkdownV2")
             sleep(1)
             bot.close()
             sleep(1)
@@ -254,7 +254,7 @@ def update_reminder(self, message):
     logger.info(f"Reminding user: {message}")
 
     bot = Bot(settings.TOKEN)
-    bot.send_message(settings.CHAT_ID, message, parse_mode="MarkdownV2")
+    bot.send_message(settings.CHAT_ID, escape_tg(message), parse_mode="MarkdownV2")
     scheduler.enter(
         60 * 60 * 12,
         1,
