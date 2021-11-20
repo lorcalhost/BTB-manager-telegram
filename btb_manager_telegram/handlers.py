@@ -395,6 +395,10 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
                 f"❌ Unable to edit user configuration file: {e}", exc_info=True
             )
             message = i18n_format("user_config_error")
+        try:
+            shutil.copymode(user_cfg_file_path, f"{user_cfg_file_path}.backup")
+        except:
+            pass
     else:
         message = (
             f"{i18n_format('exited_no_change')}\n"
