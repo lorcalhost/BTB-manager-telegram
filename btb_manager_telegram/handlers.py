@@ -457,7 +457,7 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
 
     if update.message.text != i18n_format("keyboard.cancel_update"):
         message = f"{i18n_format('tgb_updating')}\n" f"{i18n_format('wait_then_start')}"
-        keyboard = [[i18n_format("start_cmd")]]
+        keyboard = [["/start"]]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"

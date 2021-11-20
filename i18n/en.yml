@@ -94,7 +94,6 @@ keyboard:
   maintenance: "🛠 Maintenance"
   configurations: "⚙️ Configurations"
   start: "▶ Start trade bot"
-  start_cmd: "/start"
   stop: "⏹ Stop trade bot"
   read_logs: "📜 Read last log lines"
   delete_db: "❌ Delete database"
@@ -122,7 +121,6 @@ welcome: 'Welcome to _Binace Trade Bot Manager Telegram_.'
 developed_by: 'This Telegram bot was developed by @lorcalhost.'
 project_link: 'Find out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram).'
 donation: '*If you like my work please [consider supporting the project through a small donation](https://github.com/sponsors/lorcalhost). ❤*'
-stop_cmd: "/stop"
 edited_coin_list: "✔ Successfully edited coin list file to:"
 coin_edit_error: '❌ Unable to edit coin list file.'
 exited_no_change: '👌 Exited without changes.'
