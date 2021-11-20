@@ -201,8 +201,8 @@ def update_checker():
             logger.info("BTB Manager Telegram update found.")
 
             message = (
-                f"{i18n_sane('tg_bot_update_availabe')}\n\n"
-                f"{i18n_sane('tg_bot_update_instruction')}"
+                f"{i18n_format('tg_bot_update_availabe')}\n\n"
+                f"{i18n_format('tg_bot_update_instruction')}"
             )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
@@ -222,8 +222,8 @@ def update_checker():
             logger.info("Binance Trade Bot update found.")
 
             message = (
-                f"{i18n_sane('btb_update_availabe')}\n\n"
-                f"{i18n_sane('btb_bot_update_instruction')}"
+                f"{i18n_format('btb_update_availabe')}\n\n"
+                f"{i18n_format('btb_bot_update_instruction')}"
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             bot = Bot(settings.TOKEN)
@@ -268,7 +268,7 @@ def get_custom_scripts_keyboard():
     custom_scripts_path = "./config/custom_scripts.json"
     keyboard = []
     custom_script_exist = False
-    message = i18n_sane("script_not_found_in_file_error")
+    message = i18n_format("script_not_found_in_file_error")
 
     if os.path.exists(custom_scripts_path):
         with open(custom_scripts_path) as f:
@@ -278,12 +278,12 @@ def get_custom_scripts_keyboard():
 
         if len(keyboard) >= 1:
             custom_script_exist = True
-            message = i18n_sane("select_script")
+            message = i18n_format("select_script")
     else:
         logger.warning(
             "Unable to find custom_scripts.json file inside BTB-manager-telegram's config/ directory."
         )
-        message = i18n_sane("script_not_found_in_folder_error")
+        message = i18n_format("script_not_found_in_folder_error")
 
-    keyboard.append([i18n_sane("cancel")])
+    keyboard.append([i18n_format("cancel")])
     return keyboard, custom_script_exist, message
