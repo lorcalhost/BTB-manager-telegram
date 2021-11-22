@@ -5,6 +5,7 @@ from subprocess import PIPE, run
 
 import colorama
 from telegram.ext import ConversationHandler, Updater
+from telegram import Bot, ReplyKeyboardMarkup
 
 from btb_manager_telegram import (
     CUSTOM_SCRIPT,
@@ -18,11 +19,14 @@ from btb_manager_telegram import (
     scheduler,
     settings,
 )
+
 from btb_manager_telegram.utils import (
     setup_i18n,
     setup_root_path_constant,
     setup_telegram_constants,
     update_checker,
+    escape_tg,
+    i18n_format
 )
 
 
@@ -96,6 +100,7 @@ def pre_run_main() -> None:
 def main() -> None:
     from btb_manager_telegram import handlers
 
+
     """Start the bot."""
     # Create the Updater and pass it your token
     updater = Updater(settings.TOKEN)
@@ -122,8 +127,28 @@ def main() -> None:
     )
     dispatcher.add_handler(conv_handler)
 
+
     # Start the Bot
     updater.start_polling()
+
+    # Welcome mat
+    chat = Bot(settings.TOKEN).getChat(settings.CHAT_ID)
+    message = (
+        f"{i18n_format('hello', name=chat.first_name)}\n"
+        f"{i18n_format('welcome')}\n\n"
+        f"{i18n_format('developed_by')}\n"
+        f"{i18n_format('project_link')}\n\n"
+        f"{i18n_format('donation')}\n\n"
+        f"{i18n_format('how_to_start')}"
+    )
+    keyboard = [["/start"]]
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    chat.send_message(
+        escape_tg(message),
+        reply_markup=reply_markup,
+        parse_mode="MarkdownV2",
+        disable_web_page_preview=True
+    )
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since

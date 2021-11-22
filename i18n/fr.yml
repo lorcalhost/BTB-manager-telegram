@@ -84,7 +84,6 @@ open_sell_order: 'Vous avez un ordre de vente en cours de `%{amount1}` *%{coin1}
 limit_sell_price: "Ordre limite au prix de :"
 panic_btn_error: '❌ Quelque chose s'' est mal passé, le panic button ne fonctionne pas.'
 keyboard:
-  begin: "Commencer"
   current_value: "💵 Valeur actuelle"
   progress: "📈 Progression"
   current_ratios: "➗ Ratios actuels"

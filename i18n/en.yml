@@ -84,7 +84,6 @@ open_sell_order: 'You have an open sell order of `%{amount1}` *%{coin1}* for `%{
 limit_sell_price: "Limit sell at price:"
 panic_btn_error: '❌ Something went wrong, the panic button is not working at this time.'
 keyboard:
-  begin: "Begin"
   current_value: "💵 Current value"
   progress: "📈 Progress"
   current_ratios: "➗ Current ratios"
@@ -116,11 +115,13 @@ keyboard:
   confirm: "⚠ Confirm"
   stop_bot: "⚠ Stop the bot"
   next_coin: "🔀 Next coin"
+conversation_started: 'Conversation started!'
 select_option: 'Please select one of the options.'
 welcome: 'Welcome to _Binace Trade Bot Manager Telegram_.'
 developed_by: 'This Telegram bot was developed by @lorcalhost.'
 project_link: 'Find out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram).'
 donation: '*If you like my work please [consider supporting the project through a small donation](https://github.com/sponsors/lorcalhost). ❤*'
+how_to_start: '*To start the conversation, click on the button `/start`*'
 edited_coin_list: "✔ Successfully edited coin list file to:"
 coin_edit_error: '❌ Unable to edit coin list file.'
 exited_no_change: '👌 Exited without changes.'

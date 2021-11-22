@@ -89,11 +89,15 @@ def menu(update: Update, _: CallbackContext) -> int:
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     if update.message.text in [
-        i18n_format("keyboard.begin"),
+        "/start",
         i18n_format("keyboard.back"),
         i18n_format("keyboard.great"),
     ]:
-        message = i18n_format("select_option")
+        message = ""
+        if update.message.text == "/start":
+            logger.info("Started conversation.")
+            message += f"{i18n_format('conversation_started')}\n"
+        message += i18n_format("select_option")
         reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
@@ -309,32 +313,6 @@ def menu(update: Update, _: CallbackContext) -> int:
                 parse_mode="MarkdownV2",
             )
 
-    return MENU
-
-
-def start(update: Update, _: CallbackContext) -> int:
-    logger.info("Started conversation.")
-
-    # modify reply_text function to have it escaping characters
-    reply_text_escape_fun = reply_text_escape(update.message.reply_text)
-
-    keyboard = [[i18n_format("keyboard.begin")]]
-    message = (
-        f"{i18n_format('hello', name=update.message.from_user.first_name)}\n"
-        f"{i18n_format('welcome')}\n\n"
-        f"{i18n_format('developed_by')}\n"
-        f"{i18n_format('project_link')}\n\n"
-        f"{i18n_format('donation')}"
-    )
-    reply_markup = ReplyKeyboardMarkup(
-        keyboard, one_time_keyboard=True, resize_keyboard=True
-    )
-    reply_text_escape_fun(
-        message,
-        reply_markup=reply_markup,
-        parse_mode="MarkdownV2",
-        disable_web_page_preview=True,
-    )
     return MENU
 
 
@@ -669,7 +647,7 @@ def cancel(update: Update, _: CallbackContext) -> int:
 
 MENU_HANDLER = MessageHandler(
     Filters.regex(
-        f"^({i18n_format('keyboard.begin')}|{i18n_format('keyboard.current_value')}|{i18n_format('keyboard.panic')}|{i18n_format('keyboard.progress')}|{i18n_format('keyboard.current_ratios')}|{i18n_format('keyboard.next_coin')}|{i18n_format('keyboard.check_status')}|{i18n_format('keyboard.trade_history')}|{i18n_format('keyboard.maintenance')}|"
+        f"^({i18n_format('keyboard.current_value')}|{i18n_format('keyboard.panic')}|{i18n_format('keyboard.progress')}|{i18n_format('keyboard.current_ratios')}|{i18n_format('keyboard.next_coin')}|{i18n_format('keyboard.check_status')}|{i18n_format('keyboard.trade_history')}|{i18n_format('keyboard.maintenance')}|"
         f"{i18n_format('keyboard.configurations')}|{i18n_format('keyboard.start')}|{i18n_format('keyboard.stop')}|{i18n_format('keyboard.read_logs')}|{i18n_format('keyboard.delete_db')}|"
         f"{i18n_format('keyboard.edit_cfg')}|{i18n_format('keyboard.edit_coin_list')}|{i18n_format('keyboard.export_db')}|{i18n_format('keyboard.update_tgb')}|{i18n_format('keyboard.update_btb')}|"
         f"{i18n_format('keyboard.execute_script')}|{i18n_format('keyboard.back')}|{i18n_format('keyboard.go_back')}|{i18n_format('keyboard.ok')}|{i18n_format('keyboard.cancel_update')}|{i18n_format('keyboard.cancel')}|{i18n_format('keyboard.ok_s')}|{i18n_format('keyboard.great')})$"
@@ -678,7 +656,7 @@ MENU_HANDLER = MessageHandler(
 )
 
 ENTRY_POINT_HANDLER = CommandHandler(
-    "start", start, Filters.chat(chat_id=eval(settings.CHAT_ID))
+    "start", menu, Filters.chat(chat_id=eval(settings.CHAT_ID))
 )
 
 EDIT_COIN_LIST_HANDLER = MessageHandler(Filters.regex("(.*?)"), edit_coin)
