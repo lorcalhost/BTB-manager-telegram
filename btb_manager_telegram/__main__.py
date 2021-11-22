@@ -4,8 +4,8 @@ import time
 from subprocess import PIPE, run
 
 import colorama
-from telegram.ext import ConversationHandler, Updater
 from telegram import Bot, ReplyKeyboardMarkup
+from telegram.ext import ConversationHandler, Updater
 
 from btb_manager_telegram import (
     CUSTOM_SCRIPT,
@@ -19,14 +19,13 @@ from btb_manager_telegram import (
     scheduler,
     settings,
 )
-
 from btb_manager_telegram.utils import (
+    escape_tg,
+    i18n_format,
     setup_i18n,
     setup_root_path_constant,
     setup_telegram_constants,
     update_checker,
-    escape_tg,
-    i18n_format
 )
 
 
@@ -100,7 +99,6 @@ def pre_run_main() -> None:
 def main() -> None:
     from btb_manager_telegram import handlers
 
-
     """Start the bot."""
     # Create the Updater and pass it your token
     updater = Updater(settings.TOKEN)
@@ -127,7 +125,6 @@ def main() -> None:
     )
     dispatcher.add_handler(conv_handler)
 
-
     # Start the Bot
     updater.start_polling()
 
@@ -147,7 +144,7 @@ def main() -> None:
         escape_tg(message),
         reply_markup=reply_markup,
         parse_mode="MarkdownV2",
-        disable_web_page_preview=True
+        disable_web_page_preview=True,
     )
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
