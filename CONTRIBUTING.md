@@ -4,7 +4,7 @@ Contributions are always welcome, no matter how large or small!
 
 # Formatting
 
-Your code should be formatted using `Black` and `isort`.
+Your code should be formatted using `black` and `isort`.
 
 To automatically format your code you can use `pre-commit`.
 
