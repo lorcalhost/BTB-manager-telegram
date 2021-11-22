@@ -27,6 +27,9 @@ from btb_manager_telegram.utils import (
     setup_telegram_constants,
     update_checker,
 )
+from btb_manager_telegram.buttons import (
+    start_bot
+)
 
 
 def pre_run_main() -> None:
@@ -55,8 +58,14 @@ def pre_run_main() -> None:
         "-l",
         "--language",
         type=str,
-        help="(optional) Select a language. Available: 'en'",
+        help="(optional) Select a language. Available: en, ru, fr",
         default="en",
+    )
+    parser.add_argument(
+        "-s",
+        "--start_trade_bot",
+        action="store_true",
+        help="Add this flag to start the trade bot when the telegram bot starts."
     )
     parser.add_argument(
         "-c", "--chat_id", type=str, help="(optional) Telegram chat id", default=None
@@ -80,6 +89,7 @@ def pre_run_main() -> None:
     settings.TOKEN = args.token
     settings.CHAT_ID = args.chat_id
     settings.LANG = args.language
+    settings.START_TRADE_BOT = args.start_trade_bot
     settings.RAW_ARGS = " ".join(sys.argv[1:])
 
     setup_i18n(settings.LANG)
@@ -100,6 +110,25 @@ def main() -> None:
     from btb_manager_telegram import handlers
 
     """Start the bot."""
+
+    # Start trade bot
+    message_trade_bot=""
+    if settings.START_TRADE_BOT:
+        trade_bot_status = start_bot()
+
+        if trade_bot_status in (0,1):
+            message_trade_bot += i18n_format("welcome.bot_started")
+        else:
+            message_trade_bot += i18n_format("welcome.bot_not_started.base") + " "
+            if trade_bot_status == 2:
+                message_trade_bot += i18n_format("welcome.bot_not_started.bot_error")
+            if trade_bot_status == 3:
+                message_trade_bot += i18n_format("welcome.bot_not_started.bad_path")
+            if trade_bot_status == 4:
+                message_trade_bot += i18n_format("welcome.bot_not_started.no_python")
+        message_trade_bot+= "\n\n"
+
+
     # Create the Updater and pass it your token
     updater = Updater(settings.TOKEN)
 
@@ -131,12 +160,13 @@ def main() -> None:
     # Welcome mat
     chat = Bot(settings.TOKEN).getChat(settings.CHAT_ID)
     message = (
-        f"{i18n_format('hello', name=chat.first_name)}\n"
-        f"{i18n_format('welcome')}\n\n"
-        f"{i18n_format('developed_by')}\n"
-        f"{i18n_format('project_link')}\n\n"
-        f"{i18n_format('donation')}\n\n"
-        f"{i18n_format('how_to_start')}"
+        f"{i18n_format('welcome.hello', name=chat.first_name)}\n"
+        f"{i18n_format('welcome.welcome')}\n\n"
+        f"{i18n_format('welcome.developed_by')}\n"
+        f"{i18n_format('welcome.project_link')}\n\n"
+        f"{i18n_format('welcome.donation')}\n\n"
+        f"{message_trade_bot}"
+        f"{i18n_format('welcome.how_to_start')}"
     )
     keyboard = [["/start"]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
