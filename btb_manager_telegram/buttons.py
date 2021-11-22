@@ -68,18 +68,18 @@ def current_value():
                 cur.execute(
                     """SELECT cv.balance, cv.usd_price
                         FROM coin_value as cv
-                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
-                        AND cv.datetime > (SELECT th.datetime FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
-                        ORDER BY cv.datetime ASC LIMIT 1;"""
+                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
+                        AND cv.datetime < (SELECT th.datetime FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
+                        ORDER BY cv.datetime DESC LIMIT 1;"""
                 )
                 query_1_day = cur.fetchone()
 
                 cur.execute(
                     """SELECT cv.balance, cv.usd_price
                         FROM coin_value as cv
-                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
-                        AND cv.datetime > (SELECT th.datetime FROM trade_history as th WHERE th.datetime > DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime ASC LIMIT 1)
-                        ORDER BY cv.datetime ASC LIMIT 1;"""
+                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
+                        AND cv.datetime < (SELECT th.datetime FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
+                        ORDER BY cv.datetime DESC LIMIT 1;"""
                 )
                 query_7_day = cur.fetchone()
 
@@ -257,6 +257,19 @@ def current_ratios():
                 config.read_file(cfg)
                 bridge = config.get("binance_user_config", "bridge")
                 scout_multiplier = config.get("binance_user_config", "scout_multiplier")
+                try:  # scout_margin Edgen
+                    scout_margin = (
+                        float(config.get("binance_user_config", "scout_margin")) / 100.0
+                    )
+                    use_margin = config.get("binance_user_config", "use_margin")
+                except Exception as e:
+                    use_margin = "no"
+                try:  # scout_margin TnTwist
+                    ratio_calc = config.get("binance_user_config", "ratio_calc")
+                except Exception as e:
+                    ratio_calc = "default"
+                if ratio_calc == "scout_margin":
+                    scout_multiplier = float(scout_multiplier) / 100.0
 
             con = sqlite3.connect(db_file_path)
             cur = con.cursor()
@@ -278,9 +291,21 @@ def current_ratios():
 
             # Get prices and ratios of all alt coins
             try:
-                cur.execute(
-                    f"""SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ( ( ( current_coin_price / other_coin_price ) - 0.001 * '{scout_multiplier}' * ( current_coin_price / other_coin_price ) ) - sh.target_ratio ) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs JOIN coins ON coins.symbol = pairs.to_coin_id WHERE coins.enabled = 1 AND pairs.from_coin_id='{current_coin}');"""
-                )
+                if use_margin == "yes":  # scout_margin Edgen
+                    logger.info(f"Margin ratio Edgen")
+                    cur.execute(
+                        f"""SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ((1+0.001*0.001-0.002) * current_coin_price/other_coin_price / sh.target_ratio - 1 - {scout_margin}) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs JOIN coins ON coins.symbol = pairs.to_coin_id WHERE coins.enabled = 1 AND pairs.from_coin_id='{current_coin}');"""
+                    )
+                elif ratio_calc == "scout_margin":  # scout_margin TnTwist
+                    logger.info(f"Margin ratio TnTwist")
+                    cur.execute(
+                        f"""SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ((1+0.001*0.001-0.002) * current_coin_price/other_coin_price / sh.target_ratio - 1 - {scout_multiplier}) AS 'ratio2_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs JOIN coins ON coins.symbol = pairs.to_coin_id WHERE coins.enabled = 1 AND pairs.from_coin_id='{current_coin}');"""
+                    )
+                else:  # defaultst
+                    logger.info(f"Margin ratio default")
+                    cur.execute(
+                        f"""SELECT sh.datetime, p.to_coin_id, sh.other_coin_price, ( ( ( current_coin_price / other_coin_price ) - 0.001 * '{scout_multiplier}' * ( current_coin_price / other_coin_price ) ) - sh.target_ratio ) AS 'ratio_dict' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id='{current_coin}' AND p.from_coin_id = ( SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC LIMIT ( SELECT count(DISTINCT pairs.to_coin_id) FROM pairs JOIN coins ON coins.symbol = pairs.to_coin_id WHERE coins.enabled = 1 AND pairs.from_coin_id='{current_coin}');"""
+                    )
                 query = cur.fetchall()
 
                 # Generate message
@@ -332,17 +357,41 @@ def next_coin():
                 config.read_file(cfg)
                 bridge = config.get("binance_user_config", "bridge")
                 scout_multiplier = config.get("binance_user_config", "scout_multiplier")
+                try:  # scout_margin Edgen
+                    scout_margin = (
+                        float(config.get("binance_user_config", "scout_margin")) / 100.0
+                    )
+                    use_margin = config.get("binance_user_config", "use_margin")
+                except Exception as e:
+                    use_margin = "no"
+                try:  # scout_margin TnTwist
+                    ratio_calc = config.get("binance_user_config", "ratio_calc")
+                except Exception as e:
+                    ratio_calc = "default"
+                if ratio_calc == "scout_margin":
+                    scout_multiplier = float(scout_multiplier) / 100.0
 
             con = sqlite3.connect(db_file_path)
             cur = con.cursor()
 
             # Get prices and percentages for a jump to the next coin
             try:
-                cur.execute(
-                    f"""SELECT p.to_coin_id as other_coin, sh.other_coin_price, (current_coin_price - 0.001 * '{scout_multiplier}' * current_coin_price) / sh.target_ratio AS 'price_needs_to_drop_to', ((current_coin_price - 0.001 * '{scout_multiplier}' * current_coin_price) / sh.target_ratio) / sh.other_coin_price as 'percentage' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id = (SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC, percentage DESC LIMIT (SELECT count(DISTINCT pairs.to_coin_id) FROM pairs JOIN coins ON coins.symbol = pairs.to_coin_id WHERE coins.enabled = 1 AND pairs.from_coin_id=(SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1));"""
-                )
+                if use_margin == "yes":  # scout_margin Edgen
+                    logger.info(f"Margin ratio Edgen")
+                    cur.execute(
+                        f"""SELECT p.to_coin_id as other_coin, sh.other_coin_price, (1-0.001*0.001-0.002) * current_coin_price / (sh.target_ratio *(1+{scout_margin})) AS 'price_needs_to_drop_to', (1-0.001*0.001-0.002) * current_coin_price / (sh.target_ratio *(1+{scout_margin})) / sh.other_coin_price as 'percentage'  FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id = (SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC, percentage DESC LIMIT (SELECT count(DISTINCT pairs.to_coin_id) FROM pairs JOIN coins ON coins.symbol = pairs.to_coin_id WHERE coins.enabled = 1 AND pairs.from_coin_id=(SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1));"""
+                    )
+                elif ratio_calc == "scout_margin":  # scout_margin TnTwist
+                    logger.info(f"Margin ratio TnTwist")
+                    cur.execute(
+                        f"""SELECT p.to_coin_id as other_coin, sh.other_coin_price, (1-0.001*0.001-0.002) * current_coin_price / (sh.target_ratio *(1+{scout_multiplier})) AS 'price_needs_to_drop_to', (1-0.001*0.001-0.002) * current_coin_price / (sh.target_ratio *(1+{scout_multiplier})) / sh.other_coin_price as 'percentage'  FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id = (SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC, percentage DESC LIMIT (SELECT count(DISTINCT pairs.to_coin_id) FROM pairs JOIN coins ON coins.symbol = pairs.to_coin_id WHERE coins.enabled = 1 AND pairs.from_coin_id=(SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1));"""
+                    )
+                else:  # default
+                    logger.info(f"Margin ratio default")
+                    cur.execute(
+                        f"""SELECT p.to_coin_id as other_coin, sh.other_coin_price, (current_coin_price - 0.001 * '{scout_multiplier}' * current_coin_price) / sh.target_ratio AS 'price_needs_to_drop_to', ((current_coin_price - 0.001 * '{scout_multiplier}' * current_coin_price) / sh.target_ratio) / sh.other_coin_price as 'percentage' FROM scout_history sh JOIN pairs p ON p.id = sh.pair_id WHERE p.from_coin_id = (SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1) ORDER BY sh.datetime DESC, percentage DESC LIMIT (SELECT count(DISTINCT pairs.to_coin_id) FROM pairs JOIN coins ON coins.symbol = pairs.to_coin_id WHERE coins.enabled = 1 AND pairs.from_coin_id=(SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1));"""
+                    )
                 query = cur.fetchall()
-
                 m_list = []
                 query = sorted(query, key=lambda x: x[3], reverse=True)
                 for coin in query:
