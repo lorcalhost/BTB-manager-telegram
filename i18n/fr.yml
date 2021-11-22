@@ -115,11 +115,13 @@ keyboard:
   confirm: "⚠ Confirmer"
   stop_bot: "⚠ Arrêter le bot"
   next_coin: "🔀 Prochaine monnaie"
+conversation_started: "Conversation démarrée!"
 select_option: 'Sélectionnez une option'
 welcome: 'Bienvenue sur le manager télégram du _Binance Trade Bot_.'
 developed_by: 'Ce bot est développé collaborativement par lorcalhost, NovusEdge, titulebolide, Lisiadito, DmytroLitvinov, sydekumf, bloodf, idkravitz, neuhausj, MasaiasuOse, tntwist, kydrenw, pwnfoo, santiagocarod, stgo-eo and shhhmel.'
 project_link: 'Retrouvez le projet [ici](https://github.com/lorcalhost/BTB-manager-telegram).'
 donation: '*Si vous appréciez mon travail, [supportez moi avec un petit don](https://github.com/sponsors/lorcalhost). ❤*'
+how_to_start: '*Pour démarrer la discussion, appuyez sur le bouton `/start`*'
 edited_coin_list: "✔ La liste de monnaies a été changé en :"
 coin_edit_error: '❌ Impossible d''éditer la liste de monnaies.'
 exited_no_change: '👌 Sorti sans modifications.'
