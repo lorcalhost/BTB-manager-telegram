@@ -208,7 +208,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             i18n_format("bot_started"),
             i18n_format("bot_start_error"),
             f"{i18n_format('installation_path_error', path=settings.ROOT_PATH)}\n{i18n_format('directory_hint')}",
-            f"{i18n_format('python_lib_error', path=settings.PYTHON_PATH)}\n"
+            f"{i18n_format('python_lib_error', path=settings.PYTHON_PATH)}\n",
         ][status]
         reply_text_escape_fun(
             message,
@@ -459,7 +459,7 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     if update.message.text != i18n_format("keyboard.cancel_update"):
-        message = i18n_format('tgb_updating')
+        message = i18n_format("tgb_updating")
         keyboard = [["/start"]]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         reply_text_escape_fun(

@@ -19,6 +19,7 @@ from btb_manager_telegram import (
     scheduler,
     settings,
 )
+from btb_manager_telegram.buttons import start_bot
 from btb_manager_telegram.utils import (
     escape_tg,
     i18n_format,
@@ -26,9 +27,6 @@ from btb_manager_telegram.utils import (
     setup_root_path_constant,
     setup_telegram_constants,
     update_checker,
-)
-from btb_manager_telegram.buttons import (
-    start_bot
 )
 
 
@@ -65,7 +63,7 @@ def pre_run_main() -> None:
         "-s",
         "--start_trade_bot",
         action="store_true",
-        help="Add this flag to start the trade bot when the telegram bot starts."
+        help="Add this flag to start the trade bot when the telegram bot starts.",
     )
     parser.add_argument(
         "-c", "--chat_id", type=str, help="(optional) Telegram chat id", default=None
@@ -115,11 +113,11 @@ def main() -> None:
     """Start the bot."""
 
     # Start trade bot
-    message_trade_bot=""
+    message_trade_bot = ""
     if settings.START_TRADE_BOT:
         trade_bot_status = start_bot()
 
-        if trade_bot_status in (0,1):
+        if trade_bot_status in (0, 1):
             message_trade_bot += i18n_format("welcome.bot_started")
         else:
             message_trade_bot += i18n_format("welcome.bot_not_started.base") + " "
@@ -129,8 +127,7 @@ def main() -> None:
                 message_trade_bot += i18n_format("welcome.bot_not_started.bad_path")
             if trade_bot_status == 4:
                 message_trade_bot += i18n_format("welcome.bot_not_started.no_python")
-        message_trade_bot+= "\n\n"
-
+        message_trade_bot += "\n\n"
 
     # Create the Updater and pass it your token
     updater = Updater(settings.TOKEN)

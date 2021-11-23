@@ -1,9 +1,9 @@
 import os
 import sqlite3
 import subprocess
+import time
 from configparser import ConfigParser
 from datetime import datetime
-import time
 
 import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
@@ -492,7 +492,7 @@ def trade_history():
 
 
 def start_bot():
-    status = 0 #bot already running
+    status = 0  # bot already running
     if not get_binance_trade_bot_process():
         if os.path.isfile(settings.PYTHON_PATH):
             if os.path.exists(os.path.join(settings.ROOT_PATH, "binance_trade_bot/")):
@@ -500,16 +500,17 @@ def start_bot():
                     f"cd {settings.ROOT_PATH} && {settings.PYTHON_PATH} -m binance_trade_bot &",
                     shell=True,
                 )
-                time.sleep(5) #wait five seconds to let the bot start
+                time.sleep(5)  # wait five seconds to let the bot start
                 if get_binance_trade_bot_process():
-                    status =  1 #bot started
+                    status = 1  # bot started
                 else:
-                    status =  2 #bot start error
+                    status = 2  # bot start error
             else:
-                status =  3 #installation path error
+                status = 3  # installation path error
         else:
-            status = 4 #python lib error
+            status = 4  # python lib error
     return status
+
 
 def stop_bot():
     logger.info("Stop bot button pressed.")
