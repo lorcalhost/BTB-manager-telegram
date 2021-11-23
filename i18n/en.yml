@@ -133,8 +133,7 @@ deleted_db: '✔ Successfully deleted database file.'
 delete_db_error: '❌ Unable to delete database file.'
 clear_log_error: '❌ Unable to clear log file.'
 db_not_deleted: 'Your database was *not* deleted.'
-tgb_updating: 'The bot is updating.'
-wait_then_start: "Wait a few seconds then start the bot again with /start"
+tgb_updating: 'The bot is updating. Please wait for it to restart.'
 tgb_update_error: "Unable to update BTB Manager Telegram"
 tgb_not_updated: 'BTB Manager Telegram was *not* updated.'
 btb_updating: 'The bot has been stopped and is now updating.'
