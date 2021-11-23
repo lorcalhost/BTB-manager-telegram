@@ -88,6 +88,9 @@ def pre_run_main() -> None:
     if settings.TOKEN is None or settings.CHAT_ID is None:
         setup_telegram_constants()
 
+    settings.BOT = Bot(settings.TOKEN)
+    settings.CHAT = settings.BOT.getChat(settings.CHAT_ID)
+
     # Setup update notifications scheduler
     scheduler.enter(1, 1, update_checker)
     time.sleep(1)
@@ -129,9 +132,8 @@ def main() -> None:
     updater.start_polling()
 
     # Welcome mat
-    chat = Bot(settings.TOKEN).getChat(settings.CHAT_ID)
     message = (
-        f"{i18n_format('hello', name=chat.first_name)}\n"
+        f"{i18n_format('hello', name=settings.CHAT.first_name)}\n"
         f"{i18n_format('welcome')}\n\n"
         f"{i18n_format('developed_by')}\n"
         f"{i18n_format('project_link')}\n\n"
@@ -140,7 +142,7 @@ def main() -> None:
     )
     keyboard = [["/start"]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-    chat.send_message(
+    settings.CHAT.send_message(
         escape_tg(message),
         reply_markup=reply_markup,
         parse_mode="MarkdownV2",

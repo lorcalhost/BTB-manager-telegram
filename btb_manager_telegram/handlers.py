@@ -94,8 +94,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         message = (
             f"{i18n_format('conversation_started')}\n" f"{i18n_format('select_option')}"
         )
-        chat = Bot(settings.TOKEN).getChat(settings.CHAT_ID)
-        chat.send_message(
+        settings.CHAT.send_message(
             escape_tg(message), reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
 
@@ -261,9 +260,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
         )
         if document is not None:
-            bot = Bot(settings.TOKEN)
-            bot.send_document(
-                chat_id=update.message.chat_id,
+            settings.CHAT.send_document(
                 document=document,
                 filename="crypto_trading.db",
             )

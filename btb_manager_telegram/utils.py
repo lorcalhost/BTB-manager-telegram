@@ -205,13 +205,9 @@ def update_checker():
                 f"{i18n_format('tg_bot_update_instruction')}"
             )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
-            bot = Bot(settings.TOKEN)
-            bot.send_message(
-                settings.CHAT_ID, escape_tg(message), parse_mode="MarkdownV2"
+            settings.CHAT.send_message(
+                escape_tg(message), parse_mode="MarkdownV2"
             )
-            sleep(1)
-            bot.close()
-            sleep(1)
             scheduler.enter(
                 60 * 60 * 12,
                 1,
@@ -228,9 +224,8 @@ def update_checker():
                 f"{i18n_format('btb_bot_update_instruction')}"
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
-            bot = Bot(settings.TOKEN)
-            bot.send_message(
-                settings.CHAT_ID, escape_tg(message), parse_mode="MarkdownV2"
+            settings.CHAT.send_message(
+                escape_tg(message), parse_mode="MarkdownV2"
             )
             sleep(1)
             bot.close()
@@ -257,8 +252,7 @@ def update_checker():
 def update_reminder(self, message):
     logger.info(f"Reminding user: {message}")
 
-    bot = Bot(settings.TOKEN)
-    bot.send_message(settings.CHAT_ID, escape_tg(message), parse_mode="MarkdownV2")
+    settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
     scheduler.enter(
         60 * 60 * 12,
         1,
