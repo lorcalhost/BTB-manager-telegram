@@ -1,4 +1,17 @@
-hello: 'Bonjour %{name}!'
+welcome:
+  hello: 'Bonjour %{name}!'
+  welcome: 'Bienvenue sur le manager télégram du _Binance Trade Bot_.'
+  developed_by: 'Ce bot est développé collaborativement par lorcalhost, NovusEdge, titulebolide, Lisiadito, DmytroLitvinov, sydekumf, bloodf, idkravitz, neuhausj, MasaiasuOse, tntwist, kydrenw, pwnfoo, santiagocarod, stgo-eo and shhhmel.'
+  project_link: 'Retrouvez le projet [ici](https://github.com/lorcalhost/BTB-manager-telegram).'
+  donation: '*Si vous appréciez mon travail, [supportez moi avec un petit don](https://github.com/sponsors/lorcalhost). ❤*'
+  how_to_start: '*Pour démarrer la discussion, appuyez sur le bouton `/start`*'
+  bot_started: "J'ai déjà démarré le bot de trading pour vous, pas besoin de le faire!"
+  bot_not_started:
+    base: "J'ai essayé de démarrer le bot de trading mais cela a échoué."
+    bot_error: "Il semble que le bot ait rencontré une erreur au démarrage."
+    no_python: "Je n'ai pas réussi à trouver l'executable python."
+    bad_path: "Je n'ai pas réussi à trouver le bot de trading."
+
 order_placed: 'Un ordre d''achat de `%{order_size}` *%{bridge}* est actuellement placé sur *%{current_coin}*.'
 wait_for_order: '_En attente de la complétion de l''ordre_.'
 fetch_coin_from_db_error: '❌ Impossible de récupérer la monnaie actuelle depuis la base de donnée.'
@@ -117,11 +130,6 @@ keyboard:
   next_coin: "🔀 Prochaine monnaie"
 conversation_started: "Conversation démarrée!"
 select_option: 'Sélectionnez une option'
-welcome: 'Bienvenue sur le manager télégram du _Binance Trade Bot_.'
-developed_by: 'Ce bot est développé collaborativement par lorcalhost, NovusEdge, titulebolide, Lisiadito, DmytroLitvinov, sydekumf, bloodf, idkravitz, neuhausj, MasaiasuOse, tntwist, kydrenw, pwnfoo, santiagocarod, stgo-eo and shhhmel.'
-project_link: 'Retrouvez le projet [ici](https://github.com/lorcalhost/BTB-manager-telegram).'
-donation: '*Si vous appréciez mon travail, [supportez moi avec un petit don](https://github.com/sponsors/lorcalhost). ❤*'
-how_to_start: '*Pour démarrer la discussion, appuyez sur le bouton `/start`*'
 edited_coin_list: "✔ La liste de monnaies a été changé en :"
 coin_edit_error: '❌ Impossible d''éditer la liste de monnaies.'
 exited_no_change: '👌 Sorti sans modifications.'

@@ -3,6 +3,7 @@ import sqlite3
 import subprocess
 from configparser import ConfigParser
 from datetime import datetime
+import time
 
 import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
@@ -491,9 +492,7 @@ def trade_history():
 
 
 def start_bot():
-    logger.info("Start bot button pressed.")
-
-    message = i18n_format("bot_already_running")
+    status = 0 #bot already running
     if not get_binance_trade_bot_process():
         if os.path.isfile(settings.PYTHON_PATH):
             if os.path.exists(os.path.join(settings.ROOT_PATH, "binance_trade_bot/")):
@@ -501,19 +500,16 @@ def start_bot():
                     f"cd {settings.ROOT_PATH} && {settings.PYTHON_PATH} -m binance_trade_bot &",
                     shell=True,
                 )
+                time.sleep(5) #wait five seconds to let the bot start
                 if get_binance_trade_bot_process():
-                    message = i18n_format("bot_started")
+                    status =  1 #bot started
                 else:
-                    message = i18n_format("bot_start_error")
+                    status =  2 #bot start error
             else:
-                message = (
-                    f"{i18n_format('installation_path_error', path=settings.ROOT_PATH)}\n"
-                    f"{i18n_format('directory_hint')}"
-                )
+                status =  3 #installation path error
         else:
-            message = f"{i18n_format('python_lib_error', path=settings.PYTHON_PATH)}\n"
-    return message
-
+            status = 4 #python lib error
+    return status
 
 def stop_bot():
     logger.info("Stop bot button pressed.")

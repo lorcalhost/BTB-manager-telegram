@@ -195,8 +195,23 @@ def menu(update: Update, _: CallbackContext) -> int:
             )
 
     elif update.message.text == i18n_format("keyboard.start"):
+        logger.info("Start bot button pressed.")
+
         reply_text_escape_fun(
-            buttons.start_bot(),
+            i18n_format("bot_starting"),
+            reply_markup=reply_markup_config,
+            parse_mode="MarkdownV2",
+        )
+        status = buttons.start_bot()
+        message = [
+            i18n_format("bot_already_running"),
+            i18n_format("bot_started"),
+            i18n_format("bot_start_error"),
+            f"{i18n_format('installation_path_error', path=settings.ROOT_PATH)}\n{i18n_format('directory_hint')}",
+            f"{i18n_format('python_lib_error', path=settings.PYTHON_PATH)}\n"
+        ][status]
+        reply_text_escape_fun(
+            message,
             reply_markup=reply_markup_config,
             parse_mode="MarkdownV2",
         )
