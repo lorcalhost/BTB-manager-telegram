@@ -36,6 +36,7 @@ from btb_manager_telegram import (
 )
 from btb_manager_telegram.binance_api_utils import send_signed_request
 from btb_manager_telegram.utils import (
+    escape_tg,
     find_and_kill_binance_trade_bot_process,
     get_custom_scripts_keyboard,
     i18n_format,
@@ -88,18 +89,24 @@ def menu(update: Update, _: CallbackContext) -> int:
     # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
+    if update.message.text == "/start":
+        logger.info("Started conversation.")
+        message = (
+            f"{i18n_format('conversation_started')}\n" f"{i18n_format('select_option')}"
+        )
+        chat = Bot(settings.TOKEN).getChat(settings.CHAT_ID)
+        chat.send_message(
+            escape_tg(message), reply_markup=reply_markup, parse_mode="MarkdownV2"
+        )
+
     if update.message.text in [
-        "/start",
         i18n_format("keyboard.back"),
         i18n_format("keyboard.great"),
     ]:
-        message = ""
-        if update.message.text == "/start":
-            logger.info("Started conversation.")
-            message += f"{i18n_format('conversation_started')}\n"
-        message += i18n_format("select_option")
         reply_text_escape_fun(
-            message, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            i18n_format("select_option"),
+            reply_markup=reply_markup,
+            parse_mode="MarkdownV2",
         )
 
     elif update.message.text in [
@@ -107,9 +114,10 @@ def menu(update: Update, _: CallbackContext) -> int:
         i18n_format("keyboard.ok"),
         i18n_format("keyboard.configurations"),
     ]:
-        message = i18n_format("select_option")
         reply_text_escape_fun(
-            message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+            i18n_format("select_option"),
+            reply_markup=reply_markup_config,
+            parse_mode="MarkdownV2",
         )
 
     elif update.message.text in [
@@ -118,9 +126,10 @@ def menu(update: Update, _: CallbackContext) -> int:
         i18n_format("keyboard.cancel"),
         i18n_format("keyboard.ok_s"),
     ]:
-        message = i18n_format("select_option")
         reply_text_escape_fun(
-            message, reply_markup=reply_markup_maintenance, parse_mode="MarkdownV2"
+            i18n_format("select_option"),
+            reply_markup=reply_markup_maintenance,
+            parse_mode="MarkdownV2",
         )
 
     elif update.message.text == i18n_format("keyboard.current_value"):
