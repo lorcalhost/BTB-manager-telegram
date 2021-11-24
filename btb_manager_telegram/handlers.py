@@ -197,7 +197,6 @@ def menu(update: Update, _: CallbackContext) -> int:
     elif update.message.text == i18n_format("keyboard.start"):
         logger.info("Start bot button pressed.")
 
-
         reply_text_escape_fun(
             i18n_format("btb.starting"),
             reply_markup=reply_markup_config,
@@ -443,7 +442,8 @@ def delete_db(update: Update, _: CallbackContext) -> int:
 
     else:
         message = (
-            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('db.delete.not_deleted')}"
+            f"{i18n_format('exited_no_change')}\n"
+            f"{i18n_format('db.delete.not_deleted')}"
         )
 
     keyboard = [[i18n_format("keyboard.ok")]]
@@ -482,7 +482,8 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
             )
     else:
         message = (
-            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('update.tgb.not_updated')}"
+            f"{i18n_format('exited_no_change')}\n"
+            f"{i18n_format('update.tgb.not_updated')}"
         )
         keyboard = [[i18n_format("keyboard.ok_s")]]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
@@ -527,7 +528,8 @@ def update_btb(update: Update, _: CallbackContext) -> int:
             )
     else:
         message = (
-            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('update.btb.not_updated')}"
+            f"{i18n_format('exited_no_change')}\n"
+            f"{i18n_format('update.btb.not_updated')}"
         )
         reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -597,7 +599,8 @@ def panic(update: Update, _: CallbackContext) -> int:
             message = i18n_format("killed_bot")
     else:
         message = (
-            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('update.btb.not_updated')}"
+            f"{i18n_format('exited_no_change')}\n"
+            f"{i18n_format('update.btb.not_updated')}"
         )
 
     reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")

@@ -460,7 +460,9 @@ def trade_history():
 
                         trade_details = i18n_format(
                             "history.sold_bought",
-                            sold_trade=i18n_format("history.sold") if trade[2] else i18n_format("history.bought"),
+                            sold_trade=i18n_format("history.sold")
+                            if trade[2]
+                            else i18n_format("history.bought"),
                             amount1=trade[4],
                             coin1=trade[0],
                             amount2=trade[5],
@@ -524,7 +526,8 @@ def stop_bot():
             message = i18n_format("btb.stopped")
         else:
             message = (
-                f"{i18n_format('btb.stop_error')}\n\n" f"{i18n_format('btb.windows_hint')}"
+                f"{i18n_format('btb.stop_error')}\n\n"
+                f"{i18n_format('btb.windows_hint')}"
             )
     return message
 
@@ -650,7 +653,8 @@ def update_btb():
         if to_update:
             upd = True
             message = (
-                f"{i18n_format('update.btb.available')}\n" f"{i18n_format('update.now')}"
+                f"{i18n_format('update.btb.available')}\n"
+                f"{i18n_format('update.now')}"
             )
     else:
         message = i18n_format("update.btb.error")
