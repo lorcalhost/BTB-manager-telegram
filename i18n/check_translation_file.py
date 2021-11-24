@@ -52,10 +52,10 @@ def main(translation_file):
         text_output = ""
         for elt in finds:
             if elt not in translation_keys:
-                text_output += f"\t\t{elt}"
+                text_output += f"\t\t{elt}\n"
 
         if text_output != "":
-            main_text_output += f"\t{filename} :\n{text_output}"
+            main_text_output += f"\t{filename} :\n{text_output}\n"
 
     if main_text_output != "":
         print(f"Missing keys in '{translation_file}' from :\n{main_text_output}")
