@@ -197,18 +197,19 @@ def menu(update: Update, _: CallbackContext) -> int:
     elif update.message.text == i18n_format("keyboard.start"):
         logger.info("Start bot button pressed.")
 
+
         reply_text_escape_fun(
-            i18n_format("bot_starting"),
+            i18n_format("btb.starting"),
             reply_markup=reply_markup_config,
             parse_mode="MarkdownV2",
         )
         status = buttons.start_bot()
         message = [
-            i18n_format("bot_already_running"),
-            i18n_format("bot_started"),
-            i18n_format("bot_start_error"),
-            f"{i18n_format('installation_path_error', path=settings.ROOT_PATH)}\n{i18n_format('directory_hint')}",
-            f"{i18n_format('python_lib_error', path=settings.PYTHON_PATH)}\n",
+            i18n_format("btb.already_running"),
+            i18n_format("btb.started"),
+            i18n_format("btb.start_error"),
+            f"{i18n_format('btb.installation_path_error', path=settings.ROOT_PATH)}\n{i18n_format('btb.directory_hint')}",
+            f"{i18n_format('btb.lib_error', path=settings.PYTHON_PATH)}\n",
         ][status]
         reply_text_escape_fun(
             message,
@@ -345,7 +346,7 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
 
     if update.message.text != "/stop":
         message = (
-            f"{i18n_format('edited_coin_list')}\n\n"
+            f"{i18n_format('coin_list.success')}\n\n"
             f"```\n"
             f"{update.message.text}\n"
             f"```"
@@ -357,11 +358,11 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
                 f.write(update.message.text + "\n")
         except Exception as e:
             logger.error(f"❌ Unable to edit coin list file: {e}", exc_info=True)
-            message = i18n_format("coin_edit_error")
+            message = i18n_format("coin_list.error")
     else:
         message = (
             f"{i18n_format('exited_no_change')}\n"
-            f"{i18n_format('coin_list_not_modified')}"
+            f"{i18n_format('coin_list.not_modified')}"
         )
 
     keyboard = [[i18n_format("keyboard.go_back")]]
@@ -379,7 +380,7 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
 
     if update.message.text != "/stop":
         message = (
-            f"{i18n_format('edited_user_config')}\n\n"
+            f"{i18n_format('config.success')}\n\n"
             f"```\n"
             f"{update.message.text}\n"
             f"```"
@@ -393,7 +394,7 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
             logger.error(
                 f"❌ Unable to edit user configuration file: {e}", exc_info=True
             )
-            message = i18n_format("user_config_error")
+            message = i18n_format("config.error")
         try:
             shutil.copymode(user_cfg_file_path, f"{user_cfg_file_path}.backup")
         except:
@@ -401,7 +402,7 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
     else:
         message = (
             f"{i18n_format('exited_no_change')}\n"
-            f"{i18n_format('user_config_not_modified')}"
+            f"{i18n_format('config.not_modified')}"
         )
 
     keyboard = [[i18n_format("keyboard.go_back")]]
@@ -420,7 +421,7 @@ def delete_db(update: Update, _: CallbackContext) -> int:
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     if update.message.text != i18n_format("keyboard.go_back"):
-        message = i18n_format("deleted_db")
+        message = i18n_format("db.delete.success")
         db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
         pw_file_path = os.path.join(settings.ROOT_PATH, "data/paper_wallet.json")
         log_file_path = os.path.join(settings.ROOT_PATH, "logs/crypto_trading.log")
@@ -432,17 +433,17 @@ def delete_db(update: Update, _: CallbackContext) -> int:
                 os.remove(pw_file_path)
         except Exception as e:
             logger.error(f"❌ Unable to delete database file: {e}", exc_info=True)
-            message = i18n_format("delete_db_error")
+            message = i18n_format("db.delete.error")
         try:
             with open(log_file_path, "w") as f:
                 f.truncate()
         except Exception as e:
             logger.error(f"❌ Unable to clear log file: {e}", exc_info=True)
-            message = i18n_format("clear_log_error")
+            message = i18n_format("db.delete.clear_log_error")
 
     else:
         message = (
-            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('db_not_deleted')}"
+            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('db.delete.not_deleted')}"
         )
 
     keyboard = [[i18n_format("keyboard.ok")]]
@@ -459,7 +460,7 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     if update.message.text != i18n_format("keyboard.cancel_update"):
-        message = i18n_format("tgb_updating")
+        message = i18n_format("update.tgb.updating")
         keyboard = [["/start"]]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         reply_text_escape_fun(
@@ -475,13 +476,13 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
             kill_btb_manager_telegram_process()
         except Exception as e:
             logger.error(f"❌ Unable to update BTB Manager Telegram: {e}", exc_info=True)
-            message = i18n_format("tgb_update_error")
+            message = i18n_format("update.tgb.error")
             reply_text_escape_fun(
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
     else:
         message = (
-            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('tgb_not_updated')}"
+            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('update.tgb.not_updated')}"
         )
         keyboard = [[i18n_format("keyboard.ok_s")]]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
@@ -503,8 +504,8 @@ def update_btb(update: Update, _: CallbackContext) -> int:
 
     if update.message.text != i18n_format("keyboard.cancel_update"):
         message = (
-            f"{i18n_format('btb_updating')}\n"
-            f"{i18n_format('wait_then_start_manually')}"
+            f"{i18n_format('update.btb.updating')}\n"
+            f"{i18n_format('update.btb.start_manually')}"
         )
         reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -526,7 +527,7 @@ def update_btb(update: Update, _: CallbackContext) -> int:
             )
     else:
         message = (
-            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('btb_bot_updated')}"
+            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('update.btb.not_updated')}"
         )
         reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
@@ -596,7 +597,7 @@ def panic(update: Update, _: CallbackContext) -> int:
             message = i18n_format("killed_bot")
     else:
         message = (
-            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('btb_not_updated')}"
+            f"{i18n_format('exited_no_change')}\n" f"{i18n_format('update.btb.not_updated')}"
         )
 
     reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
@@ -624,7 +625,7 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
                     f"Unable to find script named {update.message.text} in custom_scripts.json file: {e}",
                     exc_info=True,
                 )
-                message = i18n_format("script_not_found", name=update.message.text)
+                message = i18n_format("script.not_found", name=update.message.text)
                 reply_text_escape_fun(
                     message, reply_markup=reply_markup, parse_mode="MarkdownV2"
                 )
@@ -646,7 +647,7 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
                     )
             except Exception as e:
                 logger.error(f"Error during script execution: {e}", exc_info=True)
-                message = i18n_format("script_error")
+                message = i18n_format("script.error")
                 reply_text_escape_fun(
                     message, reply_markup=reply_markup, parse_mode="MarkdownV2"
                 )
@@ -693,14 +694,14 @@ DELETE_DB_HANDLER = MessageHandler(
 
 UPDATE_TG_HANDLER = MessageHandler(
     Filters.regex(
-        f"^({i18n_format('keyboard.update')}|{i18n_format('keyboard.cancel_confirm')})$"
+        f"^({i18n_format('keyboard.update')}|{i18n_format('keyboard.cancel_update')})$"
     ),
     update_tg_bot,
 )
 
 UPDATE_BTB_HANDLER = MessageHandler(
     Filters.regex(
-        f"^({i18n_format('keyboard.update')}|{i18n_format('keyboard.cancel_confirm')})$"
+        f"^({i18n_format('keyboard.update')}|{i18n_format('keyboard.cancel_update')})$"
     ),
     update_btb,
 )
