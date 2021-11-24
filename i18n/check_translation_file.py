@@ -1,9 +1,9 @@
 import os
 import re
-
-import yaml
-import click
 import sys
+
+import click
+import yaml
 
 
 @click.command()
