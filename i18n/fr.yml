@@ -1,10 +1,20 @@
+exited_no_change: "👌 Sorti sans modifications."
+stop_to_stop: "Ecrivez `/stop` pour arrêter d'éditer et pour ne faire aucune modification."
+bye: "Au revoir! À la prochaine fois."
+killed_bot: "Le bot de trading a été stoppé!"
+logging_enabled_error: "⚠ Verifiez que le logging du bot de trading est activé."
+database_not_found: "⚠ Impossible de trouver la base de données ici : `%{path}`."
+conversation_started: "Conversation démarrée!"
+select_option: "Sélectionnez une option"
+
+
 welcome:
-  hello: 'Bonjour %{name}!'
-  welcome: 'Bienvenue sur le manager télégram du _Binance Trade Bot_.'
-  developed_by: 'Ce bot est développé collaborativement par lorcalhost, NovusEdge, titulebolide, Lisiadito, DmytroLitvinov, sydekumf, bloodf, idkravitz, neuhausj, MasaiasuOse, tntwist, kydrenw, pwnfoo, santiagocarod, stgo-eo and shhhmel.'
-  project_link: 'Retrouvez le projet [ici](https://github.com/lorcalhost/BTB-manager-telegram).'
-  donation: '*Si vous appréciez mon travail, [supportez moi avec un petit don](https://github.com/sponsors/lorcalhost). ❤*'
-  how_to_start: '*Pour démarrer la discussion, appuyez sur le bouton `/start`*'
+  hello: "Bonjour %{name}!"
+  welcome: "Bienvenue sur le manager télégram du _Binance Trade Bot_."
+  developed_by: "Ce bot est développé collaborativement par lorcalhost, NovusEdge, titulebolide, Lisiadito, DmytroLitvinov, sydekumf, bloodf, idkravitz, neuhausj, MasaiasuOse, tntwist, kydrenw, pwnfoo, santiagocarod, stgo-eo and shhhmel."
+  project_link: "Retrouvez le projet [ici](https://github.com/lorcalhost/BTB-manager-telegram)."
+  donation: "*Si vous appréciez mon travail, [supportez moi avec un petit don](https://github.com/sponsors/lorcalhost). ❤*"
+  how_to_start: "*Pour démarrer la discussion, appuyez sur le bouton `/start`*"
   bot_started: "J'ai déjà démarré le bot de trading pour vous, pas besoin de le faire!"
   bot_not_started:
     base: "J'ai essayé de démarrer le bot de trading mais cela a échoué."
@@ -12,97 +22,163 @@ welcome:
     no_python: "Je n'ai pas réussi à trouver l'executable python."
     bad_path: "Je n'ai pas réussi à trouver le bot de trading."
 
-order_placed: 'Un ordre d''achat de `%{order_size}` *%{bridge}* est actuellement placé sur *%{current_coin}*.'
-wait_for_order: '_En attente de la complétion de l''ordre_.'
-fetch_coin_from_db_error: '❌ Impossible de récupérer la monnaie actuelle depuis la base de donnée.'
-no_information: '❌ Pas d''information sur *%{current_coin}* disponible dans la base de données.'
-no_current_value_during_trade: '⚠ Si vous avez essayé d''utiliser le bouton `Valeur actuelle` pendant un trade, réessayez après la fin du trade.'
-last_update: "Dernière mise à jour : `%{update}`"
-current_coin: "*Monnaie actuelle : %{coin}:*"
-balance: '- Balance: `%{balance}` *%{coin}*'
-exchange_rate_purchased: '- Taux de change à l''achat : `%{rate}` *%{bridge}*/*%{coin}*'
-exchange_rate_now: '- Taux de change actuel : `%{rate}` *USD*/*%{coin}*'
-value_change: '- Évolution du taux de change : `%{change}` *%*'
-value_usd: '- Valeur actuelle en *USD* : `%{value}` *USD*'
-value_btc: '- Valeur actuelle en *BTC*: `%{value}` *BTC*'
-bought_for: "_Acheté pour_ `%{value}` *%{coin}*"
-one_day_change_btc: "Évolution sur 24h en BTC: `%{value}` %"
-seven_day_change_btc: "Évolution sur 7j en BTC: `%{value}` %"
-error_generating_value: '❌ Quelque chose s''est mal passé, impossible de générer la valeur.'
-db_action_error: '❌ Impossible de réaliser l''opération sur la base de données.'
-coin_progress: "Progression des monnaies :"
-amount: '- Quantité: `%{amount}` *%{coin}*'
-price: '- Prix: `%{amount}` *USD*'
-change_over_days: '- Évolution: `%{amount}` *%{coin}* `%{percent}` *%* en %{days} jours, %{hours} heures'
-trade_datetime: '- Moment du : `%{date}`'
-progress_fetch_error: '❌ Impossible de récuperer les informations de progression depuis la base de données.'
-compared_ratios: "*Ratio de monnaies à %{coin} en ordre décroissant :*"
-bridge_value: '- Prix: `%{value}` %{bridge}'
-ratio: '- Ratio: `%{ratio}`'
-ratio_gen_error: '❌ Quelque chose s''est mal passé, impossible de générer les ratios.'
-logging_enabled_error: '⚠ Verifiez que le logging du bot de trading est activé.'
-bot_not_running: '⚠ Le bot de trading n''est pas lancé .'
-bot_running: '✔ Le bot de trading est lancé.'
-last_x_trades: "**%{trades}** derniers trades:"
-sold_bought: "*%{sold_trade}* `%{amount1}` *%{coin1}* pour `%{amount2}` *%{coin2}*"
-trade_status: "État : _*%{status}*_"
-trade_history_error: '❌ Quelque chose s''est mal passé, impossible de générer l''historique de trade.'
-bot_already_running: '⚠ Le bot de trading est déjà lancé.'
-bot_started: '✔ Le bot de trading a démarré.'
-bot_start_error: '❌ Impossible de démarrer le bot de trading.'
-installation_path_error: '❌ Impossible de trouver le bot de trading ici : `%{path}`.'
-directory_hint: 'Verifiez que les répertoires `binance-trade-bot` et `BTB-manager-telegram` sont dans le même répertoire parent.'
-stopped_bot: '✔ Le bot de trading s''est arrêté.'
-stop_error: '❌ Impossible d''arrêter le bot de trading.'
-windows_hint: 'Si vous exectuez le bot télégram sur windows, verifiez que vous le faites avec les droits d''administrateurs.'
-log_file_error: '❌ Impossible de trouver les logs ici : `%{path}`.'
-last_4000_characters: "*4000* derniers caractères dans le log :"
-stop_bot_before_delete: '⚠ Arrêtez le bot de trading avant de supprimer la base de données.'
-sure_delete: 'Êtes-vous sûr de vouloir supprimer la base de données et les logs?'
-stop_bot_before_edit_config: '⚠ Arrêtez le bot de trading avant d''éditer le fichier de configuration.'
-config_file_is: "Fichier de configuration actuel :"
-reply_config: '_*Répondez avec un message contenant la nouvelle configuration*_.'
-stop_to_stop: 'Ecrivez `/stop` pour arrêter d''éditer et pour ne faire aucune modification.'
-config_file_error: '❌ Impossible de trouver le fichier de configuration ici : `%{path}`.'
-stop_bot_before_edit_coin_list: '⚠ Arrêtez le bot de trading avant d''éditer la liste de monnaies.'
-coin_list_is: "Liste de monnaies actuelle :"
-reply_coin_list: '_*Répondez avec un message contenant la nouvelle liste*_.'
-coin_list_error: '❌ Impossible de trouver la liste de monnaies ici : `%{path}`.'
-stop_bot_before_export: '⚠ Arrêtez le bot de trading avant d''exporter la base de données.'
-file_msg: "Fichier de base de données :"
-database_export_error: '❌ Impossible d''exporter la base de données.'
-tg_bot_up_to_date: 'Le bot télégram est déjà à jour.'
-tg_bot_update_availabe: 'Une mise à jour du bot télégram est disponible.'
-tg_bot_update_instruction: 'Mettez à jour dans *🛠 Maintenance* > *⬆ MAJ Bot Télégram*.'
-update_now: 'Voulez-vous mettre à jour maintenant?'
-tg_bot_update_error: 'Une erreur est survenue lors de la récupération des information de version du bot télégram.'
-btb_up_to_date: 'Le bot de trading est déjà à jour.'
-btb_update_availabe: 'Une mise à jour du bot de trading est disponible.'
-btb_bot_update_instruction: 'Mettez à jour dans *🛠 Maintenance* > *⬆ MAJ Bot Trading*.'
-btb_update_error: 'Une erreur est survenue lors de la récupération des information de version du bot de trading.'
-panic_db_error: 'ERREUR : Base de donnée non trouvée.'
-panic_config_error: 'ERREUR: `user.cfg` non trouvé.'
-holding: 'Vous avez actuellement `%{amount1}` *%{coin1}* acheté pour `%{amount2}` *%{coin2}*.'
-rate_when_bought: 'Taux de change à l''achat :'
-current_rate: 'Taux de change actuel :'
-current_value: 'Valeur actuelle :'
-change: "Évolution :"
-stop_and_sell: 'Voulez-vous arrêter le bot de trading et vendre au prix du marché (_market order_)?'
-open_buy_order: 'Vous avez un ordre d''achat en cours de `%{amount1}` *%{coin1}* pour `%{amount2}` *%{coin2}*.'
-limit_buy_price: "Ordre limite au prix de :"
-stop_and_cancel: 'Voulez-vous arrêter le bot de trading et annuler l''ordre en cours?'
-order_already_complete: 'Votre solde est déjà sur *%{coin}*.'
-ask_stop_bot: 'Voulez-vous arrêter le bot de trading?'
-open_sell_order: 'Vous avez un ordre de vente en cours de `%{amount1}` *%{coin1}* pour `%{amount2}` *%{coin2}*.'
-limit_sell_price: "Ordre limite au prix de :"
-panic_btn_error: '❌ Quelque chose s'' est mal passé, le panic button ne fonctionne pas.'
+
+value:
+  order_placed: "Un ordre d'achat de `%{order_size}` *%{bridge}* est actuellement placé sur *%{current_coin}*."
+  wait_for_order: "_En attente de la complétion de l'ordre_."
+  db_error: "❌ Impossible de récupérer la monnaie actuelle depuis la base de donnée."
+  no_information: "❌ Pas d'information sur *%{current_coin}* disponible dans la base de données."
+  no_during_trade: "⚠ Si vous avez essayé d'utiliser le bouton `Valeur actuelle` pendant un trade, réessayez après la fin du trade."
+  error: "❌ Quelque chose s'est mal passé, impossible de générer la valeur."
+  last_update: "Dernière mise à jour : `%{update}`"
+  current_coin: "*Monnaie actuelle : %{coin}:*"
+  balance: "- Balance: `%{balance}` *%{coin}*"
+  exchange_rate_purchased: "- Taux de change à l'achat : `%{rate}` *%{bridge}*/*%{coin}*"
+  exchange_rate_now: "- Taux de change actuel : `%{rate}` *USD*/*%{coin}*"
+  value_change: "- Évolution du taux de change : `%{change}` *%*"
+  value_usd: "- Valeur actuelle en *USD* : `%{value}` *USD*"
+  value_btc: "- Valeur actuelle en *BTC*: `%{value}` *BTC*"
+  bought_for: "_Acheté pour_ `%{value}` *%{coin}*"
+  one_day_change_btc: "Évolution sur 24h en BTC: `%{value}` %"
+  seven_day_change_btc: "Évolution sur 7j en BTC: `%{value}` %"
+
+
+progress:
+  coin: "Progression des monnaies :"
+  amount: "- Quantité: `%{amount}` *%{coin}*"
+  price: "- Prix: `%{amount}` *USD*"
+  change_over_days: "- Évolution: `%{amount}` *%{coin}* `%{percent}` *%* en %{days} jours, %{hours} heures"
+  trade_datetime: "- Moment du : `%{date}`"
+  db_error: "❌ Impossible de récuperer les informations de progression depuis la base de données."
+
+
+ratios:
+  compared_ratios: "*Ratio de monnaies à %{coin} en ordre décroissant :*"
+  bridge_value: "- Prix: `%{value}` %{bridge}"
+  ratio: "- Ratio: `%{ratio}`"
+  gen_error: "❌ Quelque chose s'est mal passé, impossible de générer les ratios."
+
+
+next_coin:
+  current_price: "- Prix actuel: `%{price}` %{coin}"
+  target_price: "- Prix visé: `%{price}` %{coin}"
+  error: "❌ Quelque chose s'est mal passé, impossible de déterminer la prochaine monnaie."
+
+
+history:
+  last_x_trades: "**%{trades}** derniers trades:"
+  sold_bought: "*%{sold_trade}* `%{amount1}` *%{coin1}* pour `%{amount2}` *%{coin2}*"
+  status: "État : _*%{status}*_"
+  error: "❌ Quelque chose s'est mal passé, impossible de générer l'historique de trade."
+
+
+btb:
+  not_running: "⚠ Le bot de trading n'est pas lancé ."
+  running: "✔ Le bot de trading est lancé."
+  already_running: "⚠ Le bot de trading est déjà lancé."
+  started: "✔ Le bot de trading a démarré."
+  start_error: "❌ Impossible de démarrer le bot de trading."
+  installation_path_error: "❌ Impossible de trouver le bot de trading ici : `%{path}`."
+  directory_hint: "Verifiez que les répertoires `binance-trade-bot` et `BTB-manager-telegram` sont dans le même répertoire parent."
+  stopped: "✔ Le bot de trading s'est arrêté."
+  stop_error: "❌ Impossible d'arrêter le bot de trading."
+  lib_error: "❌ Impossible de trouver la librairie python ici : `%{path}`."
+  windows_hint: "Si vous exectuez le bot télégram sur windows, verifiez que vous le faites avec les droits d'administrateurs."
+
+
+log:
+  error: "❌ Impossible de trouver les logs ici : `%{path}`."
+
+
+
+panic:
+  holding: "Vous avez actuellement `%{amount1}` *%{coin1}* acheté pour `%{amount2}` *%{coin2}*."
+  rate_when_bought: "Taux de change à l'achat :"
+  current_rate: "Taux de change actuel :"
+  current_value: "Valeur actuelle :"
+  change: "Évolution :"
+  stop_and_sell: "Voulez-vous arrêter le bot de trading et vendre au prix du marché (_market order_)?"
+  open_buy_order: "Vous avez un ordre d'achat en cours de `%{amount1}` *%{coin1}* pour `%{amount2}` *%{coin2}*."
+  limit_buy_price: "Ordre limite au prix de :"
+  stop_and_cancel: "Voulez-vous arrêter le bot de trading et annuler l'ordre en cours?"
+  order_already_complete: "Votre solde est déjà sur *%{coin}*."
+  ask_stop_bot: "Voulez-vous arrêter le bot de trading?"
+  open_sell_order: "Vous avez un ordre de vente en cours de `%{amount1}` *%{coin1}* pour `%{amount2}` *%{coin2}*."
+  limit_sell_price: "Ordre limite au prix de :"
+  error: "❌ Quelque chose s' est mal passé, le panic button ne fonctionne pas."
+
+
+coin_list:
+  success: "✔ La liste de monnaies a été changé en :"
+  error: "❌ Impossible d'éditer la liste de monnaies."
+  not_found: "❌ Impossible de trouver la liste de monnaies ici : `%{path}`."
+  not_modified: "La liste de monnaies *n'a pas* été modifiée."
+  is: "Liste de monnaies actuelle :"
+  reply: "_*Répondez avec un message contenant la nouvelle liste*_."
+  stop_bot: "⚠ Arrêtez le bot de trading avant d'éditer la liste de monnaies."
+
+
+config:
+  success: "✔ La configuration a été changé en :"
+  error: "❌ Impossible d'éditer la configuration."
+  not_found: "❌ Impossible de trouver le fichier de configuration ici : `%{path}`."
+  not_modified: "La configuration *n'a pas* été modifiée."
+  is: "Fichier de configuration actuel :"
+  reply: "_*Répondez avec un message contenant la nouvelle configuration*_."
+  stop_bot: "⚠ Arrêtez le bot de trading avant d'éditer le fichier de configuration."
+
+
+db:
+  delete:
+    success: "✔ La base de donnée a été supprimée."
+    error: "❌ Impossible de supprimer la base de données."
+    clear_log_error: "❌ Impossible de supprimer les logs."
+    not_deleted: "La base de données *n'a pas* été supprimée."
+    stop_bot: "⚠ Arrêtez le bot de trading avant de supprimer la base de données."
+    sure: "Êtes-vous sûr de vouloir supprimer la base de données et les logs?"
+
+  export:
+    stop_bot: "⚠ Arrêtez le bot de trading avant d'exporter la base de données."
+    file: "Fichier de base de données :"
+    error: "❌ Impossible d'exporter la base de données."
+
+
+update:
+  now: "Voulez-vous mettre à jour maintenant?"
+
+  tgb:
+    updating: "Le bot télégram se met à jour. Attendez qu'il redémarre."
+    version_error: "Une erreur est survenue lors de la récupération des information de version du bot télégram."
+    error: "Impossible de mettre à jour le bot télégram."
+    not_updated: "Le bot télégram *n'a pas* été mis à jour."
+    up_to_date: "Le bot télégram est déjà à jour."
+    available: "Une mise à jour du bot télégram est disponible."
+    instruction: "Mettez à jour dans *🛠 Maintenance* > *⬆ MAJ Bot Télégram*."
+
+  btb:
+    updating: "Le bot de trading se met à jour."
+    version_error: "Une erreur est survenue lors de la récupération des information de version du bot de trading."
+    not_updated: "Le bot de trading *n'a pas* été mis à jour."
+    up_to_date: "Le bot de trading est déjà à jour."
+    available: "Une mise à jour du bot de trading est disponible."
+    instruction: "Mettez à jour dans *🛠 Maintenance* > *⬆ MAJ Bot Trading*."
+    start_manually: "Attendez quelques secondes et relancez-le manuellement."
+
+
+script:
+  not_found: "Impossible de trouver le script %{name} dans le fichier `custom_scripts.json`."
+  error: "Une erreur a eu lieu pendant l'exécution du script."
+  no_script: "Il n'y a aucun script dans le fichier `custom_scripts.json`."
+  no_config: "Impossible de trouver le fichier `custom_scripts.json`."
+  select: "Sélectionnez l'un de vos script."
+
 keyboard:
   current_value: "💵 Valeur actuelle"
   progress: "📈 Progression"
   current_ratios: "➗ Ratios actuels"
   trade_history: "⌛ Historique des trades"
   panic: "🚨 Panic button"
-  check_status: '🔍 Verifier l''état du bot'
+  check_status: "🔍 Verifier l'état du bot"
   maintenance: "🛠 Maintenance"
   configurations: "⚙️ Configurations"
   start: "▶ Démarrer le bot de trading"
@@ -128,34 +204,3 @@ keyboard:
   confirm: "⚠ Confirmer"
   stop_bot: "⚠ Arrêter le bot"
   next_coin: "🔀 Prochaine monnaie"
-conversation_started: "Conversation démarrée!"
-select_option: 'Sélectionnez une option'
-edited_coin_list: "✔ La liste de monnaies a été changé en :"
-coin_edit_error: '❌ Impossible d''éditer la liste de monnaies.'
-exited_no_change: '👌 Sorti sans modifications.'
-coin_list_not_modified: 'La liste de monnaies *n''a pas* été modifiée.'
-edited_user_config: "✔ La configuration a été changé en :"
-user_config_error: '❌ Impossible d''éditer la configuration.'
-user_config_not_modified: 'La configuration *n''a pas* été modifiée.'
-deleted_db: '✔ La base de donnée a été supprimée.'
-delete_db_error: '❌ Impossible de supprimer la base de données.'
-clear_log_error: '❌ Impossible de supprimer les logs.'
-db_not_deleted: 'La base de données *n''a pas* été supprimée.'
-tgb_updating: "Le bot télégram se met à jour. Attendez qu'il redémarre."
-tgb_update_error: 'Impossible de mettre à jour le bot télégram.'
-tgb_not_updated: 'Le bot télégram *n''a pas* été mis à jour.'
-btb_updating: 'Le bot de trading se met à jour.'
-wait_then_start_manually: 'Attendez quelques secondes et relancez-le manuellement.'
-btb_not_updated: 'Le bot de trading *n''a pas* été mis à jour.'
-killed_bot: 'Le bot de trading a été stoppé!'
-script_not_found: 'Impossible de trouver le script %{name} dans le fichier `custom_scripts.json`.'
-script_error: 'Une erreur a eu lieu pendant l''exécution du script.'
-script_not_found_in_file_error: 'Il n''y a aucun script dans le fichier `custom_scripts.json`.'
-script_not_found_in_folder_error: 'Impossible de trouver le fichier `custom_scripts.json`.'
-bye: 'Au revoir! À la prochaine fois.'
-select_script: 'Sélectionnez l''un de vos script.'
-python_lib_error: '❌ Impossible de trouver la librairie python ici : `%{path}`.'
-database_not_found: '⚠ Impossible de trouver la base de données ici : `%{path}`.'
-next_coin_error: '❌ Quelque chose s''est mal passé, impossible de déterminer la prochaine monnaie.'
-current_price: '- Prix actuel: `%{price}` %{coin}'
-target_price: '- Prix visé: `%{price}` %{coin}'
