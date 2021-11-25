@@ -1,0 +1,215 @@
+﻿exited_no_change: "👌 Afgesloten zonder wijzigingen."
+stop_to_stop: "Schrijf /stop om het bewerken te stoppen en af te sluiten zonder te wijzigingen."
+bye: "Dag! Ik hoop dat we ooit weer kunnen praten."
+killed_bot: "Afgesloten _Binance Trade Bot_!"
+logging_enabled_error: "⚠ Zorg ervoor dat de logging voor _Binance Trade Bot_ is ingeschakeld."
+database_not_found: "❌ Kan databasebestand niet vinden op `%{path}`."
+conversation_started: "Gesprek gestart!"
+select_option: "Selecteer één van de opties."
+
+
+welcome:
+  hello: "Hallo *%{name}*!"
+  welcome: "Welkom bij de _Binace Trader Bot Telegram Manager_."
+  developed_by: "Deze Telegram bot is ontwikkeld door @lorcalhost."
+  project_link: "Lees meer over dit project [hier](https://github.com/lorcalhost/BTB-manager-telegram)."
+  donation: "*Als je mijn werk leuk vindt, [overweeg dan om het project te ondersteunen door middel van een kleine donatie](https://github.com/sponsors/lorcalhost). ❤*"
+  how_to_start: "*Om het gesprek te starten, klikt u op de knop `/start`*"
+  bot_started: "Ik heb de handelsbot al voor je gestart, je hoeft hem niet opnieuw te starten!"
+  bot_not_started:
+    base: "Ik heb geprobeerd de handelsbot te starten, maar het mislukte."
+    bot_error: "Het lijkt erop dat de bot een fout is tegengekomen bij het opstarten."
+    no_python: "Ik heb de python binaries niet gevonden."
+    bad_path: "Ik heb de handelsbot niet gevonden."
+
+
+value:
+  order_placed: "Een kooporder van `%{order_size}` *%{bridge}* is momenteel geplaatst op munt *%{current_coin}*."
+  wait_for_order: "_Wachten tot de kooporder is voltooid_."
+  db_error: "❌ Kan huidige munt niet ophalen uit database."
+  no_information: "❌ Geen informatie over *%{current_coin}* beschikbaar in de database."
+  no_during_trade: "⚠ Als u tijdens een transactie hebt geprobeerd de knop 'Huidige waarde' te gebruiken, probeer het dan opnieuw nadat de transactie is voltooid."
+  error: "❌ Er ging iets mis, niet in staat om op dit moment waarde te genereren."
+  last_update: "Laatste update: `%{update}`"
+  current_coin: "*Huidige munt %{coin}:*"
+  balance: "- Balans: `%{balance}` *%{coin}*"
+  exchange_rate_purchased: "- Gekocht op wisselkoers: `%{rate}` *%{bridge}*/*%{coin}*"
+  exchange_rate_now: "- Wisselkoers nu:           `%{rate}` *USD*/*%{coin}*"
+  value_change: "- *Waardeverandering*: `%{change}` *%*"
+  value_usd: "- Waarde in *USD*: `%{value}` *USD*"
+  value_btc: "- Waarde in *BTC*: `%{value}` *BTC*"
+  bought_for: "_Gekocht voor_ `%{value}` *%{coin}*"
+  one_day_change_btc: "1 dag verandering BTC: `%{value}` %"
+  seven_day_change_btc: "7 dagen verandering BTC: `%{value}` %"
+
+
+progress:
+  coin: "Overzicht transacties:"
+  amount: "- Bedrag: `%{amount}` *%{coin}*"
+  price: "- Prijs: `%{amount}` *USD*"
+  change_over_days: "- Verandering: `%{amount}` *%{coin}* `%{percent}` *%* in %{days} dagen, %{hours} uren"
+  trade_datetime: "- Handelstijd: `%{date}`"
+  db_error: "❌ Kan geen voortgangsinformatie ophalen uit de database."
+
+
+ratios:
+  last_update: "Laatste update: `%{update}`"
+  compared_ratios: "*Muntverhoudingen vergeleken met %{coin} in afnemende volgorde:*"
+  bridge_value: "- Prijs: `%{value}` %{bridge}"
+  ratio: "- Ratio: `%{ratio}`"
+  gen_error: "❌ Er ging iets mis, niet in staat om op dit moment ratio's te genereren."
+  db_error: "❌ Kan geen ratio ophalen uit database."
+
+
+next_coin:
+  current_price: "- Huidige prijs: `%{price}` %{coin}"
+  target_price: "- Doel prijs: `%{price}` %{coin}"
+  error: "❌ Er is iets misgegaan, niet in staat om op dit moment de volgende munt te genereren."
+  db_error: "❌ Kan volgende munt niet ophalen uit database."
+
+
+history:
+  last_x_trades: "Laatste **%{trades}** transacties:"
+  sold_bought: "*%{sold_trade}* `%{amount1}` *%{coin1}* voor `%{amount2}` *%{coin2}*"
+  sold: "Verkocht"
+  bought: "Gekocht"
+  status: "Status: _*%{status}*_"
+  error: "❌ Er ging iets mis, niet in staat om op dit moment handelsgeschiedenis te genereren."
+  db_error: "❌ Kan handelsgeschiedenis niet ophalen uit database."
+
+
+btb:
+  not_running: "⚠ Binance Trade Bot is niet actief."
+  running: "✔ Binance Trade Bot wordt uitgevoerd."
+  already_running: "⚠ Binance Trade Bot draait al."
+  starting: "De bot begint, even geduld aub..."
+  started: "✔ Binance Trade Bot succesvol gestart."
+  start_error: "❌ Kan Binance Trade Bot niet starten."
+  installation_path_error: "❌ Kan de _Binance Trade Bot_ installatie niet vinden in `%{path}`."
+  directory_hint: "Zorg ervoor dat de `binance-trade-bot` en de `BTB-manager-telegram` zich in dezelfde bovenliggende map bevinden."
+  stopped: "✔ De bot is succesvol gestopt."
+  stop_error: "❌ Kan Binance Trade Bot niet stoppen."
+  lib_error: "❌ Kan python binair niet vinden in `%{path}`."
+  windows_hint: "Als u de telegram-bot op Windows uitvoert, zorg er dan voor dat u met beheerdersrechten werkt."
+
+
+log:
+  error: "❌ Kan het logboekbestand niet vinden in `%{path}`."
+  last_4000_characters: "Laatste *4000* tekens in logbestand:"
+
+
+panic:
+  holding: "U heeft momenteel `%{amount1}` *%{coin1}* gekocht voor `%{amount2}` *%{coin2}*."
+  rate_when_bought: "Wisselkoers bij aankoop:"
+  current_rate: "Huidige wisselkoers:"
+  current_value: "Huidige waarde:"
+  change: "Wijzigen:"
+  stop_and_sell: "Wilt u _Binance Trade Bot_ stoppen en verkopen tegen marktprijs?"
+  open_buy_order: "Je hebt een openstaande kooporder van `%{amount1}` *%{coin1}* voor `%{amount2}` *%{coin2}*."
+  limit_buy_price: " limiet koopprijs:"
+  stop_and_cancel: "Wilt u _Binance Trade Bot_ stoppen en annuleer de openstaande bestelling?"
+  order_already_complete: "Je saldo is al binnen *%{coin}*."
+  ask_stop_bot: "Wilt u de _Binance Trade Bot_ stoppen?"
+  open_sell_order: "U heeft een openstaande verkooporder van `%{amount1}` *%{coin1}* voor `%{amount2}` *%{coin2}*."
+  limit_sell_price: "Verkoop tegen prijs:"
+  error: "❌ Er is iets misgegaan, de paniekknop werkt op dit moment niet."
+  db_error: "❌ Kan de benodigde acties in de database niet uitvoeren"
+
+
+coin_list:
+  success: "✔ Met succes bewerkt muntenlijstbestand naar:"
+  error: "❌ Kan het muntenlijstbestand niet bewerken."
+  not_found: "❌ Kan het muntlijstbestand niet vinden op `%{path}`."
+  not_modified: "Uw bestand 'supported_coin_list' is *niet* gewijzigd."
+  is: "Huidige muntenlijst is:"
+  reply: "_*Gelieve te antwoorden met een bericht met de bijgewerkte muntenlijst*_."
+  stop_bot: "⚠ Stop Binance Trade Bot voordat u de muntenlijst bewerkt."
+
+
+config:
+  success: "✔ Gebruikersconfiguratiebestand met succes bewerkt naar:"
+  error: "❌ Kan het configuratiebestand van de gebruiker niet bewerken."
+  not_found: "❌ Unable to find user configuration file at `%{path}`."
+  not_modified: "Uw `user.cfg` bestand is *niet* gewijzigd."
+  is: "Huidig configuratiebestand is:"
+  reply: "_*Antwoord met een bericht met de bijgewerkte configuratie*_."
+  stop_bot: "⚠ Stop Binance Trade Bot voordat u het configuratiebestand bewerkt."
+
+
+db:
+  delete:
+    success: "✔ Succesvol databasebestand verwijderd."
+    error: "❌ Kan databasebestand niet verwijderen."
+    clear_log_error: "❌ Kan het logboekbestand niet wissen."
+    not_deleted: "Uw database is *niet* verwijderd."
+    stop_bot: "⚠ Stop Binance Trade Bot voordat u het databasebestand verwijderd."
+    sure: "Weet u zeker dat u het databasebestand wilt verwijderen en de logboeken wilt wissen?"
+
+  export:
+    stop_bot: "⚠ Stop Binance Trade Bot voordat u het databasebestand exporteert."
+    file: "Hier is uw databasebestand:"
+    error: "❌ Kan het databasebestand niet exporteren."
+
+
+update:
+  now: "Wilt u nu updaten??"
+
+  tgb:
+    updating: "De bot wordt bijgewerkt. Wacht tot het opnieuw is opgestart."
+    version_error: "Fout tijdens het ophalen van BTB Manager Telegram versie informatie."
+    error: "Kan BTB Manager Telegram niet bijwerken"
+    not_updated: "BTB Manager Telegram is *niet* bijgewerkt."
+    up_to_date: "Uw BTB Manager Telegram installatie is al up-to-date."
+    available: "Er is een update voor BTB Manager Telegram beschikbaar."
+    instruction: "Gelieve bij te werken door naar *🛠 Onderhoud* te gaan en en druk op de knop *⬆ Telegram-bot bijwerken*."
+
+  btb:
+    updating: "De bot is gestopt en wordt nu bijgewerkt."
+    version_error: "Fout tijdens het ophalen van Binance Trade Bot versie informatie."
+    error: "Kan Binance Trade Bot niet bijwerken"
+    not_updated: "Binance Trade Bot is *niet* bijgewerkt."
+    up_to_date: "Uw Binance Trade Bot installatie is al up-to-date."
+    available: "Er is een update voor Binance Trade Bot beschikbaar."
+    instruction: "Werk bij door naar *🛠 Onderhoud* te gaan en op de knop *Update Binance Trade Bot* te drukken."
+    start_manually: "Wacht een paar seconden en start vervolgens handmatig opnieuw op."
+
+
+script:
+  not_found: "Kan script niet vinden met de naam %{name} in bestand custom_scripts.json."
+  error: "Fout tijdens het uitvoeren van de script."
+  no_script: "Er is geen aangepast script gevonden in *BTB-manager-telegram* 's `/config/custom_scripts.json` bestand."
+  no_config: "Kan bestand `custom_scripts.json` niet vinden binnen in de  *BTB-manager-telegram* 's `config/` map."
+  select: "Selecteer één van uw aangepaste scripts om deze uit te voeren."
+
+keyboard:
+  current_value: "💵 Huidige waarde"
+  progress: "📈 Vooruitgang"
+  current_ratios: "➗ Huidige ratio's"
+  trade_history: "⌛ Handelsgeschiedenis"
+  panic: "🚨 Paniekknop"
+  check_status: "🔍 Status controleren"
+  maintenance: "🛠 Onderhoud"
+  configurations: "⚙️ Configuraties"
+  start: "▶ Start bot"
+  stop: "⏹ Stop bot"
+  read_logs: "📜 Laatste logboekregels lezen"
+  delete_db: "❌ Database verwijderen"
+  edit_cfg: "⚙ Wijzig user.cfg"
+  edit_coin_list: "👛 Muntenlijst bewerken"
+  export_db: "📤 Database exporteren"
+  back: "⬅️ Terug"
+  go_back: "Ga terug"
+  update_tgb: "⬆ Update Telegram Bot"
+  update_btb: "⬆ Update Binance Trade Bot"
+  execute_script: "🤖 Aangepast script uitvoeren"
+  stop_sell: "⚠ Stop & verkoop tegen marktprijs"
+  stop_cancel: "⚠ Stop & annuleer bestelling"
+  ok_s: "OK 👌"
+  ok: "OK"
+  great: "Geweldig 👌"
+  cancel: "Annuleren"
+  update: "Update"
+  cancel_update: "Update annuleren"
+  confirm: "⚠ Bevestigen"
+  stop_bot: "⚠ Stop de bot"
+  next_coin: "🔀 Volgende munt"
