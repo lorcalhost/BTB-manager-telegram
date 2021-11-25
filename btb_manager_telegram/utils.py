@@ -223,9 +223,6 @@ def update_checker():
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
-            sleep(1)
-            bot.close()
-            sleep(1)
             scheduler.enter(
                 60 * 60 * 12,
                 1,
