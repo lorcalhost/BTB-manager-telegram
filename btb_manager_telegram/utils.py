@@ -38,7 +38,7 @@ def i18n_format(key, **kwargs):
 
 
 def escape_tg(message):
-    escape_char = (".", "-", "?", "!", ">")
+    escape_char = (".", "-", "?", "!", ">", "{", "}")
     escaped_message = ""
     is_escaped = False
     for cur_char in message:
@@ -201,8 +201,8 @@ def update_checker():
             logger.info("BTB Manager Telegram update found.")
 
             message = (
-                f"{i18n_format('tg_bot_update_availabe')}\n\n"
-                f"{i18n_format('tg_bot_update_instruction')}"
+                f"{i18n_format('update.tgb.available')}\n\n"
+                f"{i18n_format('update.tgb.instruction')}"
             )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
@@ -218,8 +218,8 @@ def update_checker():
             logger.info("Binance Trade Bot update found.")
 
             message = (
-                f"{i18n_format('btb_update_availabe')}\n\n"
-                f"{i18n_format('btb_bot_update_instruction')}"
+                f"{i18n_format('update.btb.available')}\n\n"
+                f"{i18n_format('update.btb.instruction')}"
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
@@ -259,7 +259,7 @@ def get_custom_scripts_keyboard():
     custom_scripts_path = "./config/custom_scripts.json"
     keyboard = []
     custom_script_exist = False
-    message = i18n_format("script_not_found_in_file_error")
+    message = i18n_format("script.no_script")
 
     if os.path.exists(custom_scripts_path):
         with open(custom_scripts_path) as f:
@@ -269,12 +269,12 @@ def get_custom_scripts_keyboard():
 
         if len(keyboard) >= 1:
             custom_script_exist = True
-            message = i18n_format("select_script")
+            message = i18n_format("script.select")
     else:
         logger.warning(
             "Unable to find custom_scripts.json file inside BTB-manager-telegram's config/ directory."
         )
-        message = i18n_format("script_not_found_in_folder_error")
+        message = i18n_format("script.no_config")
 
-    keyboard.append([i18n_format("cancel")])
+    keyboard.append([i18n_format("keyboard.cancel")])
     return keyboard, custom_script_exist, message
