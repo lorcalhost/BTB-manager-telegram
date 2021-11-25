@@ -28,7 +28,7 @@ value:
   wait_for_order: "_Warten auf den Abschluss des Kaufauftrags_."
   db_error: "❌ Der aktuelle Coin kann nicht aus der Datenbank abgerufen werden."
   no_information: "❌ Keine Informationen zu *%{current_coin}* in der Datenbank verfügbar."
-  no_during_trade: "⚠ Wenn Sie während eines Handels versucht haben, die Schaltfläche "Aktueller Wert" zu verwenden, versuchen Sie es nach Abschluss des Handels erneut."
+  no_during_trade: "⚠ Wenn Sie während eines Handels versucht haben, die Schaltfläche `Aktueller Wert` zu verwenden, versuchen Sie es nach Abschluss des Handels erneut."
   error: "❌ Etwas ist schief gelaufen, derzeit kann kein Wert generiert werden."
   last_update: "Letztes Update: `%{update}`"
   current_coin: "*Aktueller Coin %{coin}:*"
@@ -112,7 +112,7 @@ panic:
   ask_stop_bot: "Möchtest du _Binance Trade Bot_ stoppen?"
   open_sell_order: "Du hast einen offenen Verkaufauftrag von `%{amount1}` *%{coin1}* für `%{amount2}` *%{coin2}*."
   limit_sell_price: "Limit-Verkauf zum Preis:"
-  error: "❌ Etwas ist schief gelaufen, Der Panik-Knopf funktioniert derzeit nicht."
+  error: "❌ Etwas ist schief gelaufen. Der Panik-Knopf funktioniert derzeit nicht."
   db_error: "❌ Die erforderlichen Aktionen in der Datenbank können nicht ausgeführt werden"
 
 
