@@ -1,11 +1,11 @@
-exited_no_change: "👌 Beende mit keinen Änderungen."
-stop_to_stop: "Schreiben /stop, um die Bearbeitung zu stoppen und ohne Änderungen zu beenden"
+exited_no_change: "👌 Beende mit keinen Aenderungen."
+stop_to_stop: "Schreiben /stop, um die Bearbeitung zu stoppen und ohne Aenderungen zu beenden"
 bye: "Tschüss! Ich hoffe wir können bald wieder reden."
 killed_bot: "Beendete _Binance Trade Bot_!"
 logging_enabled_error: "⚠ Bitte stelle sicher, dass die Protokollierung für _Binance Trade Bot_ aktiviert ist."
 database_not_found: "❌ Datenbankdatei unter `%{path}` kann nicht gefunden werden."
 conversation_started: "Unterhaltung gestarted!"
-select_option: "Bitte wähle eine der Optionen aus."
+select_option: "Bitte waehle eine der Optionen aus."
 
 
 welcome:
@@ -14,7 +14,7 @@ welcome:
   developed_by: "Dieser Telegram Bot wurder von @lorcalhost entwickelt."
   project_link: "Finde [hier](https://github.com/lorcalhost/BTB-manager-telegram) mehr über das Projekt heraus."
   donation: "*Wenn du meine Arbeit magst, [überlege bitte das Projekt mit einer kleinen Spende zu unterstützen](https://github.com/sponsors/lorcalhost). ❤*"
-  how_to_start: "*Zum Starten der Unterhaltung, klicke auf die Schaltfläche `/start`*"
+  how_to_start: "*Zum Starten der Unterhaltung, klicke auf die Schaltflaeche `/start`*"
   bot_started: "Ich habe den Handelsbot bereits für dich gestartet. Das brauchst du nicht mehr machen"
   bot_not_started:
     base: "Das Starten des Handelsbot ist fehlgeschlagen."
@@ -28,44 +28,44 @@ value:
   wait_for_order: "_Warten auf den Abschluss des Kaufauftrags_."
   db_error: "❌ Der aktuelle Coin kann nicht aus der Datenbank abgerufen werden."
   no_information: "❌ Keine Informationen zu *%{current_coin}* in der Datenbank verfügbar."
-  no_during_trade: "⚠ Wenn Sie während eines Handels versucht haben, die Schaltfläche "Aktueller Wert" zu verwenden, versuchen Sie es nach Abschluss des Handels erneut."
+  no_during_trade: "⚠ Wenn du waehrend eines Handels versucht hast, die Schaltflaeche "Aktueller Wert" zu verwenden, versuche es nach Abschluss des Handels erneut."
   error: "❌ Etwas ist schief gelaufen, derzeit kann kein Wert generiert werden."
   last_update: "Letztes Update: `%{update}`"
   current_coin: "*Aktueller Coin %{coin}:*"
   balance: "- Bilanz: `%{balance}` *%{coin}*"
   exchange_rate_purchased: "- Wechselkurs beim Kauf:  `%{rate}` *%{bridge}*/*%{coin}*"
   exchange_rate_now: "- Aktueller Wechselkurs : `%{rate}` *USD*/*%{coin}*"
-  value_change: "- *Wertänderung*: `%{change}` *%*"
+  value_change: "- *Wertaenderung*: `%{change}` *%*"
   value_usd: "- Wert in *USD*: `%{value}` *USD*"
   value_btc: "- Wert in *BTC*: `%{value}` *BTC*"
   bought_for: "_Gekauft für_ `%{value}` *%{coin}*"
-  one_day_change_btc: "1 Tag Änderung BTC: `%{value}` %"
-  seven_day_change_btc: "7 Tage Änderung BTC: `%{value}` %"
+  one_day_change_btc: "1 Tag Aenderung BTC: `%{value}` %"
+  seven_day_change_btc: "7 Tage Aenderung BTC: `%{value}` %"
 
 
 progress:
   coin: "Aktueller Coin-Mengenfortschritt:"
   amount: "- Menge: `%{amount}` *%{coin}*"
   price: "- Preis: `%{amount}` *USD*"
-  change_over_days: "- Änderung: `%{amount}` *%{coin}* `%{percent}` *%* in %{days} Tagen, %{hours} Stunden"
+  change_over_days: "- Aenderung: `%{amount}` *%{coin}* `%{percent}` *%* in %{days} Tagen, %{hours} Stunden"
   trade_datetime: "- Handelszeit: `%{date}`"
   db_error: "❌ Fortschrittsinformationen können nicht aus der Datenbank abgerufen werden."
 
 
 ratios:
   last_update: "Letztes Update: `%{update}`"
-  compared_ratios: "*Coinverhältnisse im Vergleich zu %{coin} in absteigender Reihenfolge:*"
+  compared_ratios: "*Coinverhaeltnisse im Vergleich zu %{coin} in absteigender Reihenfolge:*"
   bridge_value: "- Preis: `%{value}` %{bridge}"
-  ratio: "- Verhältnis: `%{ratio}`"
-  gen_error: "❌ Etwas ist schief gelaufen, derzeit können keine Verhältnisse erstellt werden."
-  db_error: "❌ Verhältnisse können nicht aus der Datenbank abgerufen werden."
+  ratio: "- Verhaeltnis: `%{ratio}`"
+  gen_error: "❌ Etwas ist schief gelaufen, derzeit können keine Verhaeltnisse erstellt werden."
+  db_error: "❌ Verhaeltnisse können nicht aus der Datenbank abgerufen werden."
 
 
 next_coin:
   current_price: "- Aktueller Preis: `%{price}` %{coin}"
   target_price: "- Zielpreis: `%{price}` %{coin}"
-  error: "❌ Etwas ist schief gelaufen, derzeit kann der nächste Coin nicht ermittelt werden."
-  db_error: "❌ Nächster Coin kann nicht aus der Datenbank ermittelt werden."
+  error: "❌ Etwas ist schief gelaufen, derzeit kann der naechste Coin nicht ermittelt werden."
+  db_error: "❌ Naechster Coin kann nicht aus der Datenbank ermittelt werden."
 
 
 history:
@@ -79,9 +79,9 @@ history:
 
 
 btb:
-  not_running: "⚠ Binance Trade Bot läuft nicht."
-  running: "✔ Binance Trade Bot läuft."
-  already_running: "⚠ Binance Trade Bot läuft bereits."
+  not_running: "⚠ Binance Trade Bot laeuft nicht."
+  running: "✔ Binance Trade Bot laeuft."
+  already_running: "⚠ Binance Trade Bot laeuft bereits."
   starting: "Der Handelsbot startet, bitte warte..."
   started: "✔ Der Handelsbot ist erfolgreich gestartet."
   start_error: "❌ Binance Trade Bot kann nicht gestartet werden."
@@ -99,11 +99,11 @@ log:
 
 
 panic:
-  holding: "Du hälst derzeit `%{amount1}` *%{coin1}* gekauft für `%{amount2}` *%{coin2}*."
+  holding: "Du haelst derzeit `%{amount1}` *%{coin1}* gekauft für `%{amount2}` *%{coin2}*."
   rate_when_bought: "Wechselkurs beim Kauf:"
   current_rate: "Derzeitiger Wechselkurs:"
   current_value: "Derzeitiger Wert:"
-  change: "Änderung:"
+  change: "Aenderung:"
   stop_and_sell: "Möchtest du _Binance Trade Bot_ stoppen und zum Marktpreis verkaufen?"
   open_buy_order: "Du hast einen offenen Kaufauftrag von `%{amount1}` *%{coin1}* für `%{amount2}` *%{coin2}*."
   limit_buy_price: "Limit-Kauf zum Preis:"
@@ -117,7 +117,7 @@ panic:
 
 
 coin_list:
-  success: "✔ Erfolgreiche Änderung der Coinliste zu:"
+  success: "✔ Erfolgreiche Aenderung der Coinliste zu:"
   error: "❌ Coinliste kann nicht bearbeitet werden."
   not_found: "❌ Coinliste unter `%{path}` kann nicht gefunden werden."
   not_modified: "Deine `supported_coin_list` Datei wurde *nicht* bearbeitet."
@@ -127,7 +127,7 @@ coin_list:
 
 
 config:
-  success: "✔ Erfolgreiche Änderung der Benutzerkonfiguration zu:"
+  success: "✔ Erfolgreiche Aenderung der Benutzerkonfiguration zu:"
   error: "❌ Benutzerkonfiguration kann nicht bearbeitet werden."
   not_found: "❌ Benutzerkonfiguration unter `%{path}` kann nicht gefunden werden."
   not_modified: "Deine `user.cfg` Datei wurde *nicht* bearbeitet."
@@ -161,7 +161,7 @@ update:
     not_updated: "BTB Manager Telegram wurde *nicht* geupdatet."
     up_to_date: "Deine BTB Manager Telegram Installation ist schon auf dem neuesten Stand."
     available: "Ein Update für BTB Manager Telegram ist verfügbar."
-    instruction: "Bitte aktualisiere, indem du zu *🛠 Wartung* gehst und die Schaltfläche *⬆ Telegramm-Bot aktualisieren* drückst."
+    instruction: "Bitte aktualisiere, indem du zu *🛠 Wartung* gehst und die Schaltflaeche *⬆ Telegramm-Bot aktualisieren* drückst."
 
   btb:
     updating: "Der Bot wurde gestoppt und wird jetzt geupdatet."
@@ -170,21 +170,21 @@ update:
     not_updated: "Binance Trade Bot wurde *nicht* geupdatet."
     up_to_date: "Deine Binance Trade Bot Installation ist schon auf dem neuesten Stand."
     available: "Ein Update für Binance Trade Bot ist verfügbar."
-    instruction: "Bitte aktualisiere, indem du zu *🛠 Wartung* gehst und die Schltfläche *⬆ Binance Trade Bot aktualisieren* drückst."
+    instruction: "Bitte aktualisiere, indem du zu *🛠 Wartung* gehst und die Schltflaeche *⬆ Binance Trade Bot aktualisieren* drückst."
     start_manually: "Warte ein paar Sekunden und starte dann manuell neu."
 
 
 script:
   not_found: "Das Skript mit dem Namen %{name} kann in der Datei custom_scripts.json nicht gefunden werden."
-  error: "Fehler während der Skriptausführung."
+  error: "Fehler waehrend der Skriptausführung."
   no_script: "In der Datei `/config/custom_scripts.json` von *BTB-manager-telegram* wurde kein benutzerdefiniertes Skript gefunden."
   no_config: "Die Datei `custom_scripts.json` kann im `config/`-Verzeichnis von *BTB-manager-telegram* nicht gefunden werden."
-  select: "Wähle eines deiner benutzerdefinierten Skripts aus, um es auszuführen."
+  select: "Waehle eines deiner benutzerdefinierten Skripts aus, um es auszuführen."
 
 keyboard:
   current_value: "💵 Aktueller Wert"
   progress: "📈 Fortschritt"
-  current_ratios: "➗ Aktuelle Verhältnisse"
+  current_ratios: "➗ Aktuelle Verhaeltnisse"
   trade_history: "⌛ Handelsgeschichte"
   panic: "🚨 Panikknopf"
   check_status: "🔍 Bot-Status prüfen"
@@ -194,8 +194,8 @@ keyboard:
   stop: "⏹ Stoppe Handelsbot"
   read_logs: "📜 Letzte Protokollzeilen lesen"
   delete_db: "❌ Lösche Datenbank"
-  edit_cfg: "⚙ Ändere user.cfg"
-  edit_coin_list: "👛 Ändere Coinliste"
+  edit_cfg: "⚙ Aendere user.cfg"
+  edit_coin_list: "👛 Aendere Coinliste"
   export_db: "📤 Exportiere Datenbank"
   back: "⬅️ Zurück"
   go_back: "Gehe Zurück"
@@ -210,6 +210,6 @@ keyboard:
   cancel: "Stornieren"
   update: "Updaten"
   cancel_update: "Storniere update"
-  confirm: "⚠ Bestätige"
+  confirm: "⚠ Bestaetige"
   stop_bot: "⚠ Stoppe den Bot"
-  next_coin: "🔀 Nächster Coin"
+  next_coin: "🔀 Naechster Coin"
