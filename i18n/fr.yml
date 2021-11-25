@@ -53,29 +53,33 @@ progress:
 
 
 ratios:
+  last_update: "Dernière mise à jour: `%{update}`"
   compared_ratios: "*Ratio de monnaies à %{coin} en ordre décroissant :*"
   bridge_value: "- Prix: `%{value}` %{bridge}"
   ratio: "- Ratio: `%{ratio}`"
   gen_error: "❌ Quelque chose s'est mal passé, impossible de générer les ratios."
-
+  db_error: "❌ Impossible de récuperer les ratios depuis la base de données."
 
 next_coin:
   current_price: "- Prix actuel: `%{price}` %{coin}"
   target_price: "- Prix visé: `%{price}` %{coin}"
   error: "❌ Quelque chose s'est mal passé, impossible de déterminer la prochaine monnaie."
-
+  db_error: "❌ Impossible de récuperer les prochaines monnaies depuis la base de données."
 
 history:
   last_x_trades: "**%{trades}** derniers trades:"
   sold_bought: "*%{sold_trade}* `%{amount1}` *%{coin1}* pour `%{amount2}` *%{coin2}*"
+  sold: "Acheté"
+  bought: "Vendu"
   status: "État : _*%{status}*_"
   error: "❌ Quelque chose s'est mal passé, impossible de générer l'historique de trade."
-
+  db_error: "❌ Impossible de récuperer l'historique des trades depuis la base de données."
 
 btb:
   not_running: "⚠ Le bot de trading n'est pas lancé ."
   running: "✔ Le bot de trading est lancé."
   already_running: "⚠ Le bot de trading est déjà lancé."
+  starting: "Le bot de trading démarre, patientez..."
   started: "✔ Le bot de trading a démarré."
   start_error: "❌ Impossible de démarrer le bot de trading."
   installation_path_error: "❌ Impossible de trouver le bot de trading ici : `%{path}`."
@@ -106,7 +110,7 @@ panic:
   open_sell_order: "Vous avez un ordre de vente en cours de `%{amount1}` *%{coin1}* pour `%{amount2}` *%{coin2}*."
   limit_sell_price: "Ordre limite au prix de :"
   error: "❌ Quelque chose s' est mal passé, le panic button ne fonctionne pas."
-
+  db_error: "❌ Impossible de réaliser les actions nécéssaires sur la base de données."
 
 coin_list:
   success: "✔ La liste de monnaies a été changé en :"
@@ -158,6 +162,7 @@ update:
   btb:
     updating: "Le bot de trading se met à jour."
     version_error: "Une erreur est survenue lors de la récupération des information de version du bot de trading."
+    error: "Impossible de mettre à jour le bot de trading"
     not_updated: "Le bot de trading *n'a pas* été mis à jour."
     up_to_date: "Le bot de trading est déjà à jour."
     available: "Une mise à jour du bot de trading est disponible."

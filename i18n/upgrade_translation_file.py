@@ -3,8 +3,8 @@ import re
 import shutil
 import subprocess
 
-import yaml
 import click
+import yaml
 
 
 @click.command()
