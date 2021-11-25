@@ -113,6 +113,12 @@ optional arguments:
   -d DOCKER, --docker DOCKER
                         (optional) Run the script in a docker container.
                         NOTE: Run the 'docker_setup.py' file before passing this flag.
+  -s, --start_trade_bot
+                        (optional) To start the trading bot automatically with the telegram bot 
+  -l, --language
+                        (optional) Language of choice
+  -h, --help
+                        (optinal) Lists the optional arguments
 ```
 
 ⚠ Please check the [Docker setup] guide if you would like to run the bot in a Docker container.
