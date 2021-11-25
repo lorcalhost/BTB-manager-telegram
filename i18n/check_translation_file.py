@@ -42,9 +42,9 @@ def main(translation_file):
             content = f.read()
 
         finds = [
-            i[2]
+            i[4]
             for i in re.findall(
-                "(i18n_format|i18n.t)\(('|\")(([a-z]|_|\n|\.)*)('|\")\)", content
+                "(i18n_format|i18n.t)\(((\n| )*)('|\")(([a-z]|_|\n|\.)*)('|\")", content
             )
         ]
 

@@ -86,7 +86,7 @@ def current_value():
 
                 if query is None:
                     return [
-                        i18n_format("no_information", current_coin=current_coin),
+                        i18n_format("value.no_information", current_coin=current_coin),
                         i18n_format("value.no_during_trade"),
                     ]
 
