@@ -274,7 +274,7 @@ def get_custom_scripts_keyboard():
         logger.warning(
             "Unable to find custom_scripts.json file inside BTB-manager-telegram's config/ directory."
         )
-        message = i18n_format("script.not_found")
+        message = i18n_format("script.no_config")
 
     keyboard.append([i18n_format("keyboard.cancel")])
     return keyboard, custom_script_exist, message
