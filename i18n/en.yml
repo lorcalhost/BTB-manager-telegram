@@ -177,8 +177,8 @@ update:
 script:
   not_found: "Unable to find script named %{name} in custom_scripts.json file."
   error: "Error during script execution."
-  no_script: "No custom script was found inside *BTB-manager-telegram*'s `/config/custom_scripts.json` file."
-  no_config: "Unable to find `custom_scripts.json` file inside *BTB-manager-telegram*'s `config/` directory."
+  no_script: "No custom script was found inside *BTB-manager-telegram* 's `/config/custom_scripts.json` file."
+  no_config: "Unable to find `custom_scripts.json` file inside *BTB-manager-telegram* 's `config/` directory."
   select: "Select one of your custom scripts to execute it."
 
 keyboard:
