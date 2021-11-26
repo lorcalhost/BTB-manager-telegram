@@ -125,6 +125,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "phoenix-blue",
+      "name": "phoenix-blue",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13711891?v=4",
+      "profile": "https://github.com/phoenix-blue",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,
