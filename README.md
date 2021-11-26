@@ -206,6 +206,7 @@ This project follows the [all-contributors] specification.
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/MasaiasuOse"><img src="https://avatars.githubusercontent.com/u/45827629?v=4?s=100" width="100px;" alt=""/><br /><sub><b>MasaiasuOse</b></sub></a><br /><a href="#translation-MasaiasuOse" title="Translation">🌍</a></td>
+    <td align="center"><a href="https://github.com/phoenix-blue"><img src="https://avatars.githubusercontent.com/u/13711891?v=4?s=100" width="100px;" alt=""/><br /><sub><b>phoenix-blue</b></sub></a><br /><a href="#translation-phoenix-blue" title="Translation">🌍</a></td>
   </tr>
 </table>
 
