@@ -146,6 +146,15 @@
       "contributions": [
         "translation"
       ]
+    },
+    {
+      "login": "MasaiasuOse",
+      "name": "MasaiasuOse",
+      "avatar_url": "https://avatars.githubusercontent.com/u/45827629?v=4",
+      "profile": "https://github.com/MasaiasuOse",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -153,5 +162,6 @@
   "projectOwner": "lorcalhost",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "none"
 }

@@ -201,7 +201,11 @@ This project follows the [all-contributors] specification.
     <td align="center"><a href="https://github.com/SeriousSeal"><img src="https://avatars.githubusercontent.com/u/57253532?v=4?s=100" width="100px;" alt=""/><br /><sub><b>SeriousSeal</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=SeriousSeal" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/titulebolide"><img src="https://avatars.githubusercontent.com/u/44905741?v=4?s=100" width="100px;" alt=""/><br /><sub><b>titulebolide</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=titulebolide" title="Code">💻</a> <a href="#ideas-titulebolide" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/stgo-eo"><img src="https://avatars.githubusercontent.com/u/7523722?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Stephen Goult</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Astgo-eo" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/Lisiadito"><img src="https://avatars.githubusercontent.com/u/13214912?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Patrick Weingärtner</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=Lisiadito" title="Code">💻</a> <a href="#ideas-Lisiadito" title="Ideas, Planning, & Feedback">🤔</a> <a href="#translation-Lisiadito" title="Translation">🌍</a> <a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=Lisiadito" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/FedeArre"><img src="https://avatars.githubusercontent.com/u/39017587?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Federico Arredondo</b></sub></a><br /><a href="#translation-FedeArre" title="Translation">🌍</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/MasaiasuOse"><img src="https://avatars.githubusercontent.com/u/45827629?v=4?s=100" width="100px;" alt=""/><br /><sub><b>MasaiasuOse</b></sub></a><br /><a href="#translation-MasaiasuOse" title="Translation">🌍</a></td>
   </tr>
 </table>
 
