@@ -142,7 +142,7 @@ db:
     error: "❌ No fue posible eliminar la base de datos."
     clear_log_error: "❌ No fue posible limpiar el log."
     not_deleted: "La base de datos *no* fue eliminada."
-    stop bot: "⚠ Detén el bot antes de eliminar la base de datos."
+    stop_bot: "⚠ Detén el bot antes de eliminar la base de datos."
     sure: "Está seguro de querer eliminar la base de datos y los logs?"
  
   export:
