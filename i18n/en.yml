@@ -10,7 +10,7 @@ select_option: "Please select one of the options."
 
 welcome:
   hello: "Hi *%{name}*!"
-  welcome: "Welcome to _Binace Trade Bot Manager Telegram_."
+  welcome: "Welcome to _Binance Trade Bot Manager Telegram_."
   developed_by: "This Telegram bot was developed by @lorcalhost."
   project_link: "Find out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)."
   donation: "*If you like my work please [consider supporting the project through a small donation](https://github.com/sponsors/lorcalhost). ❤*"

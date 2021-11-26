@@ -6,11 +6,11 @@ logging_enabled_error: "⚠ Asegurate que el logging esté habilitado en el _Bin
 database_not_found: "❌ No fue posible encontrar la base de datos en `%{path}`."
 conversation_started: "¡Conversación iniciada!"
 select_option: "Elige una de las siguientes opciones."
- 
- 
+
+
 welcome:
   hello: "Hola *%{name}*!"
-  welcome: "Bienvenido a _Binace Trade Bot Manager Telegram_."
+  welcome: "Bienvenido a _Binance Trade Bot Manager Telegram_."
   developed_by: "Este bot fue programado por @lorcalhost."
   project_link: "Encuentra mas informacion del proyecto [aqui](https://github.com/lorcalhost/BTB-manager-telegram)."
   donation: "*Si te gusta mi trabajo por favor [considera donar al proyecto a través de una pequeña donacion](https://github.com/sponsors/lorcalhost). ❤*"
@@ -21,8 +21,8 @@ welcome:
     bot_error: "Parece que el bot encontró un error al inicio."
     no_python: "No se encontraron los binarios de Python."
     bad_path: "No encontré la ubicación del Binance Trade Bot."
- 
- 
+
+
 value:
   order_placed: "Una orden de compra de `%{order_size}` *%{bridge}* esta puesta en la moneda *%{current_coin}*."
   wait_for_order: "_Esperando que la orden de compra se complete_."
@@ -41,8 +41,8 @@ value:
   bought_for: "_Comprado por_ `%{value}` *%{coin}*"
   one_day_change_btc: "Cambio de un dia (BTC): `%{value}` %"
   seven_day_change_btc: "Cambio de los 7 días (BTC): `%{value}` %"
- 
- 
+
+
 progress:
   coin: "Progreso de la cantidad de la moneda actual:"
   amount: "- Cantidad: `%{amount}` *%{coin}*"
@@ -50,8 +50,8 @@ progress:
   change_over_days: "- Cambio: `%{amount}` *%{coin}* `%{percent}` *%* en %{days} dias, %{hours} horas"
   trade_datetime: "- Fecha del trade: `%{date}`"
   db_error: "❌ No se pudo obtener información del progreso en la base de datos."
- 
- 
+
+
 ratios:
   last_update: "Última actualización: `%{update}`"
   compared_ratios: "*Ratios comparados a %{coin} en orden decreciente:*"
@@ -59,15 +59,15 @@ ratios:
   ratio: "- Ratio: `%{ratio}`"
   gen_error: "❌ Algo salió mal, no fue posible generar los ratios en este momento."
   db_error: "❌ No fue posible obtener los ratios desde la base de datos."
- 
- 
+
+
 next_coin:
   current_price: "- Precio actual: `%{price}` %{coin}"
   target_price: "- Precio objetivo: `%{price}` %{coin}"
   error: "❌ Algo salió mal, no se pudo generar la próxima moneda en este momento."
   db_error: "❌ No se pudo obtener la información desde la base de datos."
- 
- 
+
+
 history:
   last_x_trades: "Últimos **%{trades}** tradeos:"
   sold_bought: "*%{sold_trade}* `%{amount1}` *%{coin1}* for `%{amount2}` *%{coin2}*"
@@ -76,8 +76,8 @@ history:
   status: "Estado: _*%{status}*_"
   error: "❌ Algo salió mal, no fue posible generar el historial de tradeos en este momento."
   db_error: "❌ No se pudo obtener la información del historial de tradeos desde la base de datos."
- 
- 
+
+
 btb:
   not_running: "⚠ Binance Trade Bot no está activo."
   running: "✔ Binance Trade Bot está activo."
@@ -91,13 +91,13 @@ btb:
   stop_error: "❌ No fue posible detener el Binance Trade Bot."
   lib_error: "❌ No se encontraron los binarios de Python en `%{path}`."
   windows_hint: "Si estás ejecutando el bot desde Windows asegurate de ejecutarlo con permisos de administrador."
- 
- 
+
+
 log:
   error: "❌ No fue posible encontrar el log en `%{path}`."
   last_4000_characters: "Últimos *4000* caracteres del log:"
- 
- 
+
+
 panic:
   holding: "Actualmente estas holdeando `%{amount1}` *%{coin1}* comprados por `%{amount2}` *%{coin2}*."
   rate_when_bought: "Tipo de cambio cuando se compro:"
@@ -114,8 +114,8 @@ panic:
   limit_sell_price: "Limitar la venta en precio:"
   error: "❌ Algo salió mal, el botón de pánico no esta funcionando en este momento."
   db_error: "❌ No se pudo obtener información de la base de datos."
- 
- 
+
+
 coin_list:
   success: "✔ Lista de monedas correctamente editada a:"
   error: "❌ No fue posible editar la lista de monedas."
@@ -124,8 +124,8 @@ coin_list:
   is: "La lista de monedas actual es:"
   reply: "_*Por favor responde al mensaje con tu lista de monedas modificada*_."
   stop_bot: "⚠ Detén el bot antes de modificar la lista de monedas del mismo."
- 
- 
+
+
 config:
   success: "✔ El archivo de configuración fue correctamente editado a:"
   error: "❌ No fue posible modificar el archivo de configuración."
@@ -134,8 +134,8 @@ config:
   is: "El archivo de configuración actual es:"
   reply: "_*Por favor responde al mensaje con tu archivo de configuración modificado*_."
   stop_bot: "⚠ Detén el bot antes de modificar la configuración del mismo."
- 
- 
+
+
 db:
   delete:
     success: "✔ Base de datos eliminada correctamente."
@@ -144,16 +144,16 @@ db:
     not_deleted: "La base de datos *no* fue eliminada."
     stop_bot: "⚠ Detén el bot antes de eliminar la base de datos."
     sure: "Está seguro de querer eliminar la base de datos y los logs?"
- 
+
   export:
     stop_bot: "⚠ Detén el bot antes de exportar la base de datos."
     file: "Aqui esta tu base de datos exportada:"
     error: "❌ No fue posible exportar tu base de datos."
- 
- 
+
+
 update:
   now: "¿Te gustaría actualizar ahora mismo?"
- 
+
   tgb:
     updating: "El bot está actualizandose, espera a que se reinicie."
     version_error: "Error al intentar obtener información sobre la ultima version del bot de Telegram."
@@ -162,7 +162,7 @@ update:
     up_to_date: "Tu Bot de Telegram se encuentra actualizado."
     available: "Una actualización del Bot de Telegram está disponible."
     instruction: "Actualiza yendo a *🛠 Mantenimiento* y presionando el botón *⬆ Actualizar Bot de Telegram*."
- 
+
   btb:
     updating: "El bot se detuvo y está actualizandose."
     version_error: "Error al intentar obtener información sobre la última versión de Binance Trade Bot."
@@ -172,15 +172,15 @@ update:
     available: "Una actualización para Binance Trade Bot está disponible."
     instruction: "Actualiza yendo a *🛠 Mantenimiento* y presionando el botón *Actualizar Binance Trade Bot*."
     start_manually: "Espera unos segundos y reiniciarlo manualmente."
- 
- 
+
+
 script:
   not_found: "No fue posible encontrar el script %{name} en el archivo custom_scripts.json."
   error: "Error durante la ejecución del script."
   no_script: "No se encontró ningún script personalizado en el archivo `/config/custom_scripts.json` de *BTB-manager-telegram*"
   no_config: "No fue posible encontrar `custom_scripts.json` dentro del directorio `config/` de *BTB-manager-telegram* '"
   select: "Elige uno de los scripts personalizados para ejecutarlo."
- 
+
 keyboard:
   current_value: "💵 Valor actual"
   progress: "📈 Progreso"

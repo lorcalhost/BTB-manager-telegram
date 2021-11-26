@@ -460,9 +460,9 @@ def trade_history():
 
                         trade_details = i18n_format(
                             "history.sold_bought",
-                            sold_trade=i18n_format("history.sold")
+                            sold_trade=i18n_format("history.bought")
                             if trade[2]
-                            else i18n_format("history.bought"),
+                            else i18n_format("history.sold"),
                             amount1=trade[4],
                             coin1=trade[0],
                             amount2=trade[5],

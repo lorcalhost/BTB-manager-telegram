@@ -113,8 +113,13 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/44905741?v=4",
       "profile": "https://github.com/titulebolide",
       "contributions": [
-        "code",
-        "ideas"
+        "doc",
+        "maintenance",
+        "review",
+        "bug",
+        "translation",
+        "test",
+        "tool"
       ]
     },
     {
@@ -127,6 +132,27 @@
       ]
     },
     {
+      "login": "Lisiadito",
+      "name": "Patrick Weingärtner",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13214912?v=4",
+      "profile": "https://github.com/Lisiadito",
+      "contributions": [
+        "code",
+        "ideas",
+        "translation",
+        "doc"
+      ]
+    },
+    {
+      "login": "FedeArre",
+      "name": "Federico Arredondo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39017587?v=4",
+      "profile": "https://github.com/FedeArre",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
       "login": "MasaiasuOse",
       "name": "MasaiasuOse",
       "avatar_url": "https://avatars.githubusercontent.com/u/45827629?v=4",
@@ -135,6 +161,42 @@
         "translation",
         "doc"
       ]
+    },
+    {
+      "login": "phoenix-blue",
+      "name": "phoenix-blue",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13711891?v=4",
+      "profile": "https://github.com/phoenix-blue",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "neuhausj",
+      "name": "neuhausj",
+      "avatar_url": "https://avatars.githubusercontent.com/u/182152?v=4",
+      "profile": "https://github.com/neuhausj",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "santiagocarod",
+      "name": "Santiago Caro Duque",
+      "avatar_url": "https://avatars.githubusercontent.com/u/23182382?v=4",
+      "profile": "https://github.com/santiagocarod",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "shhhmel",
+      "name": "Ivan Myronov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17930913?v=4",
+      "profile": "https://github.com/shhhmel",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -142,5 +204,6 @@
   "projectOwner": "lorcalhost",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "none"
 }
