@@ -208,6 +208,7 @@ This project follows the [all-contributors] specification.
     <td align="center"><a href="https://github.com/MasaiasuOse"><img src="https://avatars.githubusercontent.com/u/45827629?v=4?s=100" width="100px;" alt=""/><br /><sub><b>MasaiasuOse</b></sub></a><br /><a href="#translation-MasaiasuOse" title="Translation">🌍</a></td>
     <td align="center"><a href="https://github.com/phoenix-blue"><img src="https://avatars.githubusercontent.com/u/13711891?v=4?s=100" width="100px;" alt=""/><br /><sub><b>phoenix-blue</b></sub></a><br /><a href="#translation-phoenix-blue" title="Translation">🌍</a></td>
     <td align="center"><a href="https://github.com/neuhausj"><img src="https://avatars.githubusercontent.com/u/182152?v=4?s=100" width="100px;" alt=""/><br /><sub><b>neuhausj</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=neuhausj" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/santiagocarod"><img src="https://avatars.githubusercontent.com/u/23182382?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Santiago Caro Duque</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Asantiagocarod" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 

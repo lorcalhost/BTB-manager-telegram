@@ -173,6 +173,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "santiagocarod",
+      "name": "Santiago Caro Duque",
+      "avatar_url": "https://avatars.githubusercontent.com/u/23182382?v=4",
+      "profile": "https://github.com/santiagocarod",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
