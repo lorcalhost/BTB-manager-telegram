@@ -1,0 +1,215 @@
+exited_no_change: "👌 Ningún cambio fue realizado."
+stop_to_stop: "Escribe /stop para salir sin guardar cambios."
+bye: "Adios! Espero que podamos hablar otro día."
+killed_bot: "El proceso _Binance Trade Bot_ fue matado!"
+logging_enabled_error: "⚠ Asegurate que el logging esté habilitado en el _Binance Trade Bot_."
+database_not_found: "❌ No fue posible encontrar la base de datos en `%{path}`."
+conversation_started: "¡Conversación iniciada!"
+select_option: "Elige una de las siguientes opciones."
+ 
+ 
+welcome:
+  hello: "Hola *%{name}*!"
+  welcome: "Bienvenido a _Binace Trade Bot Manager Telegram_."
+  developed_by: "Este bot fue programado por @lorcalhost."
+  project_link: "Encuentra mas informacion del proyecto [aqui](https://github.com/lorcalhost/BTB-manager-telegram)."
+  donation: "*Si te gusta mi trabajo por favor [considera donar al proyecto a través de una pequeña donacion](https://github.com/sponsors/lorcalhost). ❤*"
+  how_to_start: "*Para iniciar una conversación utiliza `/start`*"
+  bot_started: "La conversación ya inició, no hace falta usar el comando."
+  bot_not_started:
+    base: "Intente iniciar el Binance Trade Bot pero algo falló."
+    bot_error: "Parece que el bot encontró un error al inicio."
+    no_python: "No se encontraron los binarios de Python."
+    bad_path: "No encontré la ubicación del Binance Trade Bot."
+ 
+ 
+value:
+  order_placed: "Una orden de compra de `%{order_size}` *%{bridge}* esta puesta en la moneda *%{current_coin}*."
+  wait_for_order: "_Esperando que la orden de compra se complete_."
+  db_error: "❌ Error al intentar obtener datos desde la base de datos."
+  no_information: "❌ No hay información sobre *%{current_coin}* disponible en la base de datos."
+  no_during_trade: "⚠ Si intentaste usar el botón `Valor actual` durante un tradeo inténtalo nuevamente luego de que el mismo termine."
+  error: "❌ Algo salió mal. Imposible mostrar el valor en este momento."
+  last_update: "Última actualización: `%{update}`"
+  current_coin: "*Moneda actual %{coin}:*"
+  balance: "- Balance: `%{balance}` *%{coin}*"
+  exchange_rate_purchased: "- Tipo de cambio en la compra: `%{rate}` *%{bridge}*/*%{coin}*"
+  exchange_rate_now: "- Tipo de cambio actual:           `%{rate}` *USD*/*%{coin}*"
+  value_change: "- *Cambio en valor*: `%{change}` *%*"
+  value_usd: "- Valor en *USD*: `%{value}` *USD*"
+  value_btc: "- Valor en *BTC*: `%{value}` *BTC*"
+  bought_for: "_Comprado por_ `%{value}` *%{coin}*"
+  one_day_change_btc: "Cambio de un dia (BTC): `%{value}` %"
+  seven_day_change_btc: "Cambio de los 7 días (BTC): `%{value}` %"
+ 
+ 
+progress:
+  coin: "Progreso de la cantidad de la moneda actual:"
+  amount: "- Cantidad: `%{amount}` *%{coin}*"
+  price: "- Precio: `%{amount}` *USD*"
+  change_over_days: "- Cambio: `%{amount}` *%{coin}* `%{percent}` *%* en %{days} dias, %{hours} horas"
+  trade_datetime: "- Fecha del trade: `%{date}`"
+  db_error: "❌ No se pudo obtener información del progreso en la base de datos."
+ 
+ 
+ratios:
+  last_update: "Última actualización: `%{update}`"
+  compared_ratios: "*Ratios comparados a %{coin} en orden decreciente:*"
+  bridge_value: "- Precio: `%{value}` %{bridge}"
+  ratio: "- Ratio: `%{ratio}`"
+  gen_error: "❌ Algo salió mal, no fue posible generar los ratios en este momento."
+  db_error: "❌ No fue posible obtener los ratios desde la base de datos."
+ 
+ 
+next_coin:
+  current_price: "- Precio actual: `%{price}` %{coin}"
+  target_price: "- Precio objetivo: `%{price}` %{coin}"
+  error: "❌ Algo salió mal, no se pudo generar la próxima moneda en este momento."
+  db_error: "❌ No se pudo obtener la información desde la base de datos."
+ 
+ 
+history:
+  last_x_trades: "Últimos **%{trades}** tradeos:"
+  sold_bought: "*%{sold_trade}* `%{amount1}` *%{coin1}* for `%{amount2}` *%{coin2}*"
+  sold: "Vendido"
+  bought: "Comprado"
+  status: "Estado: _*%{status}*_"
+  error: "❌ Algo salió mal, no fue posible generar el historial de tradeos en este momento."
+  db_error: "❌ No se pudo obtener la información del historial de tradeos desde la base de datos."
+ 
+ 
+btb:
+  not_running: "⚠ Binance Trade Bot no está activo."
+  running: "✔ Binance Trade Bot está activo."
+  already_running: "⚠ Binance Trade Bot ya está activo."
+  starting: "Binance Trade Bot está iniciando, espera por favor..."
+  started: "✔ Binance Trade Bot inició correctamente."
+  start_error: "❌ No fue posible iniciar el Binance Trade Bot."
+  installation_path_error: "❌ No fue posible encontrar la instalación de  _Binance Trade Bot_ en `%{path}`."
+  directory_hint: "Asegurate de que `binance-trade-bot` y `BTB-manager-telegram` en el mismo directorio raíz."
+  stopped: "✔ El bot fue detenido correctamente."
+  stop_error: "❌ No fue posible detener el Binance Trade Bot."
+  lib_error: "❌ No se encontraron los binarios de Python en `%{path}`."
+  windows_hint: "Si estás ejecutando el bot desde Windows asegurate de ejecutarlo con permisos de administrador."
+ 
+ 
+log:
+  error: "❌ No fue posible encontrar el log en `%{path}`."
+  last_4000_characters: "Últimos *4000* caracteres del log:"
+ 
+ 
+panic:
+  holding: "Actualmente estas holdeando `%{amount1}` *%{coin1}* comprados por `%{amount2}` *%{coin2}*."
+  rate_when_bought: "Tipo de cambio cuando se compro:"
+  current_rate: "Tipo de cambio actual:"
+  current_value: "Valor actual:"
+  change: "Cambio:"
+  stop_and_sell: "Te gustaria detener el _Binance Trade Bot_ y vender a precio de mercado?"
+  open_buy_order: "Tienes una orden de compra activa de `%{amount1}` *%{coin1}* por `%{amount2}` *%{coin2}*."
+  limit_buy_price: "Limitar la compra en precio:"
+  stop_and_cancel: "Te gustaria detener el _Binance Trade Bot_ y cancelar la orden?"
+  order_already_complete: "Tu balance ya está en *%{coin}*."
+  ask_stop_bot: "Te gustaria detener el _Binance Trade Bot_?"
+  open_sell_order: "Tienes una orden de venta activa de `%{amount1}` *%{coin1}* por `%{amount2}` *%{coin2}*."
+  limit_sell_price: "Limitar la venta en precio:"
+  error: "❌ Algo salió mal, el botón de pánico no esta funcionando en este momento."
+  db_error: "❌ No se pudo obtener información de la base de datos."
+ 
+ 
+coin_list:
+  success: "✔ Lista de monedas correctamente editada a:"
+  error: "❌ No fue posible editar la lista de monedas."
+  not_found: "❌ No se pudo encontrar la lista de monedas en `%{path}`."
+  not_modified: "El archivo `supported_coin_list` *no* fue modificado."
+  is: "La lista de monedas actual es:"
+  reply: "_*Por favor responde al mensaje con tu lista de monedas modificada*_."
+  stop_bot: "⚠ Detén el bot antes de modificar la lista de monedas del mismo."
+ 
+ 
+config:
+  success: "✔ El archivo de configuración fue correctamente editado a:"
+  error: "❌ No fue posible modificar el archivo de configuración."
+  not_found: "❌ No fue posible encontrar el archivo de configuración en `%{path}`."
+  not_modified: "Tu `user.cfg` *no* fue modificado."
+  is: "El archivo de configuración actual es:"
+  reply: "_*Por favor responde al mensaje con tu archivo de configuración modificado*_."
+  stop_bot: "⚠ Detén el bot antes de modificar la configuración del mismo."
+ 
+ 
+db:
+  delete:
+    success: "✔ Base de datos eliminada correctamente."
+    error: "❌ No fue posible eliminar la base de datos."
+    clear_log_error: "❌ No fue posible limpiar el log."
+    not_deleted: "La base de datos *no* fue eliminada."
+    stop_bot: "⚠ Detén el bot antes de eliminar la base de datos."
+    sure: "Está seguro de querer eliminar la base de datos y los logs?"
+ 
+  export:
+    stop_bot: "⚠ Detén el bot antes de exportar la base de datos."
+    file: "Aqui esta tu base de datos exportada:"
+    error: "❌ No fue posible exportar tu base de datos."
+ 
+ 
+update:
+  now: "¿Te gustaría actualizar ahora mismo?"
+ 
+  tgb:
+    updating: "El bot está actualizandose, espera a que se reinicie."
+    version_error: "Error al intentar obtener información sobre la ultima version del bot de Telegram."
+    error: "Error al intentar actualizar el Bot de Telegram"
+    not_updated: "El Bot de Telegram *no* fue actualizado."
+    up_to_date: "Tu Bot de Telegram se encuentra actualizado."
+    available: "Una actualización del Bot de Telegram está disponible."
+    instruction: "Actualiza yendo a *🛠 Mantenimiento* y presionando el botón *⬆ Actualizar Bot de Telegram*."
+ 
+  btb:
+    updating: "El bot se detuvo y está actualizandose."
+    version_error: "Error al intentar obtener información sobre la última versión de Binance Trade Bot."
+    error: "Error al intentar actualizar Binance Trade Bot."
+    not_updated: "Binance Trade Bot *no* fue actualizado."
+    up_to_date: "Tu version del bot está actualizada."
+    available: "Una actualización para Binance Trade Bot está disponible."
+    instruction: "Actualiza yendo a *🛠 Mantenimiento* y presionando el botón *Actualizar Binance Trade Bot*."
+    start_manually: "Espera unos segundos y reiniciarlo manualmente."
+ 
+ 
+script:
+  not_found: "No fue posible encontrar el script %{name} en el archivo custom_scripts.json."
+  error: "Error durante la ejecución del script."
+  no_script: "No se encontró ningún script personalizado en el archivo `/config/custom_scripts.json` de *BTB-manager-telegram*"
+  no_config: "No fue posible encontrar `custom_scripts.json` dentro del directorio `config/` de *BTB-manager-telegram* '"
+  select: "Elige uno de los scripts personalizados para ejecutarlo."
+ 
+keyboard:
+  current_value: "💵 Valor actual"
+  progress: "📈 Progreso"
+  current_ratios: "➗ Ratios actuales"
+  trade_history: "⌛ Historial de tradeos"
+  panic: "🚨 Botón del pánico"
+  check_status: "🔍 Revisar estado del bot"
+  maintenance: "🛠 Mantenimiento"
+  configurations: "⚙️ Configuraciones"
+  start: "▶ Iniciar trade bot"
+  stop: "⏹ Detener trade bot"
+  read_logs: "📜 Mostrar ultimas lineas del log"
+  delete_db: "❌ Eliminar base de datos"
+  edit_cfg: "⚙ Editar user.cfg"
+  edit_coin_list: "👛 Editar lista de monedas"
+  export_db: "📤 Exportar base de datos"
+  back: "⬅️ Atrás"
+  go_back: "Ir atrás"
+  update_tgb: "⬆ Actualizar Bot de Telegram"
+  update_btb: "⬆ Actualizar Binance Trade Bot"
+  execute_script: "🤖 Ejecutar script personalizado"
+  stop_sell: "⚠ Detenerse y vender a precio del mercado"
+  stop_cancel: "⚠ Detenerse y cancelar orden"
+  ok_s: "OK 👌"
+  ok: "OK"
+  great: "Excelente 👌"
+  cancel: "Cancelar"
+  update: "Actualizar"
+  cancel_update: "Cancelar actualización"
+  confirm: "⚠ Confirmar"
+  stop_bot: "⚠ Detener el bot"
+  next_coin: "🔀 Siguiente moneda"

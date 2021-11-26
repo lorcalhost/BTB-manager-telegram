@@ -56,7 +56,7 @@ def pre_run_main() -> None:
         "-l",
         "--language",
         type=str,
-        help="(optional) Select a language. Available: en, ru, fr, de, nl",
+        help="(optional) Select a language. Available: en, ru, fr, de, nl, es",
         default="en",
     )
     parser.add_argument(
