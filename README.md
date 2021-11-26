@@ -13,6 +13,7 @@ As of now the bot is able to perform the following actions:
 - [x] ⏹ Stop _Binance Trade Bot_
 - [x] 💵 Display current coin stats (balance, USD value, BTC value, initial buying price)
 - [x] ➗ Display current coin ratios
+- [x] 🔀 Display next coin probability 
 - [x] 📈 Display progress (how much more of a certain coin you gained since you started using _Binance Trade Bot_)
 - [x] ⌛ Display trade history
 - [x] 📜 Display last 4000 characters of log file
