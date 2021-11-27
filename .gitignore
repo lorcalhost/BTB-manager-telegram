@@ -136,7 +136,6 @@ dmypy.json
 .idea/
 
 # Custom
-data/
 binance_trade_bot/
 user.cfg
 user.cfg.backup
