@@ -44,6 +44,9 @@ from btb_manager_telegram.utils import (
     reply_text_escape,
     telegram_text_truncator,
 )
+from btb_manager_telegram.report import (
+    get_graph
+)
 
 
 def menu(update: Update, _: CallbackContext) -> int:
@@ -61,6 +64,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         [i18n_format("keyboard.current_value"), i18n_format("keyboard.progress")],
         [i18n_format("keyboard.current_ratios"), i18n_format("keyboard.next_coin")],
         [i18n_format("keyboard.check_status"), i18n_format("keyboard.trade_history")],
+        ["Graph"],
         [i18n_format("keyboard.maintenance"), i18n_format("keyboard.configurations")],
     ]
 
@@ -188,11 +192,17 @@ def menu(update: Update, _: CallbackContext) -> int:
             buttons.check_status(), reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
 
-    elif update.message.text == i18n_format("keyboard.trade_history"):
-        for mes in buttons.trade_history():
-            reply_text_escape_fun(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
-            )
+    #elif update.message.text == i18n_format("keyboard.trade_history"):
+    #    for mes in buttons.trade_history():
+    #        reply_text_escape_fun(
+    #            mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+    #        )
+
+    elif update.message.text == "Graph":
+        logger.info("Graph button pressed")
+        figname = get_graph(False, 'EUR', 7, "amount", "USD")
+        with open(figname, 'rb') as f:
+            update.message.reply_photo(f)
 
     elif update.message.text == i18n_format("keyboard.start"):
         logger.info("Start bot button pressed.")
@@ -672,7 +682,7 @@ def cancel(update: Update, _: CallbackContext) -> int:
 
 MENU_HANDLER = MessageHandler(
     Filters.regex(
-        f"^({i18n_format('keyboard.current_value')}|{i18n_format('keyboard.panic')}|{i18n_format('keyboard.progress')}|{i18n_format('keyboard.current_ratios')}|{i18n_format('keyboard.next_coin')}|{i18n_format('keyboard.check_status')}|{i18n_format('keyboard.trade_history')}|{i18n_format('keyboard.maintenance')}|"
+        f"^({i18n_format('keyboard.current_value')}|{i18n_format('keyboard.panic')}|{i18n_format('keyboard.progress')}|{i18n_format('keyboard.current_ratios')}|{i18n_format('keyboard.next_coin')}|{i18n_format('keyboard.check_status')}|{i18n_format('keyboard.trade_history')}|Graph|{i18n_format('keyboard.maintenance')}|"
         f"{i18n_format('keyboard.configurations')}|{i18n_format('keyboard.start')}|{i18n_format('keyboard.stop')}|{i18n_format('keyboard.read_logs')}|{i18n_format('keyboard.delete_db')}|"
         f"{i18n_format('keyboard.edit_cfg')}|{i18n_format('keyboard.edit_coin_list')}|{i18n_format('keyboard.export_db')}|{i18n_format('keyboard.update_tgb')}|{i18n_format('keyboard.update_btb')}|"
         f"{i18n_format('keyboard.execute_script')}|{i18n_format('keyboard.back')}|{i18n_format('keyboard.go_back')}|{i18n_format('keyboard.ok')}|{i18n_format('keyboard.cancel_update')}|{i18n_format('keyboard.cancel')}|{i18n_format('keyboard.ok_s')}|{i18n_format('keyboard.great')})$"

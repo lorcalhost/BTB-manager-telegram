@@ -5,6 +5,14 @@ import binance
 import numpy as np
 from btb_manager_telegram import logger, scheduler, settings
 
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import datetime as dt
+
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+
+
 
 def build_ticker(all_symbols, tickers_raw):
     backup_coins = ["BTC", "ETH", "BNB"]
@@ -112,3 +120,104 @@ def make_snapshot():
     )
     scheduler.enter(3600, 2, make_snapshot)
     logger.info("Snapshot saved")
+
+
+def get_graph(relative, symbol, days, graph_type, ref_currency):
+    if symbol == "*":
+        symbol = settings.COIN_LIST
+    else:
+        symbol = symbol.split(",")
+        for s in symbol:
+            assert s in settings.COIN_LIST + [settings.CURRENCY]
+    if len(symbol) > 1:
+        relative = True
+    reports = get_previous_reports()
+
+    figname = None
+
+    if len(reports) == 0:
+        logger.warning(
+            "No snapshot in database. Run at least once main.py snapshot"
+        )
+    else:
+        figname, nb_plot = graph_report(
+            reports, symbol, relative, days, graph_type, ref_currency
+        )
+        if nb_plot <= 1:
+            logger.warning(
+                "Less than one report has been used to generate the plot. As a result, no line will be visible on the graph. Please check that snapshots are actually made."
+            )
+    return figname
+
+
+def graph_report(reports, symbols, relative, days, graph_type, ref_currency):
+    plt.clf()
+    plt.close()
+    if len(symbols) < 10:
+        plt.figure()
+    else:
+        plt.figure(figsize=(10, 6))
+
+    min_timestamp = 0
+    if days != 0:
+        min_timestamp = time.time() - days * 24 * 60 * 60
+
+    nb_plot = 0
+    for symbol in symbols:
+        X, Y = [], []
+        for report in reports:
+            if report["time"] < min_timestamp:
+                continue  # skip if too recent
+            if symbol not in report["tickers"]:
+                ts = report["time"]
+                brb.logger.debug(f"{symbol} has no price in the report with timestamp {ts}")
+                continue
+            ticker = report["tickers"][symbol]
+            if ticker == 0:
+                ts = report["time"]
+                brb.logger.debug(f"{symbol} has an invalid price in the report with timestamp {ts}")
+                continue
+
+            y = None
+            if graph_type == "amount":
+                y = report["total_usdt"] / ticker
+            elif graph_type == "price":
+                ref_currency_ticker = 1
+                if ref_currency not in ("USD", "USDT"):
+                    if ref_currency not in report["tickers"]:
+                        continue
+                    ref_currency_ticker = report["tickers"][ref_currency]
+                    if ref_currency_ticker == 0:
+                        continue
+                y = ticker / ref_currency_ticker
+            if y is None:
+                continue
+
+            Y.append(y)
+            X.append(dt.datetime.fromtimestamp(report["time"]))
+            nb_plot += 1
+
+        if relative:
+            Y = np.array(Y)
+            Y = (Y / Y[0] - 1) * 100
+        plt.plot(X, Y, label=symbol)
+
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%d/%m %H:%M"))
+    plt.setp(plt.xticks()[1], rotation=15)
+    if graph_type == "amount":
+        if relative:
+            plt.ylabel("Relative evolution of amount (%)")
+            plt.legend(bbox_to_anchor=(1, 1), loc="upper left")
+        else:
+            label = "Amount"
+            label += f" ({symbols[0]})" if len(symbols) == 1 else ""
+            plt.ylabel(label)
+    elif graph_type == "price":
+        if relative:
+            plt.ylabel(f"Relative evolution of price in {ref_currency} (%)")
+        else:
+            plt.ylabel(f"Price in {ref_currency}")
+    plt.grid()
+    figname = f"data/quantity_{symbol}.png"
+    plt.savefig(figname)
+    return figname, nb_plot
