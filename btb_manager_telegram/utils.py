@@ -3,6 +3,7 @@ import os
 import subprocess
 from time import sleep
 from typing import List, Optional
+import configparser
 
 import psutil
 import telegram
@@ -102,6 +103,26 @@ def setup_telegram_constants():
             "No chat_id has been set in the yaml configuration, anyone would be able to control your bot. Aborting."
         )
         exit(-1)
+
+
+def retreive_btb_constants():
+    logger.info("Retreiving binance tokens")
+    btb_config_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    btb_config = configparser.ConfigParser()
+    btb_config.read(btb_config_path)
+    settings.BINANCE_API_KEY = btb_config.get("binance_user_config", "api_key")
+    settings.BINANCE_API_SECRET = btb_config.get(
+        "binance_user_config", "api_secret_key"
+    )
+    settings.TLD = btb_config.get("binance_user_config", "tld")
+
+
+def setup_coin_list():
+    logger.info("Retreiving coin list")
+    coin_list_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
+    with open(coin_list_path, "r") as f:
+        coin_list = [line.replace("\n", "").replace(" ", "") for line in f.readlines()]
+    settings.COIN_LIST = [i for i in coin_list if i != ""]
 
 
 def telegram_text_truncator(

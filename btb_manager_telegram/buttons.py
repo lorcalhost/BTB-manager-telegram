@@ -13,6 +13,7 @@ from btb_manager_telegram.utils import (
     format_float,
     get_binance_trade_bot_process,
     i18n_format,
+    setup_coin_list,
     is_btb_bot_update_available,
     is_tg_bot_update_available,
     telegram_text_truncator,
@@ -500,6 +501,7 @@ def start_bot():
     if not get_binance_trade_bot_process():
         if os.path.isfile(settings.PYTHON_PATH):
             if os.path.exists(os.path.join(settings.ROOT_PATH, "binance_trade_bot/")):
+                setup_coin_list()
                 subprocess.call(
                     f"cd {settings.ROOT_PATH} && {settings.PYTHON_PATH} -m binance_trade_bot &",
                     shell=True,

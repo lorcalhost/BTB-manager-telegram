@@ -26,7 +26,12 @@ from btb_manager_telegram.utils import (
     setup_i18n,
     setup_root_path_constant,
     setup_telegram_constants,
-    update_checker,
+    retreive_btb_constants,
+    setup_coin_list,
+    update_checker
+)
+from btb_manager_telegram.report import (
+    make_snapshot
 )
 
 
@@ -69,6 +74,20 @@ def pre_run_main() -> None:
         "-c", "--chat_id", type=str, help="(optional) Telegram chat id", default=None
     )
     parser.add_argument(
+        "-u",
+        "--currency",
+        type=str,
+        help="(optional) The currency in which the reports are written",
+        default="USD",
+    )
+    parser.add_argument(
+        "-o",
+        "--oer_key",
+        type=str,
+        help="openexchangerates.org api key. Mandatory if CURRENCY is not EUR or USD. Get yours here : https://openexchangerates.org/signup/free",
+        default=None,
+    )
+    parser.add_argument(
         "-d",
         "--docker",
         action="store_true",
@@ -88,16 +107,28 @@ def pre_run_main() -> None:
     settings.CHAT_ID = args.chat_id
     settings.LANG = args.language
     settings.START_TRADE_BOT = args.start_trade_bot
+    settings.CURRENCY = args.currency
+    settings.OER_KEY = args.oer_key
     settings.RAW_ARGS = " ".join(sys.argv[1:])
+
+    if settings.CURRENCY not in ("USD", "EUR") and (
+        settings.OER_KEY is None or settings.OER_KEY == ""
+    ):
+        raise ValueError("If using another currency than USD or EUR, and openexchangerates API key is needed")
 
     setup_i18n(settings.LANG)
     setup_root_path_constant()
+    retreive_btb_constants()
+    setup_coin_list()
 
     if settings.TOKEN is None or settings.CHAT_ID is None:
         setup_telegram_constants()
 
     settings.BOT = Bot(settings.TOKEN)
     settings.CHAT = settings.BOT.getChat(settings.CHAT_ID)
+
+
+    make_snapshot()
 
     # Setup update notifications scheduler
     scheduler.enter(1, 1, update_checker)
