@@ -11,7 +11,9 @@ import time
     UPDATE_BTB,
     PANIC_BUTTON,
     CUSTOM_SCRIPT,
-) = range(8)
+    GRAPH_MENU,
+    CREATE_GRAPH,
+) = range(10)
 
 BOUGHT, BUYING, SOLD, SELLING = range(4)
 

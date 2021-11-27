@@ -13,9 +13,9 @@ from btb_manager_telegram.utils import (
     format_float,
     get_binance_trade_bot_process,
     i18n_format,
-    setup_coin_list,
     is_btb_bot_update_available,
     is_tg_bot_update_available,
+    setup_coin_list,
     telegram_text_truncator,
 )
 

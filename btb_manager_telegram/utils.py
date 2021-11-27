@@ -1,9 +1,9 @@
+import configparser
 import json
 import os
 import subprocess
 from time import sleep
 from typing import List, Optional
-import configparser
 
 import psutil
 import telegram

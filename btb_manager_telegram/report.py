@@ -1,15 +1,16 @@
+import datetime as dt
 import os
 import time
-import requests
+import warnings
+
 import binance
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 import numpy as np
+import requests
+
 from btb_manager_telegram import logger, scheduler, settings
 
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import datetime as dt
-
-import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
@@ -170,12 +171,12 @@ def graph_report(reports, symbols, relative, days, graph_type, ref_currency):
                 continue  # skip if too recent
             if symbol not in report["tickers"]:
                 ts = report["time"]
-                brb.logger.debug(f"{symbol} has no price in the report with timestamp {ts}")
+                logger.debug(f"{symbol} has no price in the report with timestamp {ts}")
                 continue
             ticker = report["tickers"][symbol]
             if ticker == 0:
                 ts = report["time"]
-                brb.logger.debug(f"{symbol} has an invalid price in the report with timestamp {ts}")
+                logger.debug(f"{symbol} has an invalid price in the report with timestamp {ts}")
                 continue
 
             y = None

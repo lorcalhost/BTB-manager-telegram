@@ -12,6 +12,8 @@ from btb_manager_telegram import (
     DELETE_DB,
     EDIT_COIN_LIST,
     EDIT_USER_CONFIG,
+    GRAPH_MENU,
+    CREATE_GRAPH,
     MENU,
     PANIC_BUTTON,
     UPDATE_BTB,
@@ -20,18 +22,16 @@ from btb_manager_telegram import (
     settings,
 )
 from btb_manager_telegram.buttons import start_bot
+from btb_manager_telegram.report import make_snapshot
 from btb_manager_telegram.utils import (
     escape_tg,
     i18n_format,
+    retreive_btb_constants,
+    setup_coin_list,
     setup_i18n,
     setup_root_path_constant,
     setup_telegram_constants,
-    retreive_btb_constants,
-    setup_coin_list,
-    update_checker
-)
-from btb_manager_telegram.report import (
-    make_snapshot
+    update_checker,
 )
 
 
@@ -131,8 +131,8 @@ def pre_run_main() -> None:
     make_snapshot()
 
     # Setup update notifications scheduler
-    scheduler.enter(1, 1, update_checker)
-    time.sleep(1)
+    #scheduler.enter(1, 1, update_checker)
+    #time.sleep(1)
     scheduler.run(blocking=False)
 
     return False
@@ -179,6 +179,8 @@ def main() -> None:
             UPDATE_BTB: [handlers.UPDATE_BTB_HANDLER],
             PANIC_BUTTON: [handlers.PANIC_BUTTON_HANDLER],
             CUSTOM_SCRIPT: [handlers.CUSTOM_SCRIPT_HANDLER],
+            GRAPH_MENU: [handlers.GRAPH_MENU_HANDLER],
+            CREATE_GRAPH: [handlers.CREATE_GRAPH_HANDLER],
         },
         fallbacks=[handlers.FALLBACK_HANDLER],
         per_user=True,
