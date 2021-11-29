@@ -23,7 +23,7 @@ def main(translation_file):
     def getkeys(pre, d):
         keys = []
         for k in d:
-            new_pre = k if pre == "" else pre + "." + k
+            new_pre = str(k) if pre == "" else pre + "." + str(k)
             if type(d[k]) == dict:
                 keys += getkeys(new_pre, d[k])
             else:
