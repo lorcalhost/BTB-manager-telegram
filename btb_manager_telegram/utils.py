@@ -228,7 +228,7 @@ def update_checker():
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
             scheduler.enter(
-                60 * 60 * 12,
+                60 * 60 * 12 * 7,
                 1,
                 update_reminder,
                 ("_*Reminder*_:\n\n" + message,),
@@ -245,7 +245,7 @@ def update_checker():
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
             scheduler.enter(
-                60 * 60 * 12,
+                60 * 60 * 24 * 7,
                 1,
                 update_reminder,
                 ("_*Reminder*_:\n\n" + message,),
@@ -255,9 +255,8 @@ def update_checker():
         settings.TG_UPDATE_BROADCASTED_BEFORE is False
         or settings.BTB_UPDATE_BROADCASTED_BEFORE is False
     ):
-        sleep(1)
         scheduler.enter(
-            60 * 60,
+            60 * 60 * 24,
             1,
             update_checker,
         )
@@ -265,10 +264,9 @@ def update_checker():
 
 def update_reminder(self, message):
     logger.info(f"Reminding user: {message}")
-
     settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
     scheduler.enter(
-        60 * 60 * 12,
+        60 * 60 * 12 * 7,
         1,
         update_reminder,
     )
