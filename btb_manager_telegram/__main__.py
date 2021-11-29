@@ -8,12 +8,12 @@ from telegram import Bot, ReplyKeyboardMarkup
 from telegram.ext import ConversationHandler, Updater
 
 from btb_manager_telegram import (
+    CREATE_GRAPH,
     CUSTOM_SCRIPT,
     DELETE_DB,
     EDIT_COIN_LIST,
     EDIT_USER_CONFIG,
     GRAPH_MENU,
-    CREATE_GRAPH,
     MENU,
     PANIC_BUTTON,
     UPDATE_BTB,
@@ -115,7 +115,9 @@ def pre_run_main() -> None:
     if settings.CURRENCY not in ("USD", "EUR") and (
         settings.OER_KEY is None or settings.OER_KEY == ""
     ):
-        raise ValueError("If using another currency than USD or EUR, and openexchangerates API key is needed")
+        raise ValueError(
+            "If using another currency than USD or EUR, and openexchangerates API key is needed"
+        )
 
     setup_i18n(settings.LANG)
     setup_root_path_constant()

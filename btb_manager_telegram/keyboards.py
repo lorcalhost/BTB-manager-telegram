@@ -1,7 +1,6 @@
-from btb_manager_telegram.utils import (
-    i18n_format,
-)
 from telegram import ReplyKeyboardMarkup
+
+from btb_manager_telegram.utils import i18n_format
 
 menu = ReplyKeyboardMarkup(
     [
@@ -11,5 +10,5 @@ menu = ReplyKeyboardMarkup(
         ["Graph"],
         [i18n_format("keyboard.maintenance"), i18n_format("keyboard.configurations")],
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
 )

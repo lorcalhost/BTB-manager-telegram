@@ -4,10 +4,10 @@ import shutil
 import sqlite3
 import subprocess
 import sys
-from configparser import ConfigParser
-import numpy as np
 import traceback
+from configparser import ConfigParser
 
+import numpy as np
 from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
     CallbackContext,
@@ -18,16 +18,15 @@ from telegram.ext import (
 )
 from telegram.utils.helpers import escape_markdown
 
-import i18n
 from btb_manager_telegram import (
     BOUGHT,
     BUYING,
+    CREATE_GRAPH,
     CUSTOM_SCRIPT,
     DELETE_DB,
     EDIT_COIN_LIST,
     EDIT_USER_CONFIG,
     GRAPH_MENU,
-    CREATE_GRAPH,
     MENU,
     PANIC_BUTTON,
     SELLING,
@@ -35,9 +34,9 @@ from btb_manager_telegram import (
     UPDATE_BTB,
     UPDATE_TG,
     buttons,
+    keyboards,
     logger,
     settings,
-    keyboards
 )
 from btb_manager_telegram.binance_api_utils import send_signed_request
 from btb_manager_telegram.report import get_graph
@@ -201,23 +200,25 @@ def menu(update: Update, _: CallbackContext) -> int:
                 mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
 
-    elif update.message.text == "Graph":
+    elif update.message.text == i18n_format("keyboard.graph"):
         if os.path.isfile("data/favourite_graphs.npy"):
-            favourite_graphs = np.load("data/favourite_graphs.npy", allow_pickle=True).tolist()
+            favourite_graphs = np.load(
+                "data/favourite_graphs.npy", allow_pickle=True
+            ).tolist()
             favourite_graphs.sort(key=lambda x: x[1])
             kb = [[i[0]] for i in favourite_graphs[:4]]
-            kb.append(['New graph', 'Go back'])
-            message = "Choose a graph or create a new one. Hint : the syntax is 'COIN1,COIN2,COIN3 NumberOfDays'"
+            kb.append(
+                [i18n_format("keyboard.new_graph"), i18n_format("keyboard.go_back")]
+            )
+            message = i18n_format("graph.msg_existing_graphs")
         else:
-            message = "Use the 'New graph' button to create a new graph."
-            kb = [['New graph','Go back']]
+            message = i18n_format("graph.msg_no_graphs")
+            kb = [[i18n_format("keyboard.new_graph"), i18n_format("keyboard.go_back")]]
         reply_markup_graph = ReplyKeyboardMarkup(kb, resize_keyboard=True)
         reply_text_escape_fun(
             message, reply_markup=reply_markup_graph, parse_mode="MarkdownV2"
         )
         return GRAPH_MENU
-
-
 
     elif update.message.text == i18n_format("keyboard.start"):
         logger.info("Start bot button pressed.")
@@ -684,26 +685,28 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
 
 
 def graph_menu(update: Update, _: CallbackContext) -> int:
-    if update.message.text == "New graph":
-        message = """Input the new graph you want to create.
-The syntax is the following : `COIN1,COIN2,... NumberOfDays`
-If NumberOfDays is set to 0, the graph will be plotted all over recorded history
-If the list of coins is replaced by `*` all the recorded coins will be plotted
-Examples:
-\t`USD 7` will plot your holding represented in their USD value for the last 7 days
-\t`USD,BTC 0` will plot your holding represented both in USD and BTC over all the recorded data
-\t`* 14` will plot your holdings in all recorded coins over the last 14 days
-        """
+    if update.message.text == i18n_format("keyboard.new_graph"):
+        message = f"""{i18n_format("graph.new_graph.a")}
+{i18n_format("graph.new_graph.b")}
+{i18n_format("graph.new_graph.c")}
+{i18n_format("graph.new_graph.d")}
+{i18n_format("graph.new_graph.e")}
+- {i18n_format("graph.new_graph.f")}
+- {i18n_format("graph.new_graph.g")}
+- {i18n_format("graph.new_graph.h")}"""
         update.message.reply_text(
-            escape_tg(message), reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
+            escape_tg(message),
+            reply_markup=ReplyKeyboardRemove(),
+            parse_mode="MarkdownV2",
         )
         return CREATE_GRAPH
     else:
         return create_graph(update=update, _=_)
 
+
 def create_graph(update: Update, _: CallbackContext) -> int:
     text = update.message.text
-    text = [i for i in text.split(' ') if i != '']
+    text = [i for i in text.split(" ") if i != ""]
     assert len(text) == 2
     assert text[1].isdigit()
     days = int(text[1])
@@ -713,30 +716,37 @@ def create_graph(update: Update, _: CallbackContext) -> int:
     try:
         figname = get_graph(False, coins, days, "amount", "USD")
     except Exception as e:
-        message = "An error has occurred while generating the graph. Please report it. Error message : \n ```\n"
+        message = f"{i18n_format('graph.error')}\n ```\n"
         message += "".join(traceback.format_exception(*sys.exc_info()))
         message += "\n```"
-        update.message.reply_text(escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2")
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
         return MENU
 
-    if os.path.isfile('data/favourite_graphs.npy'):
-        favourite_graphs = np.load('data/favourite_graphs.npy', allow_pickle=True).tolist()
+    if os.path.isfile("data/favourite_graphs.npy"):
+        favourite_graphs = np.load(
+            "data/favourite_graphs.npy", allow_pickle=True
+        ).tolist()
     else:
         favourite_graphs = []
     found = False
-    for index,(graph,nb_calls) in enumerate(favourite_graphs):
+    for index, (graph, nb_calls) in enumerate(favourite_graphs):
         if graph == input_test_filtered:
-            favourite_graphs[index][1] = int(nb_calls)+1
+            favourite_graphs[index][1] = int(nb_calls) + 1
             found = True
             break
     if not found:
-        favourite_graphs.append([input_test_filtered,1])
-    np.save('data/favourite_graphs.npy', favourite_graphs, allow_pickle=True)
+        favourite_graphs.append([input_test_filtered, 1])
+    np.save("data/favourite_graphs.npy", favourite_graphs, allow_pickle=True)
 
-    with open(figname, 'rb') as f:
-        update.message.reply_photo(f, reply_markup=keyboards.menu, parse_mode="MarkdownV2")
+    with open(figname, "rb") as f:
+        update.message.reply_photo(
+            f, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
 
     return MENU
+
 
 def cancel(update: Update, _: CallbackContext) -> int:
     logger.info("Conversation canceled.")
@@ -798,15 +808,9 @@ PANIC_BUTTON_HANDLER = MessageHandler(
 
 CUSTOM_SCRIPT_HANDLER = MessageHandler(Filters.regex("(.*?)"), execute_custom_script)
 
-GRAPH_MENU_HANDLER = MessageHandler(
-    Filters.regex("(.*)"),
-    graph_menu
-)
+GRAPH_MENU_HANDLER = MessageHandler(Filters.regex("(.*)"), graph_menu)
 
-CREATE_GRAPH_HANDLER = MessageHandler(
-    Filters.regex("(.*)"),
-    create_graph
-)
+CREATE_GRAPH_HANDLER = MessageHandler(Filters.regex("(.*)"), create_graph)
 
 
 FALLBACK_HANDLER = CommandHandler("cancel", cancel)

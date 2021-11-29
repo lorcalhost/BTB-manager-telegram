@@ -10,9 +10,9 @@ import numpy as np
 import requests
 
 from btb_manager_telegram import logger, scheduler, settings
+from btb_manager_telegram.utils import i18n_format
 
 warnings.filterwarnings("ignore", category=UserWarning)
-
 
 
 def build_ticker(all_symbols, tickers_raw):
@@ -116,9 +116,7 @@ def save_report(report, old_reports):
 def make_snapshot():
     logger.info("Retreive balance information from binance")
     crypto_report = get_report()
-    crypto_reports = save_report(
-        crypto_report, get_previous_reports()
-    )
+    crypto_reports = save_report(crypto_report, get_previous_reports())
     logger.info("Snapshot saved")
     scheduler.enter(3600, 2, make_snapshot)
 
@@ -137,9 +135,7 @@ def get_graph(relative, symbol, days, graph_type, ref_currency):
     figname = None
 
     if len(reports) == 0:
-        logger.warning(
-            "No snapshot in database. Run at least once main.py snapshot"
-        )
+        logger.warning("No snapshot in database. Run at least once main.py snapshot")
     else:
         figname, nb_plot = graph_report(
             reports, symbol, relative, days, graph_type, ref_currency
@@ -176,7 +172,9 @@ def graph_report(reports, symbols, relative, days, graph_type, ref_currency):
             ticker = report["tickers"][symbol]
             if ticker == 0:
                 ts = report["time"]
-                logger.debug(f"{symbol} has an invalid price in the report with timestamp {ts}")
+                logger.debug(
+                    f"{symbol} has an invalid price in the report with timestamp {ts}"
+                )
                 continue
 
             y = None
@@ -210,17 +208,17 @@ def graph_report(reports, symbols, relative, days, graph_type, ref_currency):
     plt.setp(plt.xticks()[1], rotation=15)
     if graph_type == "amount":
         if relative:
-            plt.ylabel("Relative evolution of amount (%)")
+            plt.ylabel(i18n_format("graph.relative_amount"))
             plt.legend(bbox_to_anchor=(1, 1), loc="upper left")
         else:
-            label = "Amount"
+            label = i18n_format("graph.amount")
             label += f" ({symbols[0]})" if len(symbols) == 1 else ""
             plt.ylabel(label)
     elif graph_type == "price":
         if relative:
-            plt.ylabel(f"Relative evolution of price in {ref_currency} (%)")
+            plt.ylabel(i18n_format("graph.relative_price", currency=ref_currency))
         else:
-            plt.ylabel(f"Price in {ref_currency}")
+            plt.ylabel(i18n_format("graph.price", currency=ref_currency))
     plt.grid()
     figname = f"data/quantity_{symbol}.png"
     plt.savefig(figname)
