@@ -46,7 +46,7 @@ value:
 progress:
   coin: "Current coin amount progress:"
   amount: "- Amount: `%{amount}` *%{coin}*"
-  price: "- Price: `%{amount}` *USD*"
+  price: "- Price: `%{amount}` *{bridge}*"
   change_over_days: "- Change: `%{amount}` *%{coin}* `%{percent}` *%* in %{days} days, %{hours} hours"
   trade_datetime: "- Trade datetime: `%{date}`"
   db_error: "❌ Unable to fetch progress information from database."

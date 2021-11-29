@@ -46,7 +46,7 @@ value:
 progress:
   coin: "Aktueller Coin-Mengenfortschritt:"
   amount: "- Menge: `%{amount}` *%{coin}*"
-  price: "- Preis: `%{amount}` *USD*"
+  price: "- Preis: `%{amount}` *{bridge}*"
   change_over_days: "- Änderung: `%{amount}` *%{coin}* `%{percent}` *%* in %{days} Tagen, %{hours} Stunden"
   trade_datetime: "- Handelszeit: `%{date}`"
   db_error: "❌ Fortschrittsinformationen können nicht aus der Datenbank abgerufen werden."

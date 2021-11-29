@@ -46,7 +46,7 @@ value:
 progress:
   coin: "Overzicht transacties:"
   amount: "- Bedrag: `%{amount}` *%{coin}*"
-  price: "- Prijs: `%{amount}` *USD*"
+  price: "- Prijs: `%{amount}` *{bridge}*"
   change_over_days: "- Verandering: `%{amount}` *%{coin}* `%{percent}` *%* in %{days} dagen, %{hours} uren"
   trade_datetime: "- Handelstijd: `%{date}`"
   db_error: "❌ Kan geen voortgangsinformatie ophalen uit de database."

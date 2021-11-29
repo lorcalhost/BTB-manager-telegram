@@ -39,7 +39,7 @@ value:
 progress:
   coin: "Прогресс текущего количества монет:"
   amount: "- Количество: `%{amount}` *%{coin}*"
-  price: "- Цена: `%{amount}` *USD*"
+  price: "- Цена: `%{amount}` *{bridge}*"
   change_over_days: "- Изменение: `%{amount}` *%{coin}* `%{percent}` *%* за %{days} дней, %{hours} часов"
   trade_datetime: "- Дата и время ордера: `%{date}`"
   db_error: "❌ Невозможно получить информацию о прогрессе из базы данных."
