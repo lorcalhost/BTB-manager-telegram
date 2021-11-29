@@ -1,6 +1,7 @@
 import logging
 import sched
 import time
+import threading
 
 (
     MENU,
@@ -23,3 +24,7 @@ logging.basicConfig(
 logger = logging.getLogger("btb_manager_telegram_logger")
 
 scheduler = sched.scheduler(time.time, time.sleep)
+
+scheduler_thread = threading.Thread(
+    target = scheduler.run
+)

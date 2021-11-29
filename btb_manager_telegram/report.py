@@ -119,8 +119,8 @@ def make_snapshot():
     crypto_reports = save_report(
         crypto_report, get_previous_reports()
     )
-    scheduler.enter(3600, 2, make_snapshot)
     logger.info("Snapshot saved")
+    scheduler.enter(3600, 2, make_snapshot)
 
 
 def get_graph(relative, symbol, days, graph_type, ref_currency):

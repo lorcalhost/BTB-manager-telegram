@@ -19,6 +19,7 @@ from btb_manager_telegram import (
     UPDATE_BTB,
     UPDATE_TG,
     scheduler,
+    scheduler_thread,
     settings,
 )
 from btb_manager_telegram.buttons import start_bot
@@ -127,18 +128,15 @@ def pre_run_main() -> None:
     settings.BOT = Bot(settings.TOKEN)
     settings.CHAT = settings.BOT.getChat(settings.CHAT_ID)
 
-
-    make_snapshot()
-
-    # Setup update notifications scheduler
-    #scheduler.enter(1, 1, update_checker)
-    #time.sleep(1)
-    scheduler.run(blocking=False)
+    scheduler.enter(1, 1, update_checker)
+    scheduler.enter(1, 1, make_snapshot)
+    scheduler_thread.start()
 
     return False
 
 
 def main() -> None:
+
     from btb_manager_telegram import handlers
 
     """Start the bot."""
