@@ -44,7 +44,7 @@ def main(translation_file):
         finds = [
             i[4]
             for i in re.findall(
-                "(i18n_format|i18n.t)\(((\n| )*)('|\")(([a-z]|_|\n|\.)*)('|\")", content
+                "(i18n_format|i18n.t)\(((\n| )*)('|\")(([a-z]|[0-9]|_|\n|\.)*)('|\")", content
             )
         ]
 
