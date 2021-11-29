@@ -6,6 +6,7 @@ import subprocess
 import sys
 from configparser import ConfigParser
 import numpy as np
+import traceback
 
 from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
@@ -203,7 +204,6 @@ def menu(update: Update, _: CallbackContext) -> int:
     elif update.message.text == "Graph":
         if os.path.isfile("data/favourite_graphs.npy"):
             favourite_graphs = np.load("data/favourite_graphs.npy", allow_pickle=True).tolist()
-            print(type(favourite_graphs))
             favourite_graphs.sort(key=lambda x: x[1])
             kb = [[i[0]] for i in favourite_graphs[:4]]
             kb.append(['New graph', 'Go back'])
@@ -702,7 +702,6 @@ Examples:
         return create_graph(update=update, _=_)
 
 def create_graph(update: Update, _: CallbackContext) -> int:
-    print(update.message.text)
     text = update.message.text
     text = [i for i in text.split(' ') if i != '']
     assert len(text) == 2
@@ -711,14 +710,19 @@ def create_graph(update: Update, _: CallbackContext) -> int:
     coins = text[0].upper()
     input_test_filtered = f"{coins} {days}"
 
-
-    figname = get_graph(False, coins, days, "amount", "USD")
+    try:
+        figname = get_graph(False, coins, days, "amount", "USD")
+    except Exception as e:
+        message = "An error has occurred while generating the graph. Please report it. Error message : \n ```\n"
+        message += "".join(traceback.format_exception(*sys.exc_info()))
+        message += "\n```"
+        update.message.reply_text(escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2")
+        return MENU
 
     if os.path.isfile('data/favourite_graphs.npy'):
         favourite_graphs = np.load('data/favourite_graphs.npy', allow_pickle=True).tolist()
     else:
         favourite_graphs = []
-    print(favourite_graphs)
     found = False
     for index,(graph,nb_calls) in enumerate(favourite_graphs):
         if graph == input_test_filtered:

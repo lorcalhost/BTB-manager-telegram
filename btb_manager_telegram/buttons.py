@@ -563,7 +563,6 @@ def delete_db():
             delete = True
         else:
             message = f"{i18n_format('database_not_found', path=db_file_path)}"
-    print(message)
     return [message, delete]
 
 

@@ -198,6 +198,9 @@ def graph_report(reports, symbols, relative, days, graph_type, ref_currency):
             X.append(dt.datetime.fromtimestamp(report["time"]))
             nb_plot += 1
 
+        if len(Y) == 0:
+            continue
+
         if relative:
             Y = np.array(Y)
             Y = (Y / Y[0] - 1) * 100
