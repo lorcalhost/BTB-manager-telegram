@@ -189,6 +189,7 @@ graph:
   amount: "Amount"
   relative_price: "Relative evolution of price in %{currency} (%)"
   price: "Price in %{currency}"
+  exit: "👌 Exited"
   new_graph:
     a: "Input the new graph you want to create."
     b: "The syntax is the following : `COIN1,COIN2,... NumberOfDays`"
@@ -198,6 +199,7 @@ graph:
     f: "`USD 7` will plot your holding represented in their USD value for the last 7 days"
     g: "`USD,BTC 0` will plot your holding represented both in USD and BTC over all the recorded data"
     h: "`* 14` will plot your holdings in all recorded coins over the last 14 days"
+    i: "Write `/stop` to exit"
 
 keyboard:
   current_value: "💵 Current value"

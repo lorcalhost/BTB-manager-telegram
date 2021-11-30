@@ -685,6 +685,12 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
 
 
 def graph_menu(update: Update, _: CallbackContext) -> int:
+    if update.message.text == i18n_format("keyboard.go_back"):
+        message = i18n_format("graph.exit")
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
     if update.message.text == i18n_format("keyboard.new_graph"):
         message = f"""{i18n_format("graph.new_graph.a")}
 {i18n_format("graph.new_graph.b")}
@@ -693,7 +699,8 @@ def graph_menu(update: Update, _: CallbackContext) -> int:
 {i18n_format("graph.new_graph.e")}
 - {i18n_format("graph.new_graph.f")}
 - {i18n_format("graph.new_graph.g")}
-- {i18n_format("graph.new_graph.h")}"""
+- {i18n_format("graph.new_graph.h")}
+{i18n_format("graph.new_graph.i")}"""
         update.message.reply_text(
             escape_tg(message),
             reply_markup=ReplyKeyboardRemove(),
@@ -706,6 +713,14 @@ def graph_menu(update: Update, _: CallbackContext) -> int:
 
 def create_graph(update: Update, _: CallbackContext) -> int:
     text = update.message.text
+
+    if text == "/stop":
+        message = i18n_format("graph.exit")
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
+
     text = [i for i in text.split(" ") if i != ""]
     assert len(text) == 2
     assert text[1].isdigit()
