@@ -30,5 +30,5 @@ maintenance = ReplyKeyboardMarkup(
         [i18n_format("keyboard.execute_script")],
         [i18n_format("keyboard.back")],
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
 )
