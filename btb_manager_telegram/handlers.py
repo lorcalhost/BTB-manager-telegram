@@ -62,35 +62,7 @@ def menu(update: Update, _: CallbackContext) -> int:
     #     [i18n_format('keyboard.maintenance'), i18n_format('keyboard.configurations')],
     # ]
 
-    keyboard = [
-        [i18n_format("keyboard.current_value"), i18n_format("keyboard.progress")],
-        [i18n_format("keyboard.current_ratios"), i18n_format("keyboard.next_coin")],
-        [i18n_format("keyboard.check_status"), i18n_format("keyboard.trade_history")],
-        ["Graph"],
-        [i18n_format("keyboard.maintenance"), i18n_format("keyboard.configurations")],
-    ]
 
-    config_keyboard = [
-        [i18n_format("keyboard.start"), i18n_format("keyboard.stop")],
-        [i18n_format("keyboard.read_logs"), i18n_format("keyboard.delete_db")],
-        [i18n_format("keyboard.edit_cfg"), i18n_format("keyboard.edit_coin_list")],
-        [i18n_format("keyboard.export_db"), i18n_format("keyboard.back")],
-    ]
-
-    maintenance_keyboard = [
-        [i18n_format("keyboard.update_tgb")],
-        [i18n_format("keyboard.update_btb")],
-        [i18n_format("keyboard.execute_script")],
-        [i18n_format("keyboard.back")],
-    ]
-
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-
-    reply_markup_config = ReplyKeyboardMarkup(config_keyboard, resize_keyboard=True)
-
-    reply_markup_maintenance = ReplyKeyboardMarkup(
-        maintenance_keyboard, resize_keyboard=True
-    )
 
     # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
@@ -101,7 +73,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             f"{i18n_format('conversation_started')}\n" f"{i18n_format('select_option')}"
         )
         settings.CHAT.send_message(
-            escape_tg(message), reply_markup=reply_markup, parse_mode="MarkdownV2"
+            escape_tg(message), reply_markup=keyboard.menu, parse_mode="MarkdownV2"
         )
 
     if update.message.text in [
@@ -110,7 +82,7 @@ def menu(update: Update, _: CallbackContext) -> int:
     ]:
         reply_text_escape_fun(
             i18n_format("select_option"),
-            reply_markup=reply_markup,
+            reply_markup=keyboard.menu,
             parse_mode="MarkdownV2",
         )
 
@@ -121,7 +93,7 @@ def menu(update: Update, _: CallbackContext) -> int:
     ]:
         reply_text_escape_fun(
             i18n_format("select_option"),
-            reply_markup=reply_markup_config,
+            reply_markup=keyboard.config,
             parse_mode="MarkdownV2",
         )
 
@@ -133,14 +105,14 @@ def menu(update: Update, _: CallbackContext) -> int:
     ]:
         reply_text_escape_fun(
             i18n_format("select_option"),
-            reply_markup=reply_markup_maintenance,
+            reply_markup=keyboard.maintenance,
             parse_mode="MarkdownV2",
         )
 
     elif update.message.text == i18n_format("keyboard.current_value"):
         for mes in buttons.current_value():
             reply_text_escape_fun(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=keyboard.menu, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.panic"):
@@ -168,36 +140,36 @@ def menu(update: Update, _: CallbackContext) -> int:
 
         else:
             reply_text_escape_fun(
-                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                message, reply_markup=keyboard.config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.progress"):
         for mes in buttons.check_progress():
             reply_text_escape_fun(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=keyboard.menu, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.current_ratios"):
         for mes in buttons.current_ratios():
             reply_text_escape_fun(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=keyboard.menu, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.next_coin"):
         for mes in buttons.next_coin():
             reply_text_escape_fun(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=keyboard.menu, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.check_status"):
         reply_text_escape_fun(
-            buttons.check_status(), reply_markup=reply_markup, parse_mode="MarkdownV2"
+            buttons.check_status(), reply_markup=keyboard.menu, parse_mode="MarkdownV2"
         )
 
     elif update.message.text == i18n_format("keyboard.trade_history"):
         for mes in buttons.trade_history():
             reply_text_escape_fun(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=keyboard.menu, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.graph"):
@@ -225,7 +197,7 @@ def menu(update: Update, _: CallbackContext) -> int:
 
         reply_text_escape_fun(
             i18n_format("btb.starting"),
-            reply_markup=reply_markup_config,
+            reply_markup=keyboard.config,
             parse_mode="MarkdownV2",
         )
         status = buttons.start_bot()
@@ -238,21 +210,21 @@ def menu(update: Update, _: CallbackContext) -> int:
         ][status]
         reply_text_escape_fun(
             message,
-            reply_markup=reply_markup_config,
+            reply_markup=keyboard.config,
             parse_mode="MarkdownV2",
         )
 
     elif update.message.text == i18n_format("keyboard.stop"):
         reply_text_escape_fun(
             buttons.stop_bot(),
-            reply_markup=reply_markup_config,
+            reply_markup=keyboard.config,
             parse_mode="MarkdownV2",
         )
 
     elif update.message.text == i18n_format("keyboard.read_logs"):
         reply_text_escape_fun(
             buttons.read_log(),
-            reply_markup=reply_markup_config,
+            reply_markup=keyboard.config,
             parse_mode="MarkdownV2",
         )
 
@@ -268,7 +240,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             return DELETE_DB
         else:
             reply_text_escape_fun(
-                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                message, reply_markup=keyboard.config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.edit_cfg"):
@@ -280,7 +252,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             return EDIT_USER_CONFIG
         else:
             reply_text_escape_fun(
-                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                message, reply_markup=keyboard.config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.edit_coin_list"):
@@ -292,13 +264,13 @@ def menu(update: Update, _: CallbackContext) -> int:
             return EDIT_COIN_LIST
         else:
             reply_text_escape_fun(
-                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                message, reply_markup=keyboard.config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.export_db"):
         message, document = buttons.export_db()
         reply_text_escape_fun(
-            message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+            message, reply_markup=keyboard.config, parse_mode="MarkdownV2"
         )
         if document is not None:
             settings.CHAT.send_document(
@@ -321,7 +293,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         else:
             reply_text_escape_fun(
                 message,
-                reply_markup=reply_markup_maintenance,
+                reply_markup=keyboard.maintenance,
                 parse_mode="MarkdownV2",
             )
 
@@ -340,7 +312,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         else:
             reply_text_escape_fun(
                 message,
-                reply_markup=reply_markup_maintenance,
+                reply_markup=keyboard.maintenance,
                 parse_mode="MarkdownV2",
             )
 
@@ -356,7 +328,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         else:
             reply_text_escape_fun(
                 message,
-                reply_markup=reply_markup_maintenance,
+                reply_markup=keyboard.maintenance,
                 parse_mode="MarkdownV2",
             )
 

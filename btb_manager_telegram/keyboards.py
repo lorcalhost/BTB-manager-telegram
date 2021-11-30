@@ -12,3 +12,23 @@ menu = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True,
 )
+
+config = ReplyKeyboardMarkup(
+    [
+        [i18n_format("keyboard.start"), i18n_format("keyboard.stop")],
+        [i18n_format("keyboard.read_logs"), i18n_format("keyboard.delete_db")],
+        [i18n_format("keyboard.edit_cfg"), i18n_format("keyboard.edit_coin_list")],
+        [i18n_format("keyboard.export_db"), i18n_format("keyboard.back")],
+    ],
+    resize_keyboard=True,
+)
+
+maintenance = ReplyKeyboardMarkup(
+    [
+        [i18n_format("keyboard.update_tgb")],
+        [i18n_format("keyboard.update_btb")],
+        [i18n_format("keyboard.execute_script")],
+        [i18n_format("keyboard.back")],
+    ],
+    resize_keyboard=True
+)
