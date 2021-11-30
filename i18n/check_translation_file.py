@@ -23,7 +23,7 @@ def main(translation_file):
     def getkeys(pre, d):
         keys = []
         for k in d:
-            new_pre = k if pre == "" else pre + "." + k
+            new_pre = str(k) if pre == "" else pre + "." + str(k)
             if type(d[k]) == dict:
                 keys += getkeys(new_pre, d[k])
             else:
@@ -44,7 +44,8 @@ def main(translation_file):
         finds = [
             i[4]
             for i in re.findall(
-                "(i18n_format|i18n.t)\(((\n| )*)('|\")(([a-z]|_|\n|\.)*)('|\")", content
+                "(i18n_format|i18n.t)\(((\n| )*)('|\")(([a-z]|[0-9]|_|\n|\.)*)('|\")",
+                content,
             )
         ]
 

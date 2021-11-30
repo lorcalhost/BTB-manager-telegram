@@ -8,21 +8,28 @@ from telegram import Bot, ReplyKeyboardMarkup
 from telegram.ext import ConversationHandler, Updater
 
 from btb_manager_telegram import (
+    CREATE_GRAPH,
     CUSTOM_SCRIPT,
     DELETE_DB,
     EDIT_COIN_LIST,
     EDIT_USER_CONFIG,
+    GRAPH_MENU,
     MENU,
     PANIC_BUTTON,
     UPDATE_BTB,
     UPDATE_TG,
+    logger,
     scheduler,
+    scheduler_thread,
     settings,
 )
 from btb_manager_telegram.buttons import start_bot
+from btb_manager_telegram.report import make_snapshot
 from btb_manager_telegram.utils import (
     escape_tg,
     i18n_format,
+    retreive_btb_constants,
+    setup_coin_list,
     setup_i18n,
     setup_root_path_constant,
     setup_telegram_constants,
@@ -69,6 +76,20 @@ def pre_run_main() -> None:
         "-c", "--chat_id", type=str, help="(optional) Telegram chat id", default=None
     )
     parser.add_argument(
+        "-u",
+        "--currency",
+        type=str,
+        help="(optional) The currency in which the reports are written",
+        default="USD",
+    )
+    parser.add_argument(
+        "-o",
+        "--oer_key",
+        type=str,
+        help="openexchangerates.org api key. Mandatory if CURRENCY is not EUR or USD. Get yours here : https://openexchangerates.org/signup/free",
+        default=None,
+    )
+    parser.add_argument(
         "-d",
         "--docker",
         action="store_true",
@@ -88,10 +109,21 @@ def pre_run_main() -> None:
     settings.CHAT_ID = args.chat_id
     settings.LANG = args.language
     settings.START_TRADE_BOT = args.start_trade_bot
+    settings.CURRENCY = args.currency
+    settings.OER_KEY = args.oer_key
     settings.RAW_ARGS = " ".join(sys.argv[1:])
+
+    if settings.CURRENCY not in ("USD", "EUR") and (
+        settings.OER_KEY is None or settings.OER_KEY == ""
+    ):
+        raise ValueError(
+            "If using another currency than USD or EUR, and openexchangerates API key is needed"
+        )
 
     setup_i18n(settings.LANG)
     setup_root_path_constant()
+    retreive_btb_constants()
+    setup_coin_list()
 
     if settings.TOKEN is None or settings.CHAT_ID is None:
         setup_telegram_constants()
@@ -99,15 +131,15 @@ def pre_run_main() -> None:
     settings.BOT = Bot(settings.TOKEN)
     settings.CHAT = settings.BOT.getChat(settings.CHAT_ID)
 
-    # Setup update notifications scheduler
     scheduler.enter(1, 1, update_checker)
-    time.sleep(1)
-    scheduler.run(blocking=False)
+    scheduler.enter(1, 1, make_snapshot)
+    scheduler_thread.start()
 
     return False
 
 
 def main() -> None:
+
     from btb_manager_telegram import handlers
 
     """Start the bot."""
@@ -148,6 +180,8 @@ def main() -> None:
             UPDATE_BTB: [handlers.UPDATE_BTB_HANDLER],
             PANIC_BUTTON: [handlers.PANIC_BUTTON_HANDLER],
             CUSTOM_SCRIPT: [handlers.CUSTOM_SCRIPT_HANDLER],
+            GRAPH_MENU: [handlers.GRAPH_MENU_HANDLER],
+            CREATE_GRAPH: [handlers.CREATE_GRAPH_HANDLER],
         },
         fallbacks=[handlers.FALLBACK_HANDLER],
         per_user=True,
@@ -180,6 +214,11 @@ def main() -> None:
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
+
+    scheduler_thread.stop()
+    scheduler_thread.join()
+
+    logger.info("The telegram bot has stopped")
 
 
 def run_on_docker() -> None:

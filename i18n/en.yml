@@ -181,6 +181,27 @@ script:
   no_config: "Unable to find `custom_scripts.json` file inside *BTB-manager-telegram* 's `config/` directory."
   select: "Select one of your custom scripts to execute it."
 
+graph:
+  msg_existing_graphs: "Choose a graph or create a new one. Hint : the syntax is 'COIN1,COIN2,COIN3 NumberOfDays'"
+  msg_no_graphs: "Use the 'New graph' button to create a new graph."
+  error: "An error has occurred while generating the graph. Please report it. Error message :"
+  relative_amount: "Relative evolution of amount (%)"
+  amount: "Amount"
+  relative_price: "Relative evolution of price in %{currency} (%)"
+  price: "Price in %{currency}"
+  exit: "👌 Exited"
+  not_enough_points: "Less than one report has been used to generate the plot. As a result, no graph can be generated. Please wait one hour for a new report to be made."
+  new_graph:
+    a: "Input the new graph you want to create."
+    b: "The syntax is the following : `COIN1,COIN2,... NumberOfDays`"
+    c: "If NumberOfDays is set to 0, the graph will be plotted all over recorded history"
+    d: "If the list of coins is replaced by `*` all the recorded coins will be plotted"
+    e: "Examples:"
+    f: "`USD 7` will plot your holding represented in their USD value for the last 7 days"
+    g: "`USD,BTC 0` will plot your holding represented both in USD and BTC over all the recorded data"
+    h: "`* 14` will plot your holdings in all recorded coins over the last 14 days"
+    i: "Write `/stop` to exit"
+
 keyboard:
   current_value: "💵 Current value"
   progress: "📈 Progress"
@@ -213,3 +234,5 @@ keyboard:
   confirm: "⚠ Confirm"
   stop_bot: "⚠ Stop the bot"
   next_coin: "🔀 Next coin"
+  graph: "📊 Graph"
+  new_graph: "➕ New graph"

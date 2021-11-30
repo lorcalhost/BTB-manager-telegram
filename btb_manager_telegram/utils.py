@@ -1,3 +1,4 @@
+import configparser
 import json
 import os
 import subprocess
@@ -104,6 +105,26 @@ def setup_telegram_constants():
         exit(-1)
 
 
+def retreive_btb_constants():
+    logger.info("Retreiving binance tokens")
+    btb_config_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    btb_config = configparser.ConfigParser()
+    btb_config.read(btb_config_path)
+    settings.BINANCE_API_KEY = btb_config.get("binance_user_config", "api_key")
+    settings.BINANCE_API_SECRET = btb_config.get(
+        "binance_user_config", "api_secret_key"
+    )
+    settings.TLD = btb_config.get("binance_user_config", "tld")
+
+
+def setup_coin_list():
+    logger.info("Retreiving coin list")
+    coin_list_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
+    with open(coin_list_path, "r") as f:
+        coin_list = [line.replace("\n", "").replace(" ", "") for line in f.readlines()]
+    settings.COIN_LIST = [i for i in coin_list if i != ""]
+
+
 def telegram_text_truncator(
     m_list, padding_chars_head="", padding_chars_tail=""
 ) -> List[str]:
@@ -207,7 +228,7 @@ def update_checker():
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
             scheduler.enter(
-                60 * 60 * 12,
+                60 * 60 * 12 * 7,
                 1,
                 update_reminder,
                 ("_*Reminder*_:\n\n" + message,),
@@ -224,7 +245,7 @@ def update_checker():
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
             scheduler.enter(
-                60 * 60 * 12,
+                60 * 60 * 24 * 7,
                 1,
                 update_reminder,
                 ("_*Reminder*_:\n\n" + message,),
@@ -234,9 +255,8 @@ def update_checker():
         settings.TG_UPDATE_BROADCASTED_BEFORE is False
         or settings.BTB_UPDATE_BROADCASTED_BEFORE is False
     ):
-        sleep(1)
         scheduler.enter(
-            60 * 60,
+            60 * 60 * 24,
             1,
             update_checker,
         )
@@ -244,10 +264,9 @@ def update_checker():
 
 def update_reminder(self, message):
     logger.info(f"Reminding user: {message}")
-
     settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
     scheduler.enter(
-        60 * 60 * 12,
+        60 * 60 * 12 * 7,
         1,
         update_reminder,
     )

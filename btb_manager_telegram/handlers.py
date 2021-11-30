@@ -4,8 +4,10 @@ import shutil
 import sqlite3
 import subprocess
 import sys
+import traceback
 from configparser import ConfigParser
 
+import numpy as np
 from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
     CallbackContext,
@@ -16,14 +18,15 @@ from telegram.ext import (
 )
 from telegram.utils.helpers import escape_markdown
 
-import i18n
 from btb_manager_telegram import (
     BOUGHT,
     BUYING,
+    CREATE_GRAPH,
     CUSTOM_SCRIPT,
     DELETE_DB,
     EDIT_COIN_LIST,
     EDIT_USER_CONFIG,
+    GRAPH_MENU,
     MENU,
     PANIC_BUTTON,
     SELLING,
@@ -31,10 +34,12 @@ from btb_manager_telegram import (
     UPDATE_BTB,
     UPDATE_TG,
     buttons,
+    keyboards,
     logger,
     settings,
 )
 from btb_manager_telegram.binance_api_utils import send_signed_request
+from btb_manager_telegram.report import get_graph
 from btb_manager_telegram.utils import (
     escape_tg,
     find_and_kill_binance_trade_bot_process,
@@ -57,35 +62,6 @@ def menu(update: Update, _: CallbackContext) -> int:
     #     [i18n_format('keyboard.maintenance'), i18n_format('keyboard.configurations')],
     # ]
 
-    keyboard = [
-        [i18n_format("keyboard.current_value"), i18n_format("keyboard.progress")],
-        [i18n_format("keyboard.current_ratios"), i18n_format("keyboard.next_coin")],
-        [i18n_format("keyboard.check_status"), i18n_format("keyboard.trade_history")],
-        [i18n_format("keyboard.maintenance"), i18n_format("keyboard.configurations")],
-    ]
-
-    config_keyboard = [
-        [i18n_format("keyboard.start"), i18n_format("keyboard.stop")],
-        [i18n_format("keyboard.read_logs"), i18n_format("keyboard.delete_db")],
-        [i18n_format("keyboard.edit_cfg"), i18n_format("keyboard.edit_coin_list")],
-        [i18n_format("keyboard.export_db"), i18n_format("keyboard.back")],
-    ]
-
-    maintenance_keyboard = [
-        [i18n_format("keyboard.update_tgb")],
-        [i18n_format("keyboard.update_btb")],
-        [i18n_format("keyboard.execute_script")],
-        [i18n_format("keyboard.back")],
-    ]
-
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-
-    reply_markup_config = ReplyKeyboardMarkup(config_keyboard, resize_keyboard=True)
-
-    reply_markup_maintenance = ReplyKeyboardMarkup(
-        maintenance_keyboard, resize_keyboard=True
-    )
-
     # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
@@ -95,7 +71,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             f"{i18n_format('conversation_started')}\n" f"{i18n_format('select_option')}"
         )
         settings.CHAT.send_message(
-            escape_tg(message), reply_markup=reply_markup, parse_mode="MarkdownV2"
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
         )
 
     if update.message.text in [
@@ -104,7 +80,7 @@ def menu(update: Update, _: CallbackContext) -> int:
     ]:
         reply_text_escape_fun(
             i18n_format("select_option"),
-            reply_markup=reply_markup,
+            reply_markup=keyboards.menu,
             parse_mode="MarkdownV2",
         )
 
@@ -115,7 +91,7 @@ def menu(update: Update, _: CallbackContext) -> int:
     ]:
         reply_text_escape_fun(
             i18n_format("select_option"),
-            reply_markup=reply_markup_config,
+            reply_markup=keyboards.config,
             parse_mode="MarkdownV2",
         )
 
@@ -127,14 +103,14 @@ def menu(update: Update, _: CallbackContext) -> int:
     ]:
         reply_text_escape_fun(
             i18n_format("select_option"),
-            reply_markup=reply_markup_maintenance,
+            reply_markup=keyboards.maintenance,
             parse_mode="MarkdownV2",
         )
 
     elif update.message.text == i18n_format("keyboard.current_value"):
         for mes in buttons.current_value():
             reply_text_escape_fun(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.panic"):
@@ -162,44 +138,64 @@ def menu(update: Update, _: CallbackContext) -> int:
 
         else:
             reply_text_escape_fun(
-                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.progress"):
         for mes in buttons.check_progress():
             reply_text_escape_fun(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.current_ratios"):
         for mes in buttons.current_ratios():
             reply_text_escape_fun(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.next_coin"):
         for mes in buttons.next_coin():
             reply_text_escape_fun(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.check_status"):
         reply_text_escape_fun(
-            buttons.check_status(), reply_markup=reply_markup, parse_mode="MarkdownV2"
+            buttons.check_status(), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
         )
 
     elif update.message.text == i18n_format("keyboard.trade_history"):
         for mes in buttons.trade_history():
             reply_text_escape_fun(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+                mes, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
             )
+
+    elif update.message.text == i18n_format("keyboard.graph"):
+        if os.path.isfile("data/favourite_graphs.npy"):
+            favourite_graphs = np.load(
+                "data/favourite_graphs.npy", allow_pickle=True
+            ).tolist()
+            favourite_graphs.sort(key=lambda x: x[1])
+            kb = [[i[0]] for i in favourite_graphs[:4]]
+            kb.append(
+                [i18n_format("keyboard.new_graph"), i18n_format("keyboard.go_back")]
+            )
+            message = i18n_format("graph.msg_existing_graphs")
+        else:
+            message = i18n_format("graph.msg_no_graphs")
+            kb = [[i18n_format("keyboard.new_graph"), i18n_format("keyboard.go_back")]]
+        reply_markup_graph = ReplyKeyboardMarkup(kb, resize_keyboard=True)
+        reply_text_escape_fun(
+            message, reply_markup=reply_markup_graph, parse_mode="MarkdownV2"
+        )
+        return GRAPH_MENU
 
     elif update.message.text == i18n_format("keyboard.start"):
         logger.info("Start bot button pressed.")
 
         reply_text_escape_fun(
             i18n_format("btb.starting"),
-            reply_markup=reply_markup_config,
+            reply_markup=keyboards.config,
             parse_mode="MarkdownV2",
         )
         status = buttons.start_bot()
@@ -212,21 +208,21 @@ def menu(update: Update, _: CallbackContext) -> int:
         ][status]
         reply_text_escape_fun(
             message,
-            reply_markup=reply_markup_config,
+            reply_markup=keyboards.config,
             parse_mode="MarkdownV2",
         )
 
     elif update.message.text == i18n_format("keyboard.stop"):
         reply_text_escape_fun(
             buttons.stop_bot(),
-            reply_markup=reply_markup_config,
+            reply_markup=keyboards.config,
             parse_mode="MarkdownV2",
         )
 
     elif update.message.text == i18n_format("keyboard.read_logs"):
         reply_text_escape_fun(
             buttons.read_log(),
-            reply_markup=reply_markup_config,
+            reply_markup=keyboards.config,
             parse_mode="MarkdownV2",
         )
 
@@ -242,7 +238,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             return DELETE_DB
         else:
             reply_text_escape_fun(
-                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.edit_cfg"):
@@ -254,7 +250,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             return EDIT_USER_CONFIG
         else:
             reply_text_escape_fun(
-                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.edit_coin_list"):
@@ -266,13 +262,13 @@ def menu(update: Update, _: CallbackContext) -> int:
             return EDIT_COIN_LIST
         else:
             reply_text_escape_fun(
-                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+                message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n_format("keyboard.export_db"):
         message, document = buttons.export_db()
         reply_text_escape_fun(
-            message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+            message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
         )
         if document is not None:
             settings.CHAT.send_document(
@@ -295,7 +291,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         else:
             reply_text_escape_fun(
                 message,
-                reply_markup=reply_markup_maintenance,
+                reply_markup=keyboards.maintenance,
                 parse_mode="MarkdownV2",
             )
 
@@ -314,7 +310,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         else:
             reply_text_escape_fun(
                 message,
-                reply_markup=reply_markup_maintenance,
+                reply_markup=keyboards.maintenance,
                 parse_mode="MarkdownV2",
             )
 
@@ -330,7 +326,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         else:
             reply_text_escape_fun(
                 message,
-                reply_markup=reply_markup_maintenance,
+                reply_markup=keyboards.maintenance,
                 parse_mode="MarkdownV2",
             )
 
@@ -658,6 +654,93 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
     return MENU
 
 
+def graph_menu(update: Update, _: CallbackContext) -> int:
+    if update.message.text == i18n_format("keyboard.go_back"):
+        message = i18n_format("graph.exit")
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
+    if update.message.text == i18n_format("keyboard.new_graph"):
+        message = f"""{i18n_format("graph.new_graph.a")}
+{i18n_format("graph.new_graph.b")}
+{i18n_format("graph.new_graph.c")}
+{i18n_format("graph.new_graph.d")}
+{i18n_format("graph.new_graph.e")}
+- {i18n_format("graph.new_graph.f")}
+- {i18n_format("graph.new_graph.g")}
+- {i18n_format("graph.new_graph.h")}
+{i18n_format("graph.new_graph.i")}"""
+        update.message.reply_text(
+            escape_tg(message),
+            reply_markup=ReplyKeyboardRemove(),
+            parse_mode="MarkdownV2",
+        )
+        return CREATE_GRAPH
+    else:
+        return create_graph(update=update, _=_)
+
+
+def create_graph(update: Update, _: CallbackContext) -> int:
+    text = update.message.text
+
+    if text == "/stop":
+        message = i18n_format("graph.exit")
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
+
+    text = [i for i in text.split(" ") if i != ""]
+    assert len(text) == 2
+    assert text[1].isdigit()
+    days = int(text[1])
+    coins = text[0].upper().split(",")
+    coins.sort()
+    input_text_filtered = f"{','.join(coins)} {days}"
+
+    try:
+        figname, nb_plot = get_graph(False, coins, days, "amount", "USD")
+    except Exception as e:
+        message = f"{i18n_format('graph.error')}\n ```\n"
+        message += "".join(traceback.format_exception(*sys.exc_info()))
+        message += "\n```"
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
+
+    if nb_plot <= 1:
+        message = i18n_format("graph.not_enough_points")
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
+
+    if os.path.isfile("data/favourite_graphs.npy"):
+        favourite_graphs = np.load(
+            "data/favourite_graphs.npy", allow_pickle=True
+        ).tolist()
+    else:
+        favourite_graphs = []
+    found = False
+    for index, (graph, nb_calls) in enumerate(favourite_graphs):
+        if graph == input_text_filtered:
+            favourite_graphs[index][1] = int(nb_calls) + 1
+            found = True
+            break
+    if not found:
+        favourite_graphs.append([input_text_filtered, 1])
+    np.save("data/favourite_graphs.npy", favourite_graphs, allow_pickle=True)
+
+    with open(figname, "rb") as f:
+        update.message.reply_photo(
+            f, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+
+    return MENU
+
+
 def cancel(update: Update, _: CallbackContext) -> int:
     logger.info("Conversation canceled.")
 
@@ -672,7 +755,7 @@ def cancel(update: Update, _: CallbackContext) -> int:
 
 MENU_HANDLER = MessageHandler(
     Filters.regex(
-        f"^({i18n_format('keyboard.current_value')}|{i18n_format('keyboard.panic')}|{i18n_format('keyboard.progress')}|{i18n_format('keyboard.current_ratios')}|{i18n_format('keyboard.next_coin')}|{i18n_format('keyboard.check_status')}|{i18n_format('keyboard.trade_history')}|{i18n_format('keyboard.maintenance')}|"
+        f"^({i18n_format('keyboard.current_value')}|{i18n_format('keyboard.panic')}|{i18n_format('keyboard.progress')}|{i18n_format('keyboard.current_ratios')}|{i18n_format('keyboard.next_coin')}|{i18n_format('keyboard.check_status')}|{i18n_format('keyboard.trade_history')}|{i18n_format('keyboard.graph')}|{i18n_format('keyboard.maintenance')}|"
         f"{i18n_format('keyboard.configurations')}|{i18n_format('keyboard.start')}|{i18n_format('keyboard.stop')}|{i18n_format('keyboard.read_logs')}|{i18n_format('keyboard.delete_db')}|"
         f"{i18n_format('keyboard.edit_cfg')}|{i18n_format('keyboard.edit_coin_list')}|{i18n_format('keyboard.export_db')}|{i18n_format('keyboard.update_tgb')}|{i18n_format('keyboard.update_btb')}|"
         f"{i18n_format('keyboard.execute_script')}|{i18n_format('keyboard.back')}|{i18n_format('keyboard.go_back')}|{i18n_format('keyboard.ok')}|{i18n_format('keyboard.cancel_update')}|{i18n_format('keyboard.cancel')}|{i18n_format('keyboard.ok_s')}|{i18n_format('keyboard.great')})$"
@@ -717,5 +800,10 @@ PANIC_BUTTON_HANDLER = MessageHandler(
 )
 
 CUSTOM_SCRIPT_HANDLER = MessageHandler(Filters.regex("(.*?)"), execute_custom_script)
+
+GRAPH_MENU_HANDLER = MessageHandler(Filters.regex("(.*)"), graph_menu)
+
+CREATE_GRAPH_HANDLER = MessageHandler(Filters.regex("(.*)"), create_graph)
+
 
 FALLBACK_HANDLER = CommandHandler("cancel", cancel)
