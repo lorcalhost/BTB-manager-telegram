@@ -192,7 +192,7 @@ graph:
   exit: "👌 Beendet"
   new_graph:
     a: "Gebe das neue Diagramm ein, das du erstellen möchtest."
-    b: "Das Syntax ist folgendes'COIN1,COIN2,COIN3 AnzahlTage'"
+    b: "Das Syntax ist folgendes'COIN1,COIN2,... AnzahlTage'"
     c: "Wenn AnzahlTage auf 0 gesetzt ist, wird der Graph über die komplett aufgezeichnete Zeit erstellt"
     d: "Wenn die Liste an Coins durch `*` ersetzt wird, werden alle aufgezeichneten Coins gezeichnet"
     e: "Beispiele:"
