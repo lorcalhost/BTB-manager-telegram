@@ -185,7 +185,7 @@ keyboard:
   current_value: "💵 Aktueller Wert"
   progress: "📈 Fortschritt"
   current_ratios: "➗ Aktuelle Verhältnisse"
-  trade_history: "⌛ Handelsgeschichte"
+  trade_history: "⌛ Handelshistorie"
   panic: "🚨 Panikknopf"
   check_status: "🔍 Bot-Status prüfen"
   maintenance: "🛠 Wartung"
