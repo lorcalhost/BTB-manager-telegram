@@ -181,6 +181,26 @@ script:
   no_config: "Die Datei `custom_scripts.json` kann im `config/`-Verzeichnis von *BTB-manager-telegram* nicht gefunden werden."
   select: "Wähle eines deiner benutzerdefinierten Skripts aus, um es auszuführen."
 
+graph:
+  msg_existing_graphs: "Wählr ein Diagramm oder erstelle ein neues. Hinweis : Hinweis: Die Syntax ist 'COIN1,COIN2,COIN3 AnzahlTage'"
+  msg_no_graphs: "Use the 'New graph' button to create a new graph."
+  error: "An error has occurred while generating the graph. Please report it. Error message :"
+  relative_amount: "Relative evolution of amount (%)"
+  amount: "Amount"
+  relative_price: "Relative evolution of price in %{currency} (%)"
+  price: "Price in %{currency}"
+  exit: "👌 Exited"
+  new_graph:
+    a: "Input the new graph you want to create."
+    b: "The syntax is the following : `COIN1,COIN2,... AnzahlTage`"
+    c: "Wenn AnzahlTage auf 0 gesetzt ist, wird der Graph über die komplett aufgezeichnete Zeit erstellt"
+    d: "Wenn die Liste an Coins durch `*` ersetzt wird, werden alle aufgezeichneten Coins gezeichnet"
+    e: "Beispiele:"
+    f: "`USD 7` zeigt deinen Bestand in USD-Wert der letzten 7 Tage an"
+    g: "`USD,BTC 0` wird deinen Bestand sowohl in USD als auch in BTC über alle aufgezeichneten Daten darstellen"
+    h: "`*14` zeigt deine Bestände in allen aufgezeichneten Coins der letzten 14 Tage an"
+    i: "Schreibe `/stop` zum Beenden"
+
 keyboard:
   current_value: "💵 Aktueller Wert"
   progress: "📈 Fortschritt"
@@ -213,3 +233,5 @@ keyboard:
   confirm: "⚠ Bestätige"
   stop_bot: "⚠ Stoppe den Bot"
   next_coin: "🔀 Nächster Coin"
+  graph: "📊 Diagramm"
+  new_graph: "➕ Neues Diagramm"
