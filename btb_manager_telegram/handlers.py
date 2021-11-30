@@ -699,11 +699,18 @@ def create_graph(update: Update, _: CallbackContext) -> int:
     input_test_filtered = f"{coins} {days}"
 
     try:
-        figname = get_graph(False, coins, days, "amount", "USD")
+        figname, nb_plot = get_graph(False, coins, days, "amount", "USD")
     except Exception as e:
         message = f"{i18n_format('graph.error')}\n ```\n"
         message += "".join(traceback.format_exception(*sys.exc_info()))
         message += "\n```"
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
+
+    if nb_plot <= 1:
+        message = i18n_format("graph.not_enough_points")
         update.message.reply_text(
             escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
         )

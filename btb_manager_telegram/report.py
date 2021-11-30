@@ -140,11 +140,7 @@ def get_graph(relative, symbol, days, graph_type, ref_currency):
         figname, nb_plot = graph_report(
             reports, symbol, relative, days, graph_type, ref_currency
         )
-        if nb_plot <= 1:
-            logger.warning(
-                "Less than one report has been used to generate the plot. As a result, no line will be visible on the graph. Please check that snapshots are actually made."
-            )
-    return figname
+    return figname, nb_plot
 
 
 def graph_report(reports, symbols, relative, days, graph_type, ref_currency):

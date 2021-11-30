@@ -190,6 +190,7 @@ graph:
   relative_price: "Relative evolution of price in %{currency} (%)"
   price: "Price in %{currency}"
   exit: "👌 Exited"
+  not_enough_points: "Less than one report has been used to generate the plot. As a result, no graph can be generated. Please wait one hour for a new report to be made."
   new_graph:
     a: "Input the new graph you want to create."
     b: "The syntax is the following : `COIN1,COIN2,... NumberOfDays`"
