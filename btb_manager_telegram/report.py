@@ -121,29 +121,16 @@ def make_snapshot():
     scheduler.enter(3600, 2, make_snapshot)
 
 
-def get_graph(relative, symbol, days, graph_type, ref_currency):
-    if symbol == "*":
-        symbol = settings.COIN_LIST
+def get_graph(relative, symbols, days, graph_type, ref_currency):
+    if symbols == ["*"]:
+        symbols = settings.COIN_LIST
     else:
-        symbol = symbol.split(",")
-        for s in symbol:
+        for s in symbols:
             assert s in settings.COIN_LIST + [settings.CURRENCY]
-    if len(symbol) > 1:
+    if len(symbols) > 1:
         relative = True
     reports = get_previous_reports()
 
-    figname = None
-
-    if len(reports) == 0:
-        logger.warning("No snapshot in database. Run at least once main.py snapshot")
-    else:
-        figname, nb_plot = graph_report(
-            reports, symbol, relative, days, graph_type, ref_currency
-        )
-    return figname, nb_plot
-
-
-def graph_report(reports, symbols, relative, days, graph_type, ref_currency):
     plt.clf()
     plt.close()
     if len(symbols) < 10:

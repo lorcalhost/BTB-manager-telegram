@@ -695,8 +695,9 @@ def create_graph(update: Update, _: CallbackContext) -> int:
     assert len(text) == 2
     assert text[1].isdigit()
     days = int(text[1])
-    coins = text[0].upper()
-    input_test_filtered = f"{coins} {days}"
+    coins = text[0].upper().split(',')
+    coins.sort()
+    input_text_filtered = f"{','.join(coins)} {days}"
 
     try:
         figname, nb_plot = get_graph(False, coins, days, "amount", "USD")
@@ -724,12 +725,12 @@ def create_graph(update: Update, _: CallbackContext) -> int:
         favourite_graphs = []
     found = False
     for index, (graph, nb_calls) in enumerate(favourite_graphs):
-        if graph == input_test_filtered:
+        if graph == input_text_filtered:
             favourite_graphs[index][1] = int(nb_calls) + 1
             found = True
             break
     if not found:
-        favourite_graphs.append([input_test_filtered, 1])
+        favourite_graphs.append([input_text_filtered, 1])
     np.save("data/favourite_graphs.npy", favourite_graphs, allow_pickle=True)
 
     with open(figname, "rb") as f:
