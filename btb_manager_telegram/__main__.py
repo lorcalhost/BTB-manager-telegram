@@ -18,6 +18,7 @@ from btb_manager_telegram import (
     PANIC_BUTTON,
     UPDATE_BTB,
     UPDATE_TG,
+    logger,
     scheduler,
     scheduler_thread,
     settings,
@@ -213,6 +214,11 @@ def main() -> None:
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
+
+    scheduler_thread.stop()
+    scheduler_thread.join()
+
+    logger.info("The telegram bot has stopped")
 
 
 def run_on_docker() -> None:
