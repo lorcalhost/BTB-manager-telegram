@@ -695,7 +695,7 @@ def create_graph(update: Update, _: CallbackContext) -> int:
     assert len(text) == 2
     assert text[1].isdigit()
     days = int(text[1])
-    coins = text[0].upper().split(',')
+    coins = text[0].upper().split(",")
     coins.sort()
     input_text_filtered = f"{','.join(coins)} {days}"
 
