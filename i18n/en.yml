@@ -233,5 +233,5 @@ keyboard:
   confirm: "⚠ Confirm"
   stop_bot: "⚠ Stop the bot"
   next_coin: "🔀 Next coin"
-  graph: "Graph"
-  new_graph: "New graph"
+  graph: "📊 Graph"
+  new_graph: "➕ New graph"
