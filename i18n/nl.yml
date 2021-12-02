@@ -180,6 +180,28 @@ script:
   no_script: "Er is geen aangepast script gevonden in *BTB-manager-telegram* 's `/config/custom_scripts.json` bestand."
   no_config: "Kan bestand `custom_scripts.json` niet vinden binnen in de  *BTB-manager-telegram* 's `config/` map."
   select: "Selecteer één van uw aangepaste scripts om deze uit te voeren."
+  
+graph:
+  msg_existing_graphs: "Kies een grafiek of maak een nieuwe. Tip : de opbouw is 'MUNT1,MUNT2,MUNT3 AantalDagen'"
+  msg_no_graphs: "Gebruik de knop 'Nieuwe grafiek' om een nieuwe grafiek te maken."
+  error: "Er is een fout opgetreden tijdens het genereren van de grafiek. Gelieve deze te melden. Foutmelding :"
+  relative_amount: "Relatieve ontwikkeling van het bedrag (%)"
+  amount: "Bedrag"
+  relative_price: "Relatieve ontwikkeling van de prijs in %{currency} (%)"
+  price: "Prijs in %{currency}"
+  exit: "👌 Verlaten"
+  not_enough_points: "Minder dan één rapport is gebruikt om de plot te genereren. Hierdoor kan er geen grafiek gegenereerd worden. Wacht alstublieft een uur tot er een nieuwe update aanwezig is."
+  bad_graph: "De opdracht die u hebt ingevoerd, is niet omschreven en wordt afgesloten."
+  new_graph:
+    a: "Voer de nieuwe grafiek in die u wilt maken."
+    b: "De volgende opbouw kan worden gebruikt : `MUNT1,MUNT2,... AantalDagen`"
+    c: "Wanneer het AantalDagen is ingesteld op 0, zal de grafiek worden uitgezet over de gehele geregistreerde geschiedenis"
+    d: "Wanneer de lijst munten wordt vervangen door '*' worden alle geregistreerde munten gebruikt"
+    e: "Voorbeelden:"
+    f: "`USD 7' zal uw weergave in USD-waarde van de afgelopen 7 dagen weergeven"
+    g: "`USD,BTC 0` zal de weergave zowel in USD als BTC uitzetten over alle geregistreerde gegevens"
+    h: "`* 14` zal uw vermogen in alle geregistreerde munten van de afgelopen 14 dagen plotten"
+    i: "Schrijf '/stop' om af te sluiten"
 
 keyboard:
   current_value: "💵 Huidige waarde"
@@ -213,3 +235,6 @@ keyboard:
   confirm: "⚠ Bevestigen"
   stop_bot: "⚠ Stop de bot"
   next_coin: "🔀 Volgende munt"
+  graph: "📊 Grafiek"
+  new_graph: "➕ Nieuwe grafiek"
+
