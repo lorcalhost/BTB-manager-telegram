@@ -693,7 +693,7 @@ def create_graph(update: Update, _: CallbackContext) -> int:
 
     text = [i for i in text.split(" ") if i != ""]
 
-    if not(len(text) == 2 and text[1].isdigit()):
+    if not (len(text) == 2 and text[1].isdigit()):
         message = i18n_format("graph.bad_graph")
         update.message.reply_text(
             escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
