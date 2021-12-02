@@ -75,7 +75,7 @@ history:
   bought: "Gekocht"
   status: "Status: _*%{status}*_"
   error: "❌ Er ging iets mis, niet in staat om op dit moment handelsgeschiedenis te genereren."
-  db_error: "❌ Kan handelsgeschiedenis niet ophalen uit database."
+  db_error: "❌ Kan handelshistorie niet ophalen uit database."
 
 
 btb:
@@ -185,7 +185,7 @@ keyboard:
   current_value: "💵 Huidige waarde"
   progress: "📈 Vooruitgang"
   current_ratios: "➗ Huidige ratio's"
-  trade_history: "⌛ Handelsgeschiedenis"
+  trade_history: "⌛ Handelshistorie"
   panic: "🚨 Paniekknop"
   check_status: "🔍 Status controleren"
   maintenance: "🛠 Onderhoud"

@@ -13,6 +13,7 @@ As of now the bot is able to perform the following actions:
 - [x] ⏹ Stop _Binance Trade Bot_
 - [x] 💵 Display current coin stats (balance, USD value, BTC value, initial buying price)
 - [x] ➗ Display current coin ratios
+- [x] 🔀 Display next coin probability 
 - [x] 📈 Display progress (how much more of a certain coin you gained since you started using _Binance Trade Bot_)
 - [x] ⌛ Display trade history
 - [x] 📜 Display last 4000 characters of log file
@@ -205,11 +206,12 @@ This project follows the [all-contributors] specification.
     <td align="center"><a href="https://github.com/FedeArre"><img src="https://avatars.githubusercontent.com/u/39017587?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Federico Arredondo</b></sub></a><br /><a href="#translation-FedeArre" title="Translation">🌍</a></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://github.com/MasaiasuOse"><img src="https://avatars.githubusercontent.com/u/45827629?v=4?s=100" width="100px;" alt=""/><br /><sub><b>MasaiasuOse</b></sub></a><br /><a href="#translation-MasaiasuOse" title="Translation">🌍</a></td>
+    <td align="center"><a href="https://github.com/MasaiasuOse"><img src="https://avatars.githubusercontent.com/u/45827629?v=4?s=100" width="100px;" alt=""/><br /><sub><b>MasaiasuOse</b></sub></a><br /><a href="#translation-MasaiasuOse" title="Translation">🌍</a> <a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=MasaiasuOse" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/phoenix-blue"><img src="https://avatars.githubusercontent.com/u/13711891?v=4?s=100" width="100px;" alt=""/><br /><sub><b>phoenix-blue</b></sub></a><br /><a href="#translation-phoenix-blue" title="Translation">🌍</a></td>
     <td align="center"><a href="https://github.com/neuhausj"><img src="https://avatars.githubusercontent.com/u/182152?v=4?s=100" width="100px;" alt=""/><br /><sub><b>neuhausj</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=neuhausj" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/santiagocarod"><img src="https://avatars.githubusercontent.com/u/23182382?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Santiago Caro Duque</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Asantiagocarod" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/shhhmel"><img src="https://avatars.githubusercontent.com/u/17930913?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ivan Myronov</b></sub></a><br /><a href="#translation-shhhmel" title="Translation">🌍</a></td>
+    <td align="center"><a href="https://github.com/hieu0nguyen"><img src="https://avatars.githubusercontent.com/u/4257715?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Hieu Nguyen</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Ahieu0nguyen" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 

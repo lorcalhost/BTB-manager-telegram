@@ -158,7 +158,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/45827629?v=4",
       "profile": "https://github.com/MasaiasuOse",
       "contributions": [
-        "translation"
+        "translation",
+        "doc"
       ]
     },
     {
@@ -195,6 +196,15 @@
       "profile": "https://github.com/shhhmel",
       "contributions": [
         "translation"
+      ]
+    },
+    {
+      "login": "hieu0nguyen",
+      "name": "Hieu Nguyen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4257715?v=4",
+      "profile": "https://github.com/hieu0nguyen",
+      "contributions": [
+        "bug"
       ]
     }
   ],
