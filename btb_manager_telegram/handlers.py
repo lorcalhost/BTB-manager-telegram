@@ -692,8 +692,14 @@ def create_graph(update: Update, _: CallbackContext) -> int:
         return MENU
 
     text = [i for i in text.split(" ") if i != ""]
-    assert len(text) == 2
-    assert text[1].isdigit()
+
+    if not(len(text) == 2 and text[1].isdigit()):
+        message = i18n_format("graph.bad_graph")
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
+
     days = int(text[1])
     coins = text[0].upper().split(",")
     coins.sort()
