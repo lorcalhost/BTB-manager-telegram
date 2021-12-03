@@ -180,7 +180,29 @@ script:
   no_script: "No se encontró ningún script personalizado en el archivo `/config/custom_scripts.json` de *BTB-manager-telegram*"
   no_config: "No fue posible encontrar `custom_scripts.json` dentro del directorio `config/` de *BTB-manager-telegram* '"
   select: "Elige uno de los scripts personalizados para ejecutarlo."
-
+  
+graph:
+  msg_existing_graphs: "Elige una grafica o crea una nueva. Consejo: La sintaxis es 'MONEDA1,MONEDA2,MONEDA3 NumeroDias'"
+  msg_no_graphs: "Usa el boton 'Nueva grafica' para crear una grafica."
+  error: "Un error ocurrio generado la grafica. Reportalo por favor. Mensaje de error :"
+  relative_amount: "Evolucion relativa de la cantidad (%)"
+  amount: "Cantidad"
+  relative_price: "Evolucion relativa de precio en %{currency} (%)"
+  price: "Precio en %{currency}"
+  exit: "👌 Salida exitosa"
+  not_enough_points: "Menos de un reporte de datos fue utilizado para la generacion. Como resultado, la grafica no puede ser generada. Espera al menos una hora para generar una grafica."
+  bad_graph: "El comando introducido no es valido, saliendo."
+  new_graph:
+    a: "Introduce la grafica que quieres crear."
+    b: "La sintaxis es la siguiente: `MONEDA1,MONEDA2,... NumeroDias`"
+    c: "Si el numero de dias elegido es 0, la grafica utilizara todos los datos registrados"
+    d: "Si la lista de monedas es reemplazada por un asterisco se utilizaran todas las monedas registradas"
+    e: "Ejemplos:"
+    f: "`USD 7` mostrara el valor de tus criptomonedas holdeadas en dolares de los ultimos 7 dias"
+    g: "`USD,BTC 0` mostrara el valor de tus criptomonedas holdeadas en dolares y BTC desde que se tienen datos"
+    h: "`* 14` mostrara el valor en todas las monedas registradas en los ultimos 14 dias"
+    i: "Escribe `/stop` para salir"
+    
 keyboard:
   current_value: "💵 Valor actual"
   progress: "📈 Progreso"
@@ -213,3 +235,5 @@ keyboard:
   confirm: "⚠ Confirmar"
   stop_bot: "⚠ Detener el bot"
   next_coin: "🔀 Siguiente moneda"
+  graph: "📊 Grafica"
+  new_graph: "➕ Nueva grafica"
