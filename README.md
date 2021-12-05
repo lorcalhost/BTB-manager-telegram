@@ -2,134 +2,115 @@
 
 A Telegram bot for remotely managing [Binance Trade Bot].
 
-## About
-
 I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn't have to constantly ssh into my VPS, and my non-techy friends could enjoy the benefits of automated trading.
 
-As of now the bot is able to perform the following actions:
-
-- [x] 🔍 Check bot status (running / not running)
-- [x] ▶ Start _Binance Trade Bot_
-- [x] ⏹ Stop _Binance Trade Bot_
-- [x] 💵 Display current coin stats (balance, USD value, BTC value, initial buying price)
-- [x] ➗ Display current coin ratios
-- [x] 🔀 Display next coin probability 
-- [x] 📈 Display progress (how much more of a certain coin you gained since you started using _Binance Trade Bot_)
-- [x] ⌛ Display trade history
-- [x] 📜 Display last 4000 characters of log file
-- [x] 👛 Edit coin list (`supported_coin_list` file)
-- [x] ⚙ Edit user configuration (`user.cfg` file)
-- [x] ❌ Delete database file (`crypto_trading.db` file)
-- [x] 📤 Export database file
-- [x] ⬆ **Update** _Binance Trade Bot_ (and notify when new update is available)
-- [x] ⬆ **Update** _Binance Trade Bot Manager Telegram_ (and notify when new update is available)
-- [x] [User defined custom scripts](./docs/custom-scripts.md)
-
-</br>
-
-The program's default behavior fetches Telegram `token` and `chat_id` from [Binance Trade Bot]'s `apprise.yml` file.  
-Only the Telegram users in the chat with `chat_id` equal to the one set in the `apprise.yml` file will be able to use the bot.
-
-⚠ The program is fully compatible with **Linux** and **Windows** through **[WSL]**;  
-`RWX` permission problems are present on **native Windows** and **MacOS**.
+The program's default behavior fetches Telegram `token` and `chat_id` from [Binance Trade Bot]'s `apprise.yml` file. For a quick Telegram bot setup guide [click here](./docs/telegram-setup.md).
 
 ## Installation
+### Docker install
+For a Docker setup guide [click here](./docs/docker-setup.md).
 
-_Python 3_ is required.  
-**BTB-manager-telegram** should be installed in the same parent directory as _Binance Trade Bot_.  
-Your filesystem should look like this:
+### Manual install
+**Python 3.7, 3.8 or 3.9** is required.
+**BTB-manager-telegram** should be installed in the same parent directory as **Binance Trade Bot**. Your filesystem should look like this:
 
 ```
-.
-└── *parent_dir*
-    ├── BTB-manager-telegram
-    └── binance-trade-bot
+PARENT_DIR
+  ├── BTB-manager-telegram
+  └── binance-trade-bot
 ```
 
-1. Clone this repository:
-
-```console
-$ git clone https://github.com/lorcalhost/BTB-manager-telegram.git
+To begin with, open a terminal and place yourself in the directory where the binance-trade-bot is already present, e.g. if the binance_trade_bot directory is located in `/home/user/trading_bot` run:
+```bash
+cd /home/user/trading_bot
 ```
-
-2. Move to `BTB-manager-telegram`'s directory:
-
-```console
-$ cd BTB-manager-telegram
+Then, run the following lines:
+```bash
+git clone https://github.com/lorcalhost/BTB-manager-telegram.git
+cd BTB-manager-telegram
+python3 -m pip install -r requirements.txt
 ```
-
-3. Install `BTB-manager-telegram`'s dependencies:
-
-```console
-$ python3 -m pip install -r requirements.txt
-```
-
-⚠ Make sure the correct `rwx` permissions are set and the program is run with correct privileges.
-
-## Language Setting
-You can set the language by using the `-l, --language` command line parameter.
-For help and available options run ` python3 -m btb_manager_telegram -h`. Default is english.
-
-### Adding translations
-Copy the `i18n/en.yml` file and rename it to e.g. `i18n/it.yml` and translate all the included values.
-
-## Setup
-
-- For a quick Telegram bot setup guide [click here](./docs/telegram-setup.md).
-- For a Docker setup guide [click here](./docs/docker-setup.md).
-- If you would like to run several _Binance Trade Bot_ instances at the same time [click here](./docs/multiple-bots.md).
-
-Note:  
-`BTB-manager-telegram` also supports [user defined custom scripts](./docs/custom-scripts.md).
 
 ## Usage
 
-**BTBManagerTelegram** can be run directly by executing the following command:
+As the telegram bot is launching itself the **Binance Trade Bot**, you only have to start the **BTB Manager Telegram** like so:
 
-```console
-# Run normally
-$ python3 -m btb_manager_telegram
-
-# If the bot is running on a server you may want to keep it running even after ssh connection is closed by using nohup
-$ nohup python3 -m btb_manager_telegram &
-
-# If you are using a virtual environment for the binance trade bot you can specify the Python binary path
-$ python3 -m btb_manager_telegram --python_path=/home/pi/binance-trade-bot/venv/bin/python
+```bash
+python3 -m btb_manager_telegram
 ```
 
-Make sure [Binance Trade Bot]'s `apprise.yml` file is correctly setup before running.  
-</br>
-Note:  
-If _Binance Trade Bot_ and _BTB-Manager-Telegram_ were **not** installed in the same parent directory or you want to use different `token` and `chat_id` from the ones in the `apprise.yml` file, the following optional arguments can be used:
-
-```console
-optional arguments:
-  -p PATH, --path PATH  (optional) binance-trade-bot installation path
-  -y PYTHON, --python_path PYTHON_PATH
-                        (optional) Python binary to be used for the BTB. If unset, uses the same executable (and thus virtual env if any) than the telegram bot.
-  -t TOKEN, --token TOKEN
-                        (optional) Telegram bot token
-  -c CHAT_ID, --chat_id CHAT_ID
-                        (optional) Telegram chat id
-  -d DOCKER, --docker DOCKER
-                        (optional) Run the script in a docker container.
-                        NOTE: Run the 'docker_setup.py' file before passing this flag.
-  -s, --start_trade_bot
-                        (optional) To start the trading bot automatically with the telegram bot 
-  -l, --language
-                        (optional) Language of choice
-  -h, --help
-                        (optinal) Lists the optional arguments
+If the bot is running on a server you may want to keep it running even after ssh connection is closed by using nohup. Note the trailing "&" :
+```bash
+nohup python3 -m btb_manager_telegram &
 ```
 
-⚠ Please check the [Docker setup] guide if you would like to run the bot in a Docker container.
+However, you can run the bot with options :
+```bash
+# Autostart the Binance Trade Bot when the BTB Manager starts
+# (Otherwise you will have to manually start the Binance Trade Bot from telegram)
+python3 -m btb_manager_telegram -s
 
-## Interaction
+# Use the french translation. Available translation : en, ru, fr, de, nl, es
+python3 -m btb_manager_telegram -l fr
 
-Interaction with **BTBManagerTelegram** can be _started_ by sending the `/start` command in the bot's Telegram chat.  
-Every time the Telegram bot is restarted, the `/start` command should be sent again.
+# Make possible to plot the bot's performance in EUR instead of USD
+python3 -m btb_manager_telegram -u EUR
 
-You can also add the bot to a group if multiple people need to access this bot. Please note that each user will have to type `/start` in the group, before they can start interacting with the bot.
+# If using other currencies than USD or EUR, for example GBP, you will have to provide
+# an openexchangerates API key, see the flag --oer_key.
+# Get you key here : https://openexchangerates.org/signup/free
+python3 -m btb_manager_telegram -u GBP -o OPENEXCHANGERATES_KEY
+
+# Of course you can combine all of this!
+python3 -m btb_manager_telegram -s -l fr -u EUR
+
+# Using nohup with options
+nohup python3 -m btb_manager_telegram -s -l fr -u EUR &
+
+# See all available options
+python3 -m btb_manager_telegram --help
+```
+
+## Manual upgrade
+First of, stop the telegram bot.
+```
+git pull
+python3 -m pip install --upgrade -r requirements.txt
+```
+You can now reboot the telegram bot.
+
+## Additional notes
+
+### Custom scripts
+This bot supports custom scripts in a plugin manner. An extensive documentation on customs scripts is available [here](./docs/custom-scripts.md).
+
+### Create a new translation
+Copy the `i18n/en.yml` file and rename it to e.g. `i18n/it.yml` and translate all the included values.
+Check the translation is complete :
+```bash
+cd i18n
+pip3 install click
+python3 check_translation_file it.yml
+```
+Please submit your translation in a PR for it to profit everybody!
+
+### Telegram token and chat_id
+Make sure [Binance Trade Bot]'s `apprise.yml` file is correctly setup before running, the telegram manager retreives this file to connect the bot.
+
+If **Binance Trade Bot** and **BTB-Manager-Telegram** were **not** installed in the same parent directory or if `apprise.yml` is not setup or you want to use different `token` and `chat_id` from the ones in the `apprise.yml` file, you can set these two keys with the options `--token` and `--chat_id`
+
+### Virtualenvs
+If the Binance Trade Bot has its own python environment, that is not shared with the telegram manager, you have to specify the path of the python binary used by the trade bot with the option `--python_path`. For example, if you created a virtualenv specific to the binance trade bot in the folder `/home/user/trading_bot/binance-trade-bot/venv`, you have to run the telegram bot like so:
+```bash
+python3 -m btb_manager_telegram --python_path /home/user/trading_bot/binance-trade-bot/venv/bin/python
+```
+
+### Multiple bots
+If you would like to run several _Binance Trade Bot_ instances at the same time [click here](./docs/multiple-bots.md).
+
+### Compatibility
+The program is fully compatible with **Linux** and **Windows** through **[WSL]**.  
+`RWX` permission problems are present on **native Windows** and **MacOS**.
 
 ## Screenshots
 
@@ -141,8 +122,6 @@ You can also add the bot to a group if multiple people need to access this bot. 
     <img height="20%" width="20%" src="https://i.imgur.com/UKyREe9.jpg" />
 </p>
 </details>
-
-## [Troubleshooting]
 
 ## Support the project
 
@@ -172,11 +151,9 @@ any securities or other financial instruments in this or in any other
 jurisdiction in which such solicitation or offer would be unlawful under the
 securities laws of such jurisdiction.
 
-If you plan to use real money, USE AT YOUR OWN RISK.
+**If you plan to use real money, USE AT YOUR OWN RISK.**
 
-Under no circumstances will I or the project's maintainers be held responsible or liable in any way for any claims,
-damages, losses, expenses, costs, or liabilities whatsoever, including, without limitation, any direct or indirect
-damages for loss of profits.
+Under no circumstances will I or the project's maintainers be held responsible or liable in any way for any claims, damages, losses, expenses, costs, or liabilities whatsoever, including, without limitation, any direct or indirect damages for loss of profits.
 
 ## Contributors ✨
 
