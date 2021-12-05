@@ -185,7 +185,7 @@ def kill_btb_manager_telegram_process():
 def is_tg_bot_update_available():
     try:
         proc = subprocess.Popen(
-            ["bash", "-c", "git remote update && git status -uno"],
+            ["bash", "-c", "git remote update origin && git status -uno"],
             stdout=subprocess.PIPE,
         )
         output, _ = proc.communicate()
@@ -198,16 +198,13 @@ def is_tg_bot_update_available():
 
 def is_btb_bot_update_available():
     try:
-        proc = subprocess.Popen(
-            [
-                "bash",
-                "-c",
-                f"cd {settings.ROOT_PATH} && git remote update && git status -uno",
-            ],
-            stdout=subprocess.PIPE,
-        )
-        output, _ = proc.communicate()
-        re = "Your branch is behind" in str(output)
+        subprocess.run(['git', 'remote', 'update', 'origin'])
+        branch = subprocess.check_output(['git', 'branch', '--show-current']).decode().rstrip('\n')
+        current_version = subprocess.check_output(['git','describe','--tags',branch]).decode().rstrip('\n')
+        remote_version = subprocess.check_output(['git','describe','--tags',f'origin/{branch}']).decode().rstrip('\n')
+        current_version = current_version.split('-')[0]
+        remote_version = remote_version.split('-')[0]
+        re = current_version != remote_version
     except Exception as e:
         logger.error(e, exc_info=True)
         re = None
