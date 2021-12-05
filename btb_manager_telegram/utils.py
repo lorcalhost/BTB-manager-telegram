@@ -200,7 +200,10 @@ def is_btb_bot_update_available():
     try:
         subprocess.run(['git', 'remote', 'update', 'origin'])
         branch = subprocess.check_output(['git', 'branch', '--show-current']).decode().rstrip('\n')
-        current_version = subprocess.check_output(['git','describe','--tags',branch]).decode().rstrip('\n')
+        try:
+            current_version = subprocess.check_output(['git','describe','--tags',branch]).decode().rstrip('\n')
+        except subprocess.CalledProcessError:
+            return True
         remote_version = subprocess.check_output(['git','describe','--tags',f'origin/{branch}']).decode().rstrip('\n')
         current_version = current_version.split('-')[0]
         remote_version = remote_version.split('-')[0]
