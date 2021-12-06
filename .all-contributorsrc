@@ -206,6 +206,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "SunBooster",
+      "name": "Riza Abdul Aziz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/79193009?v=4",
+      "profile": "https://github.com/SunBooster",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,
