@@ -1,0 +1,239 @@
+exited_no_change: "👌 Keluar tanpa melakukan perubahan."
+stop_to_stop: "Ketik /stop untuk berhenti merubah dan keluar tanpa perubahan."
+bye: "Sampai jumpa! semoga kita bisa berbincang lagi nanti."
+killed_bot: "Menghentikan _Binance Trade Bot_!"
+logging_enabled_error: "⚠ Pastikan logging untuk _Binance Trade Bot_ telah diaktifkan."
+database_not_found: "❌ tidak dapat menemukan file database di `%{path}`."
+conversation_started: "Percapakan dimulai!"
+select_option: "Silahkan pilih salah satu opsi di bawah ini."
+
+
+welcome:
+  hello: "Hai *%{name}*!"
+  welcome: "Selamat datang di _Binance Trade Bot Manager Telegram_."
+  developed_by: "Bot Telegram ini dikembangkan oleh @lorcalhost."
+  project_link: "Cari tahu tentang project ini [disini](https://github.com/lorcalhost/BTB-manager-telegram)."
+  donation: "*Jika kamu menyukai project ini [pertimbangkan untuk mendukung proyek ini dengan memberikan sedikit donasi](https://github.com/sponsors/lorcalhost). ❤*"
+  how_to_start: "*Untuk memulai percakapan, klik tombol `/start`*"
+  bot_started: "Aku sudah menjalankan trade bot, Kamu tidak perlu menjalankannya lagi"
+  bot_not_started:
+    base: "Trade bot telah coba dijalankan tetapi gagal."
+    bot_error: "Sepertinya bot mengalami gangguan saat akan dijalankan."
+    no_python: "Tidak dapat menemukan python binaries."
+    bad_path: "Tidak dapat menemukan trade bot."
+
+
+value:
+  order_placed: "Pembelian `%{order_size}` *%{bridge}* akan dilakukan untuk koin *%{current_coin}*."
+  wait_for_order: "_Menunggu pembelian selesai_."
+  db_error: "❌ Gagal mengambil informasi koin saat ini dari database."
+  no_information: "❌ Tidak ada informasi mengenai *%{current_coin}* yang tersedia di database."
+  no_during_trade: "⚠ Jika kamu mencoba menggunakan tombol `💵 Nilai saat ini` saat melakukan pembelian mohon untuk dicoba kembali setelah pembelian selesai."
+  error: "❌ Terjadi kesalahan, tidak dapat menampilkan nilai saat ini."
+  last_update: "Permbaruan terakhir: `%{update}`"
+  current_coin: "*Koin saat ini %{coin}:*"
+  balance: "- Saldo: `%{balance}` *%{coin}*"
+  exchange_rate_purchased: "- Nilai tukar saat pembelian: `%{rate}` *%{coin}*/*%{bridge}*"
+  exchange_rate_now: "- Nilai tukar saat ini:       `%{rate}` *%{coin}*/*USD*"
+  value_change: "- *Perubahan harga*: `%{change}` *%*"
+  value_usd: "- Nilai dalam *USD*: `%{value}` *USD*"
+  value_btc: "- Nilai dalam *BTC*: `%{value}` *BTC*"
+  bought_for: "_Pembelian_ `%{value}` *%{coin}*"
+  one_day_change_btc: "Perubahan harga BTC 1 Hari: `%{value}` %"
+  seven_day_change_btc: "Perubahan harga BTC 7 hari: `%{value}` %"
+
+
+progress:
+  coin: "Perkembangan jumlah koin saat ini:"
+  amount: "- Jumlah: `%{amount}` *%{coin}*"
+  price: "- harga: `%{amount}` *USD*"
+  change_over_days: "- Berubah: `%{amount}` *%{coin}* `%{percent}` *%* dalam %{days} Hari, %{hours} Jam"
+  trade_datetime: "- Tanggal Pembelian: `%{date}`"
+  db_error: "❌ Tidak dapat mengambil informasi perkembangan saat ini dari database."
+
+
+ratios:
+  last_update: "Pembaruan terakhir: `%{update}`"
+  compared_ratios: "*Rasio koin dibandingkan dengan %{coin} dengan urutan besar ke kecil:*"
+  bridge_value: "- Harga: `%{value}` %{bridge}"
+  ratio: "- Rasio: `%{ratio}`"
+  gen_error: "❌ Terjadi kesalahan, tidak dapat menampilkan rasio saat ini."
+  db_error: "❌ tidak dapat menampilkan rasio dari database."
+
+
+next_coin:
+  current_price: "- Harga saat ini: `%{price}` %{coin}"
+  target_price: "- Target harga: `%{price}` %{coin}"
+  error: "❌Terjadi kesalahan, tidak dapat menampilkan data koin selanjutnya."
+  db_error: "❌ tidak bisa menampilkan koin selanjutnya dari database."
+
+
+history:
+  last_x_trades: "Pembelian **%{trades}** terakhir:"
+  sold_bought: "*%{sold_trade}* `%{amount1}` *%{coin1}* untuk `%{amount2}` *%{coin2}*"
+  sold: "Terjual"
+  bought: "Terbeli"
+  status: "Status: _*%{status}*_"
+  error: "❌ Terjadi kesalahan, tidak dapat menampilkan riwayat pembelian saat ini."
+  db_error: "❌ tidak dapat menampilkan riwayat pembelian dari database."
+
+
+btb:
+  not_running: "⚠ Binance Trade Bot tidak berjalan."
+  running: "✔ Binance Trade Bot berjalan."
+  already_running: "⚠ Binance Trade Bot telah berjalan."
+  starting: "Trade bot mulai berjalan, harap tunggu sejenak..."
+  started: "✔ Binance Trade Bot berhasil dijalankan."
+  start_error: "❌ Gagal menjalankan Binance Trade Bot."
+  installation_path_error: "❌ Tidak dapat menemukan instalasi _Binance Trade Bot_ di `%{path}`."
+  directory_hint: "Pastikan file `binance-trade-bot` dan `BTB-manager-telegram` berada pada direktori induk yang sama ."
+  stopped: "✔ Berhasil menghentikan bot."
+  stop_error: "❌ Gagal menghentikan Binance Trade Bot."
+  lib_error: "❌ Tidak dapat menemukan python binary pada `%{path}`."
+  windows_hint: "Jika kamu menjalankan telegram bot di Windows pastikan untuk menjalankannya dengan tingkatan administrator."
+
+
+log:
+  error: "❌ Tidak dapat menemukan file log di `%{path}`."
+  last_4000_characters: "*4000* karakter terakhir dalam file log:"
+
+
+panic:
+  holding: "Saat ini kamu memiliki `%{amount1}` *%{coin1}* yang dibeli pada `%{amount2}` *%{coin2}*."
+  rate_when_bought: "Nilai tukar saat pembelian:"
+  current_rate: "Nilai tukar saat ini:"
+  current_value: "Jumlah saat ini:"
+  change: "Perubahan:"
+  stop_and_sell: "Apakah kamu ingin menghentikan _Binance Trade Bot_ dan menjual sesuai dengan harga market saat ini?"
+  open_buy_order: "Kamu memiliki pembelian yang masih berjalan sebesar `%{amount1}` *%{coin1}* untuk `%{amount2}` *%{coin2}*."
+  limit_buy_price: "Batas harga pembelian:"
+  stop_and_cancel: "Apakah kamu ini menghentikan _Binance Trade Bot_ dan membatalkan pembelian yang masih berjalan?"
+  order_already_complete: "saldo kamu saat ini *%{coin}*."
+  ask_stop_bot: "Apakah kamu ingin menghentikan _Binance Trade Bot_?"
+  open_sell_order: "Kamu memiliki penjualan `%{amount1}` *%{coin1}* untuk `%{amount2}` *%{coin2}*."
+  limit_sell_price: "Batas harga penjualan:"
+  error: "❌ Terjadi kesalahan, Tombol panik tidak dapat berfungsi saat ini."
+  db_error: "❌ tidak dapat melakukan perintah tersebut kepada database"
+
+
+coin_list:
+  success: "✔ Berhasil merubah file daftar koin menjadi:"
+  error: "❌ Gagal merubah file daftar koin."
+  not_found: "❌ Gagal menemukan daftar koin pada `%{path}`."
+  not_modified: "File `supported_coin_list` kamu *tidak* berubah."
+  is: "Daftar koin saat ini:"
+  reply: "_*Harap balas pesan ini dengan mencantumkan daftar koin terbaru yang dinginkan*_."
+  stop_bot: "⚠ Harap hentikan dahulu Binance Trade Bot sebelum merubah daftar koin."
+
+
+config:
+  success: "✔ Berhasil merubah file konfigurasi pengguna menjadi:"
+  error: "❌ Tidak dapat merubah file konfigurasi pengguna."
+  not_found: "❌ Tidak dapat menemukan file konfigurasi pengguna pada `%{path}`."
+  not_modified: "File `user.cfg` kamu *tidak* berubah."
+  is: "Konfigurasi pengguna kamu saat ini:"
+  reply: "_*Harap balas pesan ini dengan mencantumkan konfigurasi pengguna terbaru yang dinginkan*_."
+  stop_bot: "⚠ Harap hentikan dahulu Binance Trade Bot sebelum merubah file konfigurasi pengguna."
+
+
+db:
+  delete:
+    success: "✔ Berhasil menghapus file database."
+    error: "❌ Tidak dapat menghapus file database."
+    clear_log_error: "❌ Tidak dapat menghapus file log."
+    not_deleted: "Database kamu *tidak* dihapus."
+    stop_bot: "⚠ Harap hentikan dahulu Binance Trade Bot sebelum menghapus file database."
+    sure: "Apakah kamu yakin ingin menghapus file database dan menghapus semua log?"
+
+  export:
+    stop_bot: "⚠ Harap hentikan dahulu Binance Trade Bot sebelum mengunduh file database."
+    file: "Ini adalah file database kamu:"
+    error: "❌ tidak dapat mengunduh file database."
+
+
+update:
+  now: "Apakah kamu ingin memperbaharui sekarang?"
+
+  tgb:
+    updating: "Bot sedang diperbarui. Harap tunggu hingga dijalankan kembali."
+    version_error: "Terjadi kesalahan saat mencoba mengunduh informasi versi BTB Manager Telegram."
+    error: "Tidak dapat memperbarui BTB Manager Telegram"
+    not_updated: "BTB Manager Telegram *tidak* diperbarui."
+    up_to_date: "BTB Manager Telegram kamu adalah versi terbaru."
+    available: "Perbaruan untuk BTB Manager Telegram telah tersedia."
+    instruction: "Harap perbarui dengan masuk menu *🛠 Pemeliharaan* dan klik pilihan *⬆ Perbarui Telegram Bot*."
+
+  btb:
+    updating: "Bot telah dihentikan dan saat ini sedang diperbarui."
+    version_error: "Terjadi kesalahan saat mencoba mengunduh informasi versi Binance Trade Bot."
+    error: "Tidak dapat memperbarui Binance Trade Bot"
+    not_updated: "Binance Trade Bot *tidak* diperbarui."
+    up_to_date: "Binance Trade Bot kamu adalah versi terbaru."
+    available: "Perbaruan untuk Binance Trade Bot telah tersedia."
+    instruction: "Harap perbarui dengan masuk menu *🛠 Pemeliharaan* dan klik pilihan *⬆ Perbarui Binance Trade Bot*."
+    start_manually: "Tunggu beberapa saat, lalu jalankan ulang bot telegram secara manual."
+
+
+script:
+  not_found: "Tidak dapat menemukan skrip bernama %{name} pada file custom_scripts.json."
+  error: "Terjadi kesalahan saat menjalankan skrip."
+  no_script: "Tidak ada skrip khusus yang ditemukan di dalam *BTB-manager-telegram* 's `/config/custom_scripts.json`."
+  no_config: "tidak dapat menemukan file `custom_scripts.json` di dalam direktori *BTB-manager-telegram* 's `config/`."
+  select: "Silahkan pilih salah satu skrip khusus untuk dijalankan."
+
+graph:
+  msg_existing_graphs: "Pilih grafik atau buat grafik baru. Petunjuk format penulisan: 'KOIN1,KOIN2,KOIN3 jumlahhari'"
+  msg_no_graphs: "Gunakan tombol '➕ Grafik baru' untuk membuat grafik baru."
+  error: "Terjadi kesalahan saat pembuatan grafik. Harap laporkan. Pesan kesalahan:"
+  relative_amount: "Jumlah perubahan relatif (%)"
+  amount: "Jumlah"
+  relative_price: "Perubahan relatif harga dalam %{currency} (%)"
+  price: "Harga dalam %{currency}"
+  exit: "👌 Keluar"
+  not_enough_points: "Tidak ada data yang bisa ditampilan untuk grafik. Oleh karena itu, grafik tidak dibuat. Harap menunggu satu jam untuk mendapatkan data selanjutnya."
+  bad_graph: "Kamu masukkan perintah dengan format yang tidak sesuai, keluar dari pembuatan grafik."
+  new_graph:
+    a: "Masukkan grafik baru yang kamu ingin buat."
+    b: "Format penulisan perintahnya sebagai berikut : `KOIN1,KOIN2,... JumlahHari`"
+    c: "Jika JumlahHari ditulis 0, grafik akan menampilkan semua riwayat data yang tercatat"
+    d: "Jika daftar koin diganti dengan `*` semua koin yang tercatat akan ditampilkan"
+    e: "Contoh:"
+    f: "`USD 7` akan menampilkan koin yang kamu miliki berdasarkan nilai mereka dalam USD dalam rentang waktu 7 hari terakhir"
+    g: "`USD,BTC 0` akan menampilkan koin yang kamu miliki berdasarkan nilai USD dan BTC dalam semua rentang waktu data yang tercatat"
+    h: "`* 14` kan menampilkan semua koin yang sedang dan pernah kamu miliki dalam rentang waktu 14 hari terakhir"
+    i: "Ketik `/stop` untuk keluar"
+
+keyboard:
+  current_value: "💵 Nilai saat ini"
+  progress: "📈 Progress saat ini"
+  current_ratios: "➗ Rasio saat ini"
+  trade_history: "⌛ Riwayat perdagangan"
+  panic: "🚨 Tombol panik"
+  check_status: "🔍 Periksa status bot"
+  maintenance: "🛠 Pemeliharaan"
+  configurations: "⚙️ Konfigurasi"
+  start: "▶ Mulai jalankan Bot"
+  stop: "⏹ Hentikan Bot"
+  read_logs: "📜 Tampilkan log terbaru"
+  delete_db: "❌ Hapus database"
+  edit_cfg: "⚙ Ubah user.cfg"
+  edit_coin_list: "👛 Ubah daftar koin"
+  export_db: "📤 Unduh database"
+  back: "⬅️ Kembali"
+  go_back: "Kembali"
+  update_tgb: "⬆ Perbarui Telegram Bot"
+  update_btb: "⬆ Perbarui Binance Trade Bot"
+  execute_script: "🤖 Jalankan script khusus"
+  stop_sell: "⚠ Hentikan bot & dan jual sesuai harga pasar"
+  stop_cancel: "⚠ Hentikan bot & batalkan pesanan"
+  ok_s: "Oke 👌"
+  ok: "Oke"
+  great: "Bagus 👌"
+  cancel: "Batal"
+  update: "Perbaharui"
+  cancel_update: "Batalkan pembaruan"
+  confirm: "⚠ Konfirmasi"
+  stop_bot: "⚠ Hentikan bot"
+  next_coin: "🔀 Koin selanjutnya"
+  graph: "📊 Grafik"
+  new_graph: "➕ Grafik baru"
