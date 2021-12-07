@@ -90,7 +90,7 @@ Check the translation is complete :
 ```bash
 cd i18n
 pip3 install click
-python3 -m check_translation_file it.yml
+python3 check_translation_file.py it.yml
 ```
 Please submit your translation in a PR for it to profit everybody!
 
