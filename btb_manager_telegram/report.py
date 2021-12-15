@@ -14,8 +14,9 @@ from btb_manager_telegram.utils import i18n_format
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
-additional_coins = ['BTC']
+additional_coins = ["BTC"]
 include_only_coinlist = True
+
 
 def build_ticker(all_symbols, tickers_raw):
     backup_coins = ["BTC", "ETH", "BNB"]
