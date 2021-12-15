@@ -18,6 +18,7 @@ from btb_manager_telegram.utils import (
     setup_coin_list,
     telegram_text_truncator,
 )
+from btb_manager_telegram.table import tabularize
 
 
 def current_value():
@@ -318,12 +319,14 @@ def current_ratios():
                     f"\n{i18n_format('ratios.last_update', update=last_update.strftime('%H:%M:%S %d/%m/%Y'))}\n\n"
                     f"{i18n_format('ratios.compared_ratios', coin=current_coin)}\n"
                 ]
-                for coin in query:
-                    m_list.append(
-                        f"*{coin[1]}*:\n"
-                        f"\t{i18n_format('ratios.bridge_value', value=coin[2], bridge=bridge)}\n"
-                        f"\t{i18n_format('ratios.ratio', ratio=coin[3])}\n\n"
-                    )
+                query = list(query)
+                max_length_ticker = max([len(i[1]) for i in query] + [4])
+
+                m_list.extend(tabularize(
+                    ['Coin', 'Price', 'Ratio'],
+                    [[c[1] for c in query], [c[2] for c in query], [c[3] for c in query]],
+                    [7, 14, 14]
+                ))
 
                 message = telegram_text_truncator(m_list)
                 con.close()
@@ -396,13 +399,13 @@ def next_coin():
                 query = cur.fetchall()
                 m_list = []
                 query = sorted(query, key=lambda x: x[3], reverse=True)
-                for coin in query:
-                    percentage = round(coin[3] * 100, 2)
-                    m_list.append(
-                        f"*{coin[0]} \(`{format_float(percentage)}`%\)*\n"
-                        f"\t{i18n_format('next_coin.current_price', price=round(coin[1], 8), coin=bridge)}\n"
-                        f"\t{i18n_format('next_coin.target_price', price=round(coin[2], 8), coin=bridge)}\n\n"
-                    )
+                query = list(query)[:5:]
+
+                m_list.append(tabularize(
+                    ['Coin', '%', 'Cur. price', 'Target'],
+                    [[c[0] for c in query], [str(round(c[3]*100,2)) for c in query], [c[1] for c in query], [c[2] for c in query]],
+                    [7, 7, 12, 12]
+                ))
 
                 message = telegram_text_truncator(m_list)
                 con.close()
