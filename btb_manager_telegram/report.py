@@ -14,6 +14,9 @@ from btb_manager_telegram.utils import i18n_format
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
+additional_coins = ["BTC"]
+include_only_coinlist = True
+
 
 def build_ticker(all_symbols, tickers_raw):
     backup_coins = ["BTC", "ETH", "BNB"]
@@ -62,12 +65,15 @@ def get_report():
             # (see https://github.com/titulebolide/binance-report-bot/issues/5)
             continue
 
+        if include_only_coinlist and symbol not in settings.COIN_LIST:
+            continue
+
         qty = float(balance["free"]) + float(balance["locked"])
         if qty != 0:
             account_symbols.append(symbol)
             balances[symbol] = qty
 
-    all_symbols = list(set(settings.COIN_LIST + account_symbols))
+    all_symbols = list(set(settings.COIN_LIST + account_symbols + additional_coins))
     if settings.CURRENCY == "EUR":
         all_symbols.append("EUR")
     tickers_raw = api.get_symbol_ticker()
@@ -126,7 +132,7 @@ def get_graph(relative, symbols, days, graph_type, ref_currency):
         symbols = settings.COIN_LIST
     else:
         for s in symbols:
-            assert s in settings.COIN_LIST + [settings.CURRENCY]
+            assert s in settings.COIN_LIST + [settings.CURRENCY] + additional_coins
     if len(symbols) > 1:
         relative = True
     reports = get_previous_reports()
