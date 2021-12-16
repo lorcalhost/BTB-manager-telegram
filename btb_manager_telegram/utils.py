@@ -200,7 +200,7 @@ def is_btb_bot_update_available():
     try:
         subprocess.run(["git", "remote", "update", "origin"])
         branch = (
-            subprocess.check_output(["git", "branch", "--show-current"])
+            subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
             .decode()
             .rstrip("\n")
         )
