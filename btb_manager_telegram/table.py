@@ -75,9 +75,9 @@ def data_to_exact_size(
             index += 1
             if index < len(data):
                 while len(buffer + data[index]) < size:
-                    buffer += data[index]
+                    buffer += " " + data[index]
                     index += 1
-                    if index < len(data):
+                    if index >= len(data):
                         break
             result += fun_data_to_exact_size(buffer, size, add_spaces, align)
             result += "\n" if index < len(data) else ""
