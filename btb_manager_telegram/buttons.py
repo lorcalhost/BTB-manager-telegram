@@ -325,7 +325,8 @@ def current_ratios():
                 m_list.extend(tabularize(
                     ['Coin', 'Price', 'Ratio'],
                     [[c[1] for c in query], [c[2] for c in query], [c[3] for c in query]],
-                    [7, 14, 14]
+                    [5, 8, 8],
+                    add_spaces=False
                 ))
 
                 message = telegram_text_truncator(m_list)

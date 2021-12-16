@@ -58,7 +58,7 @@ def data_to_exact_size(data, size, add_spaces=True, align='left'):
 
     return spaces_before + data + spaces_after
 
-def fun_tabularize(col_head, col_data, col_size, align='left'):
+def fun_tabularize(col_head, col_data, col_size, add_spaces=True, align='left'):
     for i, size in enumerate(col_size):
         if size == 0:
             col_size[i] = max([len(str(data)) for data in col_data[i]]+[len(str(col_head[i]))]) + 2
@@ -76,7 +76,7 @@ def fun_tabularize(col_head, col_data, col_size, align='left'):
     for i,size in enumerate(col_size):
         if i > 0:
             table += "│"
-        table += data_to_exact_size(col_head[i], size, align=align)
+        table += data_to_exact_size(col_head[i], size, add_spaces, align)
     table += "│\n"
 
     table += "├"
@@ -91,7 +91,7 @@ def fun_tabularize(col_head, col_data, col_size, align='left'):
         for i,size in enumerate(col_size):
             if i > 0:
                 table += "│"
-            table += data_to_exact_size(col_data[i][j], size, align=align)
+            table += data_to_exact_size(col_data[i][j], size, add_spaces, align)
         table += "│\n"
 
     table += "└"
@@ -106,7 +106,7 @@ def fun_tabularize(col_head, col_data, col_size, align='left'):
     return table
 
 
-def tabularize(col_head, col_data, col_size, align='left', nb_row = 50):
+def tabularize(col_head, col_data, col_size, add_spaces=True, align='left', nb_row = 50):
     tables = []
     for i in range(len(col_data[0])//nb_row+1):
         tables.append(fun_tabularize(
