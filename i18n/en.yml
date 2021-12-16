@@ -55,15 +55,18 @@ progress:
 ratios:
   last_update: "Last update: `%{update}`"
   compared_ratios: "*Coin ratios compared to %{coin} in decreasing order:*"
-  bridge_value: "- Price: `%{value}` %{bridge}"
-  ratio: "- Ratio: `%{ratio}`"
+  price: "Price %{bridge}"
+  ratio: "Ratio"
+  coin: "Coin"
   gen_error: "❌ Something went wrong, unable to generate ratios at this time."
   db_error: "❌ Unable to fetch ratios from database."
 
 
 next_coin:
-  current_price: "- Current Price: `%{price}` %{coin}"
-  target_price: "- Target Price: `%{price}` %{coin}"
+  current_price: "Current price"
+  target_price: "Target price"
+  percentage: "%"
+  coin: "Coin"
   error: "❌ Something went wrong, unable to generate next coin at this time."
   db_error: "❌ Unable to fetch next coin from database."
 
