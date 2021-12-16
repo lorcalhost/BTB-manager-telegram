@@ -55,15 +55,15 @@ progress:
 ratios:
   last_update: "Última actualización: `%{update}`"
   compared_ratios: "*Ratios comparados a %{coin} en orden decreciente:*"
-  bridge_value: "- Precio: `%{value}` %{bridge}"
-  ratio: "- Ratio: `%{ratio}`"
+  price: "Precio %{bridge}"
+  ratio: "Ratio"
   gen_error: "❌ Algo salió mal, no fue posible generar los ratios en este momento."
   db_error: "❌ No fue posible obtener los ratios desde la base de datos."
 
 
 next_coin:
-  current_price: "- Precio actual: `%{price}` %{coin}"
-  target_price: "- Precio objetivo: `%{price}` %{coin}"
+  current_price: "Precio actual"
+  target_price: "Precio objetivo"
   error: "❌ Algo salió mal, no se pudo generar la próxima moneda en este momento."
   db_error: "❌ No se pudo obtener la información desde la base de datos."
 

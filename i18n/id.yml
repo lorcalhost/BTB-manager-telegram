@@ -55,15 +55,15 @@ progress:
 ratios:
   last_update: "Tanggal pembaruan data: `%{update}`"
   compared_ratios: "*Rasio koin lain dibandingkan %{coin}:*"
-  bridge_value: "- Harga: `%{value}` %{bridge}"
-  ratio: "- Rasio: `%{ratio}`"
+  price: "Harga %{bridge}"
+  ratio: "Rasio"
   gen_error: "❌ Terjadi kesalahan, tidak dapat menampilkan rasio saat ini."
   db_error: "❌ tidak dapat menampilkan rasio dari database."
 
 
 next_coin:
-  current_price: "- Harga saat ini: `%{price}` %{coin}"
-  target_price: "- Target harga pembelian: `%{price}` %{coin}"
+  current_price: "Harga saat ini"
+  target_price: "Target harga pembelian"
   error: "❌Terjadi kesalahan, tidak dapat menampilkan data koin selanjutnya."
   db_error: "❌ tidak dapat menampilkan koin selanjutnya dari database."
 

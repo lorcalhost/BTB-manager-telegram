@@ -55,15 +55,15 @@ progress:
 ratios:
   last_update: "Laatste update: `%{update}`"
   compared_ratios: "*Muntverhoudingen vergeleken met %{coin} in afnemende volgorde:*"
-  bridge_value: "- Prijs: `%{value}` %{bridge}"
-  ratio: "- Ratio: `%{ratio}`"
+  price: "Prijs %{bridge}"
+  ratio: "Ratio"
   gen_error: "❌ Er ging iets mis, niet in staat om op dit moment ratio's te genereren."
   db_error: "❌ Kan geen ratio ophalen uit database."
 
 
 next_coin:
-  current_price: "- Huidige prijs: `%{price}` %{coin}"
-  target_price: "- Doel prijs: `%{price}` %{coin}"
+  current_price: "Huidige prijs"
+  target_price: "Doel prijs"
   error: "❌ Er is iets misgegaan, niet in staat om op dit moment de volgende munt te genereren."
   db_error: "❌ Kan volgende munt niet ophalen uit database."
 
@@ -180,7 +180,7 @@ script:
   no_script: "Er is geen aangepast script gevonden in *BTB-manager-telegram* 's `/config/custom_scripts.json` bestand."
   no_config: "Kan bestand `custom_scripts.json` niet vinden binnen in de  *BTB-manager-telegram* 's `config/` map."
   select: "Selecteer één van uw aangepaste scripts om deze uit te voeren."
-  
+
 graph:
   msg_existing_graphs: "Kies een grafiek of maak een nieuwe. Tip : de opbouw is 'MUNT1,MUNT2,MUNT3 AantalDagen'"
   msg_no_graphs: "Gebruik de knop 'Nieuwe grafiek' om een nieuwe grafiek te maken."
@@ -237,4 +237,3 @@ keyboard:
   next_coin: "🔀 Volgende munt"
   graph: "📊 Grafiek"
   new_graph: "➕ Nieuwe grafiek"
-

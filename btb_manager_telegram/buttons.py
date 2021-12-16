@@ -8,6 +8,7 @@ from datetime import datetime
 import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
+from btb_manager_telegram.table import tabularize
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
     format_float,
@@ -18,7 +19,6 @@ from btb_manager_telegram.utils import (
     setup_coin_list,
     telegram_text_truncator,
 )
-from btb_manager_telegram.table import tabularize
 
 
 def current_value():
@@ -322,12 +322,23 @@ def current_ratios():
                 query = list(query)
                 max_length_ticker = max([len(i[1]) for i in query] + [4])
 
-                m_list.extend(tabularize(
-                    ['Coin', 'Price', 'Ratio'],
-                    [[c[1] for c in query], [c[2] for c in query], [c[3] for c in query]],
-                    [5, 8, 8],
-                    add_spaces=False
-                ))
+                m_list.extend(
+                    tabularize(
+                        [
+                            i18n_format("ratios.coin"),
+                            i18n_format("ratios.price", bridge=bridge),
+                            i18n_format("ratios.ratio"),
+                        ],
+                        [
+                            [c[1] for c in query],
+                            [c[2] for c in query],
+                            [c[3] for c in query],
+                        ],
+                        [6, 12, 12],
+                        align="left",
+                        add_spaces=[True, True, False],
+                    )
+                )
 
                 message = telegram_text_truncator(m_list)
                 con.close()
@@ -400,13 +411,27 @@ def next_coin():
                 query = cur.fetchall()
                 m_list = []
                 query = sorted(query, key=lambda x: x[3], reverse=True)
-                query = list(query)[:5:]
+                query = list(query)
 
-                m_list.append(tabularize(
-                    ['Coin', '%', 'Cur. price', 'Target'],
-                    [[c[0] for c in query], [str(round(c[3]*100,2)) for c in query], [c[1] for c in query], [c[2] for c in query]],
-                    [7, 7, 12, 12]
-                ))
+                m_list.extend(
+                    tabularize(
+                        [
+                            i18n_format("next_coin.coin"),
+                            i18n_format("next_coin.percentage"),
+                            i18n_format("next_coin.current_price"),
+                            i18n_format("next_coin.target_price"),
+                        ],
+                        [
+                            [c[0] for c in query],
+                            [str(round(c[3] * 100, 2)) for c in query],
+                            [c[1] for c in query],
+                            [c[2] for c in query],
+                        ],
+                        [6, 7, 8, 8],
+                        add_spaces=[True, True, False, False],
+                        align=["center", "left", "left", "left"],
+                    )
+                )
 
                 message = telegram_text_truncator(m_list)
                 con.close()
