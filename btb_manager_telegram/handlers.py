@@ -628,10 +628,7 @@ def panic(update: Update, _: CallbackContext) -> int:
         if update.message.text == i18n_format("keyboard.stop_bot"):
             message = i18n_format("killed_bot")
     else:
-        message = (
-            f"{i18n_format('exited_no_change')}\n"
-            f"{i18n_format('update.btb.not_updated')}"
-        )
+        message = i18n_format('panic.exited')
 
     reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
     return MENU

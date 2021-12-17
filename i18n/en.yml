@@ -117,7 +117,7 @@ panic:
   limit_sell_price: "Limit sell at price:"
   error: "❌ Something went wrong, the panic button is not working at this time."
   db_error: "❌ Unable to perform the needed actions on the database"
-
+  exited: "👌 Exited without closing position. The panic button was not used."
 
 coin_list:
   success: "✔ Successfully edited coin list file to:"
