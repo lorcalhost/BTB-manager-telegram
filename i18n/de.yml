@@ -65,7 +65,7 @@ ratios:
 next_coin:
   current_price: "Aktueller Preis"
   target_price: "Zielpreis"
-    percentage: "%"
+  percentage: "%"
   coin: "Coin"
   error: "❌ Etwas ist schief gelaufen, derzeit kann der nächste Coin nicht ermittelt werden."
   db_error: "❌ Nächster Coin kann nicht aus der Datenbank ermittelt werden."
