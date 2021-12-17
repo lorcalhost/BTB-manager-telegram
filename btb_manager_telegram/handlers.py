@@ -1,10 +1,13 @@
 import json
 import os
+import shutil
 import sqlite3
 import subprocess
+import sys
+import traceback
 from configparser import ConfigParser
-from shutil import copyfile
 
+import numpy as np
 from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
     CallbackContext,
@@ -18,10 +21,12 @@ from telegram.utils.helpers import escape_markdown
 from btb_manager_telegram import (
     BOUGHT,
     BUYING,
+    CREATE_GRAPH,
     CUSTOM_SCRIPT,
     DELETE_DB,
     EDIT_COIN_LIST,
     EDIT_USER_CONFIG,
+    GRAPH_MENU,
     MENU,
     PANIC_BUTTON,
     SELLING,
@@ -29,14 +34,19 @@ from btb_manager_telegram import (
     UPDATE_BTB,
     UPDATE_TG,
     buttons,
+    keyboards,
     logger,
     settings,
 )
 from btb_manager_telegram.binance_api_utils import send_signed_request
+from btb_manager_telegram.report import get_graph
 from btb_manager_telegram.utils import (
+    escape_tg,
     find_and_kill_binance_trade_bot_process,
     get_custom_scripts_keyboard,
+    i18n_format,
     kill_btb_manager_telegram_process,
+    reply_text_escape,
     telegram_text_truncator,
 )
 
@@ -44,64 +54,82 @@ from btb_manager_telegram.utils import (
 def menu(update: Update, _: CallbackContext) -> int:
     logger.info(f"Menu selector. ({update.message.text})")
 
-    keyboard = [
-        ["💵 Current value", "➗ Current ratios"],
-        ["📈 Progress", "⌛ Trade History"],
-        ["🔍 Check bot status", "🚨 Panic button"],
-        ["🛠 Maintenance", "⚙️ Configurations"],
-    ]
+    # Panic button disabled until PR #74 is complete
+    # keyboard = [
+    #     [i18n_format('keyboard.current_value'), i18n_format('keyboard.current_ratios')],
+    #     [i18n_format('keyboard.progress'), i18n_format('keyboard.trade_history')],
+    #     [i18n_format('keyboard.check_status'), i18n_format('keyboard.panic')],
+    #     [i18n_format('keyboard.maintenance'), i18n_format('keyboard.configurations')],
+    # ]
 
-    config_keyboard = [
-        ["▶ Start trade bot", "⏹ Stop trade bot"],
-        ["📜 Read last log lines", "❌ Delete database"],
-        ["⚙ Edit user.cfg", "👛 Edit coin list"],
-        ["📤 Export database", "⬅️ Back"],
-    ]
+    # modify reply_text function to have it escaping characters
+    reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
-    maintenance_keyboard = [
-        ["⬆ Update Telegram Bot"],
-        ["⬆ Update Binance Trade Bot"],
-        ["🤖 Execute custom script"],
-        ["⬅️ Back"],
-    ]
+    if update.message.text == "/start":
+        logger.info("Started conversation.")
+        message = (
+            f"{i18n_format('conversation_started')}\n" f"{i18n_format('select_option')}"
+        )
+        settings.CHAT.send_message(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
 
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    if update.message.text in [
+        i18n_format("keyboard.back"),
+        i18n_format("keyboard.great"),
+    ]:
+        reply_text_escape_fun(
+            i18n_format("select_option"),
+            reply_markup=keyboards.menu,
+            parse_mode="MarkdownV2",
+        )
 
-    reply_markup_config = ReplyKeyboardMarkup(config_keyboard, resize_keyboard=True)
+    elif update.message.text in [
+        i18n_format("keyboard.go_back"),
+        i18n_format("keyboard.ok"),
+        i18n_format("keyboard.configurations"),
+    ]:
+        reply_text_escape_fun(
+            i18n_format("select_option"),
+            reply_markup=keyboards.config,
+            parse_mode="MarkdownV2",
+        )
 
-    reply_markup_maintenance = ReplyKeyboardMarkup(
-        maintenance_keyboard, resize_keyboard=True
-    )
+    elif update.message.text in [
+        i18n_format("keyboard.maintenance"),
+        i18n_format("keyboard.cancel_update"),
+        i18n_format("keyboard.cancel"),
+        i18n_format("keyboard.ok_s"),
+    ]:
+        reply_text_escape_fun(
+            i18n_format("select_option"),
+            reply_markup=keyboards.maintenance,
+            parse_mode="MarkdownV2",
+        )
 
-    if update.message.text in ["Begin", "⬅️ Back", "Great 👌"]:
-        message = "Please select one of the options."
-        update.message.reply_text(message, reply_markup=reply_markup)
-
-    elif update.message.text in ["Go back", "OK", "⚙️ Configurations"]:
-        message = "Please select one of the options."
-        update.message.reply_text(message, reply_markup=reply_markup_config)
-
-    elif update.message.text in ["🛠 Maintenance", "Cancel update", "Cancel", "OK 👌"]:
-        message = "Please select one of the options."
-        update.message.reply_text(message, reply_markup=reply_markup_maintenance)
-
-    elif update.message.text == "💵 Current value":
+    elif update.message.text == i18n_format("keyboard.current_value"):
         for mes in buttons.current_value():
-            update.message.reply_text(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            reply_text_escape_fun(
+                mes, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
             )
 
-    elif update.message.text == "🚨 Panic button":
+    elif update.message.text == i18n_format("keyboard.panic"):
         message, status = buttons.panic_btn()
         if status in [BOUGHT, BUYING, SOLD, SELLING]:
             if status == BOUGHT:
-                kb = [["⚠ Stop & sell at market price"], ["Go back"]]
+                kb = [
+                    [i18n_format("keyboard.stop_sell")],
+                    [i18n_format("keyboard.go_back")],
+                ]
             elif status in [BUYING, SELLING]:
-                kb = [["⚠ Stop & cancel order"], ["Go back"]]
+                kb = [
+                    [i18n_format("keyboard.stop_cancel")],
+                    [i18n_format("keyboard.go_back")],
+                ]
             elif status == SOLD:
-                kb = [["⚠ Stop the bot"], ["Go back"]]
+                kb = [[i18n_format("keyboard.stop")], [i18n_format("keyboard.go_back")]]
 
-            update.message.reply_text(
+            reply_text_escape_fun(
                 message,
                 reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
@@ -109,147 +137,196 @@ def menu(update: Update, _: CallbackContext) -> int:
             return PANIC_BUTTON
 
         else:
-            update.message.reply_text(
-                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+            reply_text_escape_fun(
+                message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
             )
 
-    elif update.message.text == "📈 Progress":
+    elif update.message.text == i18n_format("keyboard.progress"):
         for mes in buttons.check_progress():
-            update.message.reply_text(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            reply_text_escape_fun(
+                mes, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
             )
 
-    elif update.message.text == "➗ Current ratios":
+    elif update.message.text == i18n_format("keyboard.current_ratios"):
         for mes in buttons.current_ratios():
-            update.message.reply_text(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            reply_text_escape_fun(
+                mes, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
             )
 
-    elif update.message.text == "🔍 Check bot status":
-        update.message.reply_text(buttons.check_status(), reply_markup=reply_markup)
+    elif update.message.text == i18n_format("keyboard.next_coin"):
+        for mes in buttons.next_coin():
+            reply_text_escape_fun(
+                mes, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+            )
 
-    elif update.message.text == "⌛ Trade History":
+    elif update.message.text == i18n_format("keyboard.check_status"):
+        reply_text_escape_fun(
+            buttons.check_status(), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+
+    elif update.message.text == i18n_format("keyboard.trade_history"):
         for mes in buttons.trade_history():
-            update.message.reply_text(
-                mes, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            reply_text_escape_fun(
+                mes, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
             )
 
-    elif update.message.text == "▶ Start trade bot":
-        update.message.reply_text(
-            buttons.start_bot(),
-            reply_markup=reply_markup_config,
+    elif update.message.text == i18n_format("keyboard.graph"):
+        if os.path.isfile("data/favourite_graphs.npy"):
+            favourite_graphs = np.load(
+                "data/favourite_graphs.npy", allow_pickle=True
+            ).tolist()
+            favourite_graphs.sort(key=lambda x: x[1])
+            kb = [[i[0]] for i in favourite_graphs[:4]]
+            kb.append(
+                [i18n_format("keyboard.new_graph"), i18n_format("keyboard.go_back")]
+            )
+            message = i18n_format("graph.msg_existing_graphs")
+        else:
+            message = i18n_format("graph.msg_no_graphs")
+            kb = [[i18n_format("keyboard.new_graph"), i18n_format("keyboard.go_back")]]
+        reply_markup_graph = ReplyKeyboardMarkup(kb, resize_keyboard=True)
+        reply_text_escape_fun(
+            message, reply_markup=reply_markup_graph, parse_mode="MarkdownV2"
+        )
+        return GRAPH_MENU
+
+    elif update.message.text == i18n_format("keyboard.start"):
+        logger.info("Start bot button pressed.")
+
+        reply_text_escape_fun(
+            i18n_format("btb.starting"),
+            reply_markup=keyboards.config,
+            parse_mode="MarkdownV2",
+        )
+        status = buttons.start_bot()
+        message = [
+            i18n_format("btb.already_running"),
+            i18n_format("btb.started"),
+            i18n_format("btb.start_error"),
+            f"{i18n_format('btb.installation_path_error', path=settings.ROOT_PATH)}\n{i18n_format('btb.directory_hint')}",
+            f"{i18n_format('btb.lib_error', path=settings.PYTHON_PATH)}\n",
+        ][status]
+        reply_text_escape_fun(
+            message,
+            reply_markup=keyboards.config,
             parse_mode="MarkdownV2",
         )
 
-    elif update.message.text == "⏹ Stop trade bot":
-        update.message.reply_text(buttons.stop_bot(), reply_markup=reply_markup_config)
+    elif update.message.text == i18n_format("keyboard.stop"):
+        reply_text_escape_fun(
+            buttons.stop_bot(),
+            reply_markup=keyboards.config,
+            parse_mode="MarkdownV2",
+        )
 
-    elif update.message.text == "📜 Read last log lines":
-        update.message.reply_text(
+    elif update.message.text == i18n_format("keyboard.read_logs"):
+        reply_text_escape_fun(
             buttons.read_log(),
-            reply_markup=reply_markup_config,
+            reply_markup=keyboards.config,
             parse_mode="MarkdownV2",
         )
 
-    elif update.message.text == "❌ Delete database":
+    elif update.message.text == i18n_format("keyboard.delete_db"):
         message, status = buttons.delete_db()
         if status:
-            kb = [["⚠ Confirm", "Go back"]]
-            update.message.reply_text(
+            kb = [[i18n_format("keyboard.confirm"), i18n_format("keyboard.go_back")]]
+            reply_text_escape_fun(
                 message,
                 reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return DELETE_DB
         else:
-            update.message.reply_text(
-                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+            reply_text_escape_fun(
+                message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
             )
 
-    elif update.message.text == "⚙ Edit user.cfg":
+    elif update.message.text == i18n_format("keyboard.edit_cfg"):
         message, status = buttons.edit_user_cfg()
         if status:
-            update.message.reply_text(
+            reply_text_escape_fun(
                 message, reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
             )
             return EDIT_USER_CONFIG
         else:
-            update.message.reply_text(
-                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+            reply_text_escape_fun(
+                message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
             )
 
-    elif update.message.text == "👛 Edit coin list":
+    elif update.message.text == i18n_format("keyboard.edit_coin_list"):
         message, status = buttons.edit_coin()
         if status:
-            update.message.reply_text(
+            reply_text_escape_fun(
                 message, reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
             )
             return EDIT_COIN_LIST
         else:
-            update.message.reply_text(
-                message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+            reply_text_escape_fun(
+                message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
             )
 
-    elif update.message.text == "📤 Export database":
+    elif update.message.text == i18n_format("keyboard.export_db"):
         message, document = buttons.export_db()
-        update.message.reply_text(
-            message, reply_markup=reply_markup_config, parse_mode="MarkdownV2"
+        reply_text_escape_fun(
+            message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
         )
         if document is not None:
-            bot = Bot(settings.TOKEN)
-            bot.send_document(
-                chat_id=update.message.chat_id,
+            settings.CHAT.send_document(
                 document=document,
                 filename="crypto_trading.db",
             )
 
-    elif update.message.text == "⬆ Update Telegram Bot":
+    elif update.message.text == i18n_format("keyboard.update_tgb"):
         message, status = buttons.update_tg_bot()
         if status:
-            kb = [["Update", "Cancel update"]]
-            update.message.reply_text(
+            kb = [
+                [i18n_format("keyboard.update"), i18n_format("keyboard.cancel_update")]
+            ]
+            reply_text_escape_fun(
                 message,
                 reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return UPDATE_TG
         else:
-            update.message.reply_text(
+            reply_text_escape_fun(
                 message,
-                reply_markup=reply_markup_maintenance,
+                reply_markup=keyboards.maintenance,
                 parse_mode="MarkdownV2",
             )
 
-    elif update.message.text == "⬆ Update Binance Trade Bot":
+    elif update.message.text == i18n_format("keyboard.update_btb"):
         message, status = buttons.update_btb()
         if status:
-            kb = [["Update", "Cancel update"]]
-            update.message.reply_text(
+            kb = [
+                [i18n_format("keyboard.update"), i18n_format("keyboard.cancel_update")]
+            ]
+            reply_text_escape_fun(
                 message,
                 reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return UPDATE_BTB
         else:
-            update.message.reply_text(
+            reply_text_escape_fun(
                 message,
-                reply_markup=reply_markup_maintenance,
+                reply_markup=keyboards.maintenance,
                 parse_mode="MarkdownV2",
             )
 
-    elif update.message.text == "🤖 Execute custom script":
+    elif update.message.text == i18n_format("keyboard.execute_script"):
         kb, status, message = get_custom_scripts_keyboard()
         if status:
-            update.message.reply_text(
+            reply_text_escape_fun(
                 message,
                 reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return CUSTOM_SCRIPT
         else:
-            update.message.reply_text(
+            reply_text_escape_fun(
                 message,
-                reply_markup=reply_markup_maintenance,
+                reply_markup=keyboards.maintenance,
                 parse_mode="MarkdownV2",
             )
 
@@ -282,29 +359,33 @@ def start(update: Update, _: CallbackContext) -> int:
 def edit_coin(update: Update, _: CallbackContext) -> int:
     logger.info(f"Editing coin list. ({update.message.text})")
 
+    # modify reply_text function to have it escaping characters
+    reply_text_escape_fun = reply_text_escape(update.message.reply_text)
+
     if update.message.text != "/stop":
         message = (
-            f"✔ Successfully edited coin list file to:\n\n"
+            f"{i18n_format('coin_list.success')}\n\n"
             f"```\n"
             f"{update.message.text}\n"
-            f"```".replace(".", "\.")
+            f"```"
         )
         coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
         try:
-            copyfile(coin_file_path, f"{coin_file_path}.backup")
+            shutil.copyfile(coin_file_path, f"{coin_file_path}.backup")
             with open(coin_file_path, "w") as f:
                 f.write(update.message.text + "\n")
         except Exception as e:
-            logger.error(f"❌ Unable to edit coin list file: {e}")
-            message = "❌ Unable to edit coin list file\."
+            logger.error(f"❌ Unable to edit coin list file: {e}", exc_info=True)
+            message = i18n_format("coin_list.error")
     else:
-        message = "👌 Exited without changes\.\nYour `supported_coin_list` file was *not* modified\."
+        message = (
+            f"{i18n_format('exited_no_change')}\n"
+            f"{i18n_format('coin_list.not_modified')}"
+        )
 
-    keyboard = [["Go back"]]
+    keyboard = [[i18n_format("keyboard.go_back")]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-    update.message.reply_text(
-        message, reply_markup=reply_markup, parse_mode="MarkdownV2"
-    )
+    reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
 
     return MENU
 
@@ -312,31 +393,39 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
 def edit_user_config(update: Update, _: CallbackContext) -> int:
     logger.info(f"Editing user configuration. ({update.message.text})")
 
+    # modify reply_text function to have it escaping characters
+    reply_text_escape_fun = reply_text_escape(update.message.reply_text)
+
     if update.message.text != "/stop":
         message = (
-            f"✔ Successfully edited user configuration file to:\n\n"
+            f"{i18n_format('config.success')}\n\n"
             f"```\n"
             f"{update.message.text}\n"
-            f"```".replace(".", "\.")
+            f"```"
         )
         user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
         try:
-            copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
+            shutil.copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
             with open(user_cfg_file_path, "w") as f:
                 f.write(update.message.text + "\n\n\n")
         except Exception as e:
-            logger.error(f"❌ Unable to edit user configuration file: {e}")
-            message = "❌ Unable to edit user configuration file\."
+            logger.error(
+                f"❌ Unable to edit user configuration file: {e}", exc_info=True
+            )
+            message = i18n_format("config.error")
+        try:
+            shutil.copymode(user_cfg_file_path, f"{user_cfg_file_path}.backup")
+        except:
+            pass
     else:
         message = (
-            "👌 Exited without changes\.\n" "Your `user.cfg` file was *not* modified\."
+            f"{i18n_format('exited_no_change')}\n"
+            f"{i18n_format('config.not_modified')}"
         )
 
-    keyboard = [["Go back"]]
+    keyboard = [[i18n_format("keyboard.go_back")]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-    update.message.reply_text(
-        message, reply_markup=reply_markup, parse_mode="MarkdownV2"
-    )
+    reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
 
     return MENU
 
@@ -346,31 +435,39 @@ def delete_db(update: Update, _: CallbackContext) -> int:
         f"Asking if the user really wants to delete the db. ({update.message.text})"
     )
 
-    if update.message.text != "Go back":
-        message = "✔ Successfully deleted database file\."
+    # modify reply_text function to have it escaping characters
+    reply_text_escape_fun = reply_text_escape(update.message.reply_text)
+
+    if update.message.text != i18n_format("keyboard.go_back"):
+        message = i18n_format("db.delete.success")
         db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        pw_file_path = os.path.join(settings.ROOT_PATH, "data/paper_wallet.json")
         log_file_path = os.path.join(settings.ROOT_PATH, "logs/crypto_trading.log")
         try:
-            copyfile(db_file_path, f"{db_file_path}.backup")
+            shutil.copyfile(db_file_path, f"{db_file_path}.backup")
             os.remove(db_file_path)
+            if os.path.isfile(pw_file_path):
+                shutil.copyfile(pw_file_path, f"{pw_file_path}.backup")
+                os.remove(pw_file_path)
         except Exception as e:
-            logger.error(f"❌ Unable to delete database file: {e}")
-            message = "❌ Unable to delete database file\."
+            logger.error(f"❌ Unable to delete database file: {e}", exc_info=True)
+            message = i18n_format("db.delete.error")
         try:
             with open(log_file_path, "w") as f:
                 f.truncate()
         except Exception as e:
-            logger.error(f"❌ Unable to clear log file: {e}")
-            message = "❌ Unable to clear log file\."
+            logger.error(f"❌ Unable to clear log file: {e}", exc_info=True)
+            message = i18n_format("db.delete.clear_log_error")
 
     else:
-        message = "👌 Exited without changes\.\n" "Your database was *not* deleted\."
+        message = (
+            f"{i18n_format('exited_no_change')}\n"
+            f"{i18n_format('db.delete.not_deleted')}"
+        )
 
-    keyboard = [["OK"]]
+    keyboard = [[i18n_format("keyboard.ok")]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-    update.message.reply_text(
-        message, reply_markup=reply_markup, parse_mode="MarkdownV2"
-    )
+    reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
 
     return MENU
 
@@ -378,36 +475,38 @@ def delete_db(update: Update, _: CallbackContext) -> int:
 def update_tg_bot(update: Update, _: CallbackContext) -> int:
     logger.info(f"Updating BTB Manager Telegram. ({update.message.text})")
 
-    if update.message.text != "Cancel update":
-        message = (
-            "The bot is updating\.\n"
-            "Wait a few seconds then start the bot again with /start"
-        )
+    # modify reply_text function to have it escaping characters
+    reply_text_escape_fun = reply_text_escape(update.message.reply_text)
+
+    if update.message.text != i18n_format("keyboard.cancel_update"):
+        message = i18n_format("update.tgb.updating")
         keyboard = [["/start"]]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-        update.message.reply_text(
+        reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
         try:
+            manager_python_path = sys.executable
             subprocess.call(
-                f"git pull && $(which python3) -m pip install -r requirements.txt --upgrade && "
-                f'$(which python3) -m btb_manager_telegram -p "{settings.ROOT_PATH}" &',
+                f"git pull && {manager_python_path} -m pip install -r requirements.txt --upgrade && "
+                f"{manager_python_path} -m btb_manager_telegram {settings.RAW_ARGS} &",
                 shell=True,
             )
             kill_btb_manager_telegram_process()
         except Exception as e:
-            logger.error(f"❌ Unable to update BTB Manager Telegram: {e}")
-            message = "Unable to update BTB Manager Telegram"
-            update.message.reply_text(
+            logger.error(f"❌ Unable to update BTB Manager Telegram: {e}", exc_info=True)
+            message = i18n_format("update.tgb.error")
+            reply_text_escape_fun(
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
     else:
         message = (
-            "👌 Exited without changes\.\n" "BTB Manager Telegram was *not* updated\."
+            f"{i18n_format('exited_no_change')}\n"
+            f"{i18n_format('update.tgb.not_updated')}"
         )
-        keyboard = [["OK 👌"]]
+        keyboard = [[i18n_format("keyboard.ok_s")]]
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-        update.message.reply_text(
+        reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
 
@@ -417,15 +516,18 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
 def update_btb(update: Update, _: CallbackContext) -> int:
     logger.info(f"Updating Binance Trade Bot. ({update.message.text})")
 
-    keyboard = [["OK 👌"]]
+    # modify reply_text function to have it escaping characters
+    reply_text_escape_fun = reply_text_escape(update.message.reply_text)
+
+    keyboard = [[i18n_format("keyboard.ok_s")]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
-    if update.message.text != "Cancel update":
+    if update.message.text != i18n_format("keyboard.cancel_update"):
         message = (
-            "The bot has been stopped and is now updating\.\n"
-            "Wait a few seconds, then restart manually\."
+            f"{i18n_format('update.btb.updating')}\n"
+            f"{i18n_format('update.btb.start_manually')}"
         )
-        update.message.reply_text(
+        reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
         try:
@@ -433,18 +535,22 @@ def update_btb(update: Update, _: CallbackContext) -> int:
             subprocess.call(
                 f"cd {settings.ROOT_PATH} && "
                 f"git pull && "
-                f"$(which python3) -m pip install -r requirements.txt --upgrade",
+                f"{settings.PYTHON_PATH} -m pip install -r requirements.txt --upgrade",
                 shell=True,
             )
+            settings.BTB_UPDATE_BROADCASTED_BEFORE = False
         except Exception as e:
-            logger.error(f"Unable to update Binance Trade Bot: {e}")
+            logger.error(f"Unable to update Binance Trade Bot: {e}", exc_info=True)
             message = "Unable to update Binance Trade Bot"
-            update.message.reply_text(
+            reply_text_escape_fun(
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"
             )
     else:
-        message = "👌 Exited without changes\.\n" "Binance Trade Bot was *not* updated\."
-        update.message.reply_text(
+        message = (
+            f"{i18n_format('exited_no_change')}\n"
+            f"{i18n_format('update.btb.not_updated')}"
+        )
+        reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
 
@@ -454,9 +560,12 @@ def update_btb(update: Update, _: CallbackContext) -> int:
 def panic(update: Update, _: CallbackContext) -> int:
     logger.info(f"Panic Button is doing its job. ({update.message.text})")
 
-    keyboard = [["Great 👌"]]
+    # modify reply_text function to have it escaping characters
+    reply_text_escape_fun = reply_text_escape(update.message.reply_text)
+
+    keyboard = [[i18n_format("keyboard.great")]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-    if update.message.text != "Go back":
+    if update.message.text != i18n_format("keyboard.go_back"):
         find_and_kill_binance_trade_bot_process()
 
         # Get current coin pair
@@ -479,7 +588,7 @@ def panic(update: Update, _: CallbackContext) -> int:
             api_secret_key = config.get("binance_user_config", "api_secret_key")
             tld = config.get("binance_user_config", "tld")
 
-        if update.message.text == "⚠ Stop & sell at market price":
+        if update.message.text == i18n_format("keyboard.stop_sell"):
             params = {
                 "symbol": f"{alt_coin_id}{crypto_coin_id}",
                 "side": "SELL",
@@ -500,7 +609,7 @@ def panic(update: Update, _: CallbackContext) -> int:
                 version=2,
             )
 
-        if update.message.text == "⚠ Stop & cancel order":
+        if update.message.text != i18n_format("keyboard.stop_cancel"):
             params = {"symbol": f"{alt_coin_id}{crypto_coin_id}"}
             message = escape_markdown(
                 "`"
@@ -516,27 +625,29 @@ def panic(update: Update, _: CallbackContext) -> int:
                 version=2,
             )
 
-        if update.message.text == "⚠ Stop the bot":
-            message = "Killed _Binance Trade Bot_\!"
+        if update.message.text == i18n_format("keyboard.stop_bot"):
+            message = i18n_format("killed_bot")
     else:
         message = (
-            "👌 Exited without closing position\.\n" "The panic button was not used\."
+            f"{i18n_format('exited_no_change')}\n"
+            f"{i18n_format('update.btb.not_updated')}"
         )
 
-    update.message.reply_text(
-        message, reply_markup=reply_markup, parse_mode="MarkdownV2"
-    )
+    reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
     return MENU
 
 
 def execute_custom_script(update: Update, _: CallbackContext) -> int:
     logger.info(f"Going to 🤖 execute custom script. ({update.message.text})")
 
-    keyboard = [["OK 👌"]]
+    # modify reply_text function to have it escaping characters
+    reply_text_escape_fun = reply_text_escape(update.message.reply_text)
+
+    keyboard = [[i18n_format("keyboard.ok_s")]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
     custom_scripts_path = "./config/custom_scripts.json"
-    if update.message.text != "Cancel":
+    if update.message.text != i18n_format("keyboard.cancel"):
         with open(custom_scripts_path) as f:
             scripts = json.load(f)
 
@@ -544,10 +655,11 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
                 command = ["bash", "-c", str(scripts[update.message.text])]
             except Exception as e:
                 logger.error(
-                    f"Unable to find script named {update.message.text} in custom_scripts.json file: {e}"
+                    f"Unable to find script named {update.message.text} in custom_scripts.json file: {e}",
+                    exc_info=True,
                 )
-                message = f"Unable to find script named `{escape_markdown(update.message.text, version=2)}` in `custom_scripts.json` file\."
-                update.message.reply_text(
+                message = i18n_format("script.not_found", name=update.message.text)
+                reply_text_escape_fun(
                     message, reply_markup=reply_markup, parse_mode="MarkdownV2"
                 )
 
@@ -563,15 +675,108 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
                     padding_chars_tail="```",
                 )
                 for message in message_list:
-                    update.message.reply_text(
+                    reply_text_escape_fun(
                         message, reply_markup=reply_markup, parse_mode="MarkdownV2"
                     )
             except Exception as e:
-                logger.error(f"Error during script execution: {e}")
-                message = "Error during script execution\."
-                update.message.reply_text(
+                logger.error(f"Error during script execution: {e}", exc_info=True)
+                message = i18n_format("script.error")
+                reply_text_escape_fun(
                     message, reply_markup=reply_markup, parse_mode="MarkdownV2"
                 )
+
+    return MENU
+
+
+def graph_menu(update: Update, _: CallbackContext) -> int:
+    if update.message.text == i18n_format("keyboard.go_back"):
+        message = i18n_format("graph.exit")
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
+    if update.message.text == i18n_format("keyboard.new_graph"):
+        message = f"""{i18n_format("graph.new_graph.a")}
+{i18n_format("graph.new_graph.b")}
+{i18n_format("graph.new_graph.c")}
+{i18n_format("graph.new_graph.d")}
+{i18n_format("graph.new_graph.e")}
+- {i18n_format("graph.new_graph.f")}
+- {i18n_format("graph.new_graph.g")}
+- {i18n_format("graph.new_graph.h")}
+{i18n_format("graph.new_graph.i")}"""
+        update.message.reply_text(
+            escape_tg(message),
+            reply_markup=ReplyKeyboardRemove(),
+            parse_mode="MarkdownV2",
+        )
+        return CREATE_GRAPH
+    else:
+        return create_graph(update=update, _=_)
+
+
+def create_graph(update: Update, _: CallbackContext) -> int:
+    text = update.message.text
+
+    if text == "/stop":
+        message = i18n_format("graph.exit")
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
+
+    text = [i for i in text.split(" ") if i != ""]
+
+    if not (len(text) == 2 and text[1].isdigit()):
+        message = i18n_format("graph.bad_graph")
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
+
+    days = int(text[1])
+    coins = text[0].upper().split(",")
+    coins.sort()
+    input_text_filtered = f"{','.join(coins)} {days}"
+
+    try:
+        figname, nb_plot = get_graph(False, coins, days, "amount", "USD")
+    except Exception as e:
+        message = f"{i18n_format('graph.error')}\n ```\n"
+        message += "".join(traceback.format_exception(*sys.exc_info()))
+        message += "\n```"
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
+
+    if nb_plot <= 1:
+        message = i18n_format("graph.not_enough_points")
+        update.message.reply_text(
+            escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
+        return MENU
+
+    if os.path.isfile("data/favourite_graphs.npy"):
+        favourite_graphs = np.load(
+            "data/favourite_graphs.npy", allow_pickle=True
+        ).tolist()
+    else:
+        favourite_graphs = []
+    found = False
+    for index, (graph, nb_calls) in enumerate(favourite_graphs):
+        if graph == input_text_filtered:
+            favourite_graphs[index][1] = int(nb_calls) + 1
+            found = True
+            break
+    if not found:
+        favourite_graphs.append([input_text_filtered, 1])
+    np.save("data/favourite_graphs.npy", favourite_graphs, allow_pickle=True)
+
+    with open(figname, "rb") as f:
+        update.message.reply_photo(
+            f, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+        )
 
     return MENU
 
@@ -579,48 +784,66 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
 def cancel(update: Update, _: CallbackContext) -> int:
     logger.info("Conversation canceled.")
 
-    update.message.reply_text(
-        "Bye! I hope we can talk again some day.",
-        reply_markup=ReplyKeyboardRemove(),
+    # modify reply_text function to have it escaping characters
+    reply_text_escape_fun = reply_text_escape(update.message.reply_text)
+
+    reply_text_escape_fun(
+        i18n_format("bye"), reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
     )
     return ConversationHandler.END
 
 
 MENU_HANDLER = MessageHandler(
     Filters.regex(
-        "^(Begin|💵 Current value|🚨 Panic button|📈 Progress|➗ Current ratios|🔍 Check bot status|⌛ Trade History|🛠 Maintenance|"
-        "⚙️ Configurations|▶ Start trade bot|⏹ Stop trade bot|📜 Read last log lines|❌ Delete database|"
-        "⚙ Edit user.cfg|👛 Edit coin list|📤 Export database|⬆ Update Telegram Bot|⬆ Update Binance Trade Bot|"
-        "🤖 Execute custom script|⬅️ Back|Go back|OK|Cancel update|Cancel|OK 👌|Great 👌)$"
+        f"^({i18n_format('keyboard.current_value')}|{i18n_format('keyboard.panic')}|{i18n_format('keyboard.progress')}|{i18n_format('keyboard.current_ratios')}|{i18n_format('keyboard.next_coin')}|{i18n_format('keyboard.check_status')}|{i18n_format('keyboard.trade_history')}|{i18n_format('keyboard.graph')}|{i18n_format('keyboard.maintenance')}|"
+        f"{i18n_format('keyboard.configurations')}|{i18n_format('keyboard.start')}|{i18n_format('keyboard.stop')}|{i18n_format('keyboard.read_logs')}|{i18n_format('keyboard.delete_db')}|"
+        f"{i18n_format('keyboard.edit_cfg')}|{i18n_format('keyboard.edit_coin_list')}|{i18n_format('keyboard.export_db')}|{i18n_format('keyboard.update_tgb')}|{i18n_format('keyboard.update_btb')}|"
+        f"{i18n_format('keyboard.execute_script')}|{i18n_format('keyboard.back')}|{i18n_format('keyboard.go_back')}|{i18n_format('keyboard.ok')}|{i18n_format('keyboard.cancel_update')}|{i18n_format('keyboard.cancel')}|{i18n_format('keyboard.ok_s')}|{i18n_format('keyboard.great')})$"
     ),
     menu,
 )
 
 ENTRY_POINT_HANDLER = CommandHandler(
-    "start", start, Filters.chat(chat_id=eval(settings.CHAT_ID))
+    "start", menu, Filters.chat(chat_id=eval(settings.CHAT_ID))
 )
 
 EDIT_COIN_LIST_HANDLER = MessageHandler(Filters.regex("(.*?)"), edit_coin)
 
 EDIT_USER_CONFIG_HANDLER = MessageHandler(Filters.regex("(.*?)"), edit_user_config)
 
-DELETE_DB_HANDLER = MessageHandler(Filters.regex("^(⚠ Confirm|Go back)$"), delete_db)
+DELETE_DB_HANDLER = MessageHandler(
+    Filters.regex(
+        f"^({i18n_format('keyboard.confirm')}|{i18n_format('keyboard.go_back')})$"
+    ),
+    delete_db,
+)
 
 UPDATE_TG_HANDLER = MessageHandler(
-    Filters.regex("^(Update|Cancel update)$"), update_tg_bot
+    Filters.regex(
+        f"^({i18n_format('keyboard.update')}|{i18n_format('keyboard.cancel_update')})$"
+    ),
+    update_tg_bot,
 )
 
 UPDATE_BTB_HANDLER = MessageHandler(
-    Filters.regex("^(Update|Cancel update)$"), update_btb
+    Filters.regex(
+        f"^({i18n_format('keyboard.update')}|{i18n_format('keyboard.cancel_update')})$"
+    ),
+    update_btb,
 )
 
 PANIC_BUTTON_HANDLER = MessageHandler(
     Filters.regex(
-        "^(⚠ Stop & sell at market price|⚠ Stop & cancel order|⚠ Stop the bot|Go back)$"
+        f"^({i18n_format('keyboard.stop_sell')}|{i18n_format('keyboard.stop_cancel')}|{i18n_format('keyboard.stop_bot')}|{i18n_format('keyboard.go_back')})$"
     ),
     panic,
 )
 
 CUSTOM_SCRIPT_HANDLER = MessageHandler(Filters.regex("(.*?)"), execute_custom_script)
+
+GRAPH_MENU_HANDLER = MessageHandler(Filters.regex("(.*)"), graph_menu)
+
+CREATE_GRAPH_HANDLER = MessageHandler(Filters.regex("(.*)"), create_graph)
+
 
 FALLBACK_HANDLER = CommandHandler("cancel", cancel)
