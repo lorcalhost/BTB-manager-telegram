@@ -191,6 +191,9 @@ This project follows the [all-contributors] specification.
     <td align="center"><a href="https://github.com/hieu0nguyen"><img src="https://avatars.githubusercontent.com/u/4257715?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Hieu Nguyen</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Ahieu0nguyen" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/SunBooster"><img src="https://avatars.githubusercontent.com/u/79193009?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Riza Abdul Aziz</b></sub></a><br /><a href="#translation-SunBooster" title="Translation">🌍</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://webdriver.agency/"><img src="https://avatars.githubusercontent.com/u/33579804?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kelecheck</b></sub></a><br /><a href="#translation-kelecheck" title="Translation">🌍</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
