@@ -57,6 +57,7 @@ ratios:
   compared_ratios: "*Coinverhältnisse im Vergleich zu %{coin} in absteigender Reihenfolge:*"
   price: "Preis %{bridge}"
   ratio: "Verhältnis"
+  coin: "Coin"
   gen_error: "❌ Etwas ist schief gelaufen, derzeit können keine Verhältnisse erstellt werden."
   db_error: "❌ Verhältnisse können nicht aus der Datenbank abgerufen werden."
 
@@ -64,6 +65,8 @@ ratios:
 next_coin:
   current_price: "Aktueller Preis"
   target_price: "Zielpreis"
+    percentage: "%"
+  coin: "Coin"
   error: "❌ Etwas ist schief gelaufen, derzeit kann der nächste Coin nicht ermittelt werden."
   db_error: "❌ Nächster Coin kann nicht aus der Datenbank ermittelt werden."
 
