@@ -319,7 +319,6 @@ def current_ratios():
                     f"\n{i18n_format('ratios.last_update', update=last_update.strftime('%H:%M:%S %d/%m/%Y'))}\n\n"
                     f"{i18n_format('ratios.compared_ratios', coin=current_coin)}\n"
                 ]
-                query = list(query)
                 max_length_ticker = max([len(i[1]) for i in query] + [4])
 
                 m_list.extend(
@@ -411,7 +410,6 @@ def next_coin():
                 query = cur.fetchall()
                 m_list = []
                 query = sorted(query, key=lambda x: x[3], reverse=True)
-                query = list(query)
 
                 m_list.extend(
                     tabularize(
