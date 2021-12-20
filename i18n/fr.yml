@@ -69,8 +69,8 @@ next_coin:
 history:
   last_x_trades: "**%{trades}** derniers trades:"
   sold_bought: "*%{sold_trade}* `%{amount1}` *%{coin1}* pour `%{amount2}` *%{coin2}*"
-  sold: "Acheté"
-  bought: "Vendu"
+  sold: "Vendu"
+  bought: "Acheté"
   status: "État : _*%{status}*_"
   error: "❌ Quelque chose s'est mal passé, impossible de générer l'historique de trade."
   db_error: "❌ Impossible de récuperer l'historique des trades depuis la base de données."
