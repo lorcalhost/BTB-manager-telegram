@@ -185,6 +185,7 @@ def main() -> None:
         },
         fallbacks=[handlers.FALLBACK_HANDLER],
         per_user=True,
+        allow_reentry=True,
     )
     dispatcher.add_handler(conv_handler)
 
