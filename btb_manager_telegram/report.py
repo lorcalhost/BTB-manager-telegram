@@ -1,6 +1,8 @@
 import datetime as dt
 import os
+import sys
 import time
+import traceback
 import warnings
 
 import binance
@@ -10,7 +12,7 @@ import numpy as np
 import requests
 
 from btb_manager_telegram import logger, scheduler, settings
-from btb_manager_telegram.utils import i18n_format
+from btb_manager_telegram.utils import escape_tg, i18n_format
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -121,9 +123,19 @@ def save_report(report, old_reports):
 
 def make_snapshot():
     logger.info("Retreive balance information from binance")
-    crypto_report = get_report()
-    crypto_reports = save_report(crypto_report, get_previous_reports())
-    logger.info("Snapshot saved")
+    try:
+        raise SystemError
+        crypto_report = get_report()
+        crypto_reports = save_report(crypto_report, get_previous_reports())
+        logger.info("Snapshot saved")
+    except Exception as e:
+        logger.error(
+            f"❌ Unable to take a snapshot of the binance account: {e}", exc_info=True
+        )
+        message = f"{i18n_format('snapshot.error')}\n ```\n"
+        message += "".join(traceback.format_exception(*sys.exc_info()))
+        message += "\n```"
+        settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
     scheduler.enter(3600, 2, make_snapshot)
 
 
