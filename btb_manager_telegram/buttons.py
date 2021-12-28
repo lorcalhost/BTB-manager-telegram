@@ -5,7 +5,6 @@ import time
 from configparser import ConfigParser
 from datetime import datetime
 
-import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
 from btb_manager_telegram.table import tabularize

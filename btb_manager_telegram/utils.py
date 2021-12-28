@@ -3,13 +3,11 @@ from io import SEEK_CUR
 import json
 import os
 import subprocess
-from time import sleep
 from typing import List, Optional
 
 import psutil
 import telegram
 import yaml
-from telegram import Bot
 from telegram.utils.helpers import escape_markdown
 
 import i18n

@@ -8,7 +8,7 @@ import traceback
 from configparser import ConfigParser
 
 import numpy as np
-from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
     CallbackContext,
     CommandHandler,

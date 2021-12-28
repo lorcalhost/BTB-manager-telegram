@@ -1,7 +1,5 @@
 import argparse
-import os
 import sys
-import time
 from subprocess import PIPE, run
 
 import colorama
