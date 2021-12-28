@@ -1,4 +1,5 @@
 import configparser
+from io import SEEK_CUR
 import json
 import os
 import subprocess
@@ -68,7 +69,10 @@ def setup_root_path_constant():
 def setup_telegram_constants():
     logger.info("Retrieving Telegram token and chat_id from apprise.yml file.")
     telegram_url = None
-    yaml_file_path = os.path.join(settings.ROOT_PATH, "config/apprise.yml")
+    if settings.APPRISE_FILE is None:
+        yaml_file_path = os.path.join(settings.ROOT_PATH, "config/apprise.yml")
+    else:
+        yaml_file_path = os.path.join(settings.ROOT_PATH, settings.APPRISE_FILE)
     if os.path.exists(yaml_file_path):
         with open(yaml_file_path) as f:
             try:
@@ -107,7 +111,10 @@ def setup_telegram_constants():
 
 def retreive_btb_constants():
     logger.info("Retreiving binance tokens")
-    btb_config_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    if settings.CONFIG_FILE is None:
+        btb_config_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    else:
+        btb_config_path = os.path.join(settings.ROOT_PATH, settings.CONFIG_FILE)
     btb_config = configparser.ConfigParser()
     btb_config.read(btb_config_path)
     settings.BINANCE_API_KEY = btb_config.get("binance_user_config", "api_key")
@@ -119,7 +126,10 @@ def retreive_btb_constants():
 
 def setup_coin_list():
     logger.info("Retreiving coin list")
-    coin_list_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
+    if settings.SUPPORTED_COIN_LIST_FILE is None:
+        coin_list_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
+    else:
+        coin_list_path = os.path.join(settings.ROOT_PATH, settings.SUPPORTED_COIN_LIST_FILE)
     with open(coin_list_path, "r") as f:
         coin_list = [line.replace("\n", "").replace(" ", "") for line in f.readlines()]
     settings.COIN_LIST = [i for i in coin_list if i != ""]

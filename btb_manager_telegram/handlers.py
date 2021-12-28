@@ -417,9 +417,12 @@ def delete_db(update: Update, _: CallbackContext) -> int:
 
     if update.message.text != i18n_format("keyboard.go_back"):
         message = i18n_format("db.delete.success")
-        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
         pw_file_path = os.path.join(settings.ROOT_PATH, "data/paper_wallet.json")
         log_file_path = os.path.join(settings.ROOT_PATH, "logs/crypto_trading.log")
+        if settings.DATABASE_FILE is None:
+            db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        else:
+            db_file_path = os.path.join(settings.ROOT_PATH, settings.DATABASE_FILE)
         try:
             shutil.copyfile(db_file_path, f"{db_file_path}.backup")
             os.remove(db_file_path)
@@ -545,8 +548,11 @@ def panic(update: Update, _: CallbackContext) -> int:
     if update.message.text != i18n_format("keyboard.go_back"):
         find_and_kill_binance_trade_bot_process()
 
+        if settings.DATABASE_FILE is None:
+            db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        else:
+            db_file_path = os.path.join(settings.ROOT_PATH, settings.DATABASE_FILE)
         # Get current coin pair
-        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
         con = sqlite3.connect(db_file_path)
         cur = con.cursor()
 

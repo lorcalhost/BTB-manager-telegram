@@ -144,3 +144,10 @@ supported_coin_list.backup
 logs/
 .history/
 custom_scripts.json
+
+# Poetry files
+poetry.lock
+pyproject.toml
+
+# Nohup Log
+nohup.out

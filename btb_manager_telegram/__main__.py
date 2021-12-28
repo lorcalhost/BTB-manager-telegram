@@ -1,4 +1,5 @@
 import argparse
+import os
 import sys
 import time
 from subprocess import PIPE, run
@@ -48,6 +49,34 @@ def pre_run_main() -> None:
         type=str,
         help="(optional) binance-trade-bot installation path.",
         default="../binance-trade-bot/",
+    )
+    parser.add_argument(
+        "-cfg",
+        "--config",
+        type=str,
+        help="(optional) binance-trade-bot config file path.",
+        default="../binance-trade-bot/user.cfg",
+    )
+    parser.add_argument(
+        "-db",
+        "--database",
+        type=str,
+        help="(optional) binance-trade-bot database to use.",
+        default="../binance-trade-bot/data/crypto_trading.db",
+    )
+    parser.add_argument(
+        "-cl",
+        "--coinlist",
+        type=str,
+        help="(optional) binance-trade-bot supported_coin_list file path.",
+        default="../binance-trade-bot/supported_coin_list",
+    )
+    parser.add_argument(
+        "-ar",
+        "--apprise",
+        type=str,
+        help="(optional) binance-trade-bot apprise's file path.",
+        default="../binance-trade-bot/config/apprise.yml",
     )
     parser.add_argument(
         "-pp",
@@ -103,7 +132,12 @@ def pre_run_main() -> None:
         run_on_docker()
         exit(1)
 
+    print(args)
     settings.ROOT_PATH = args.path
+    settings.CONFIG_FILE = args.config
+    settings.DATABASE_FILE = args.database
+    settings.SUPPORTED_COIN_LIST_FILE = args.coinlist
+    settings.APPRISE_FILE = args.apprise
     settings.PYTHON_PATH = args.python_path
     settings.TOKEN = args.token
     settings.CHAT_ID = args.chat_id
@@ -134,6 +168,7 @@ def pre_run_main() -> None:
     scheduler.enter(1, 1, update_checker)
     scheduler.enter(1, 1, make_snapshot)
     scheduler_thread.start()
+
 
     return False
 
