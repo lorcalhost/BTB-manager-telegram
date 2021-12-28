@@ -184,6 +184,9 @@ script:
   no_config: "Unable to find `custom_scripts.json` file inside *BTB-manager-telegram* 's `config/` directory."
   select: "Select one of your custom scripts to execute it."
 
+snapshot:
+  error: "❌ Unable to take a snapshot of the binance account for the moment. Error message:"
+
 graph:
   msg_existing_graphs: "Choose a graph or create a new one. Hint : the syntax is 'COIN1,COIN2,COIN3 NumberOfDays'"
   msg_no_graphs: "Use the 'New graph' button to create a new graph."

@@ -175,7 +175,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             favourite_graphs = np.load(
                 "data/favourite_graphs.npy", allow_pickle=True
             ).tolist()
-            favourite_graphs.sort(key=lambda x: x[1])
+            favourite_graphs.sort(key=lambda x: -int(x[1]))
             kb = [[i[0]] for i in favourite_graphs[:4]]
             kb.append(
                 [i18n_format("keyboard.new_graph"), i18n_format("keyboard.go_back")]

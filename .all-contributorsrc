@@ -224,6 +224,15 @@
       "contributions": [
         "translation"
       ]
+    },
+    {
+      "login": "QuentinLuppo",
+      "name": "kentuki",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34373024?v=4",
+      "profile": "http://quentinluppo.fr",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,

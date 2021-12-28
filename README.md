@@ -193,6 +193,7 @@ This project follows the [all-contributors] specification.
   </tr>
   <tr>
     <td align="center"><a href="https://webdriver.agency/"><img src="https://avatars.githubusercontent.com/u/33579804?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kelecheck</b></sub></a><br /><a href="#translation-kelecheck" title="Translation">🌍</a></td>
+    <td align="center"><a href="http://quentinluppo.fr"><img src="https://avatars.githubusercontent.com/u/34373024?v=4?s=100" width="100px;" alt=""/><br /><sub><b>kentuki</b></sub></a><br /><a href="#translation-QuentinLuppo" title="Translation">🌍</a></td>
   </tr>
 </table>
 
