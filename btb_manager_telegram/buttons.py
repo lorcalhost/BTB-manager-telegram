@@ -645,7 +645,9 @@ def edit_coin():
         if settings.SUPPORTED_COIN_LIST_FILE is None:
             coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
         else:
-            coin_file_path = os.path.join(settings.ROOT_PATH, settings.SUPPORTED_COIN_LIST_FILE)
+            coin_file_path = os.path.join(
+                settings.ROOT_PATH, settings.SUPPORTED_COIN_LIST_FILE
+            )
         if os.path.exists(coin_file_path):
             with open(coin_file_path) as f:
                 message = (

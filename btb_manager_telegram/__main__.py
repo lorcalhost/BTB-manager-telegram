@@ -3,8 +3,6 @@ import sys
 from subprocess import PIPE, run
 
 import colorama
-from telegram import Bot, ReplyKeyboardMarkup
-from telegram.ext import ConversationHandler, Updater
 
 from btb_manager_telegram import (
     CREATE_GRAPH,
@@ -34,6 +32,8 @@ from btb_manager_telegram.utils import (
     setup_telegram_constants,
     update_checker,
 )
+from telegram import Bot, ReplyKeyboardMarkup
+from telegram.ext import ConversationHandler, Updater
 
 
 def pre_run_main() -> None:
@@ -166,7 +166,6 @@ def pre_run_main() -> None:
     scheduler.enter(1, 1, update_checker)
     scheduler.enter(1, 1, make_snapshot)
     scheduler_thread.start()
-
 
     return False
 

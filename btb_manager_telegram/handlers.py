@@ -8,15 +8,6 @@ import traceback
 from configparser import ConfigParser
 
 import numpy as np
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
-from telegram.ext import (
-    CallbackContext,
-    CommandHandler,
-    ConversationHandler,
-    Filters,
-    MessageHandler,
-)
-from telegram.utils.helpers import escape_markdown
 
 from btb_manager_telegram import (
     BOUGHT,
@@ -49,6 +40,15 @@ from btb_manager_telegram.utils import (
     reply_text_escape,
     telegram_text_truncator,
 )
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram.ext import (
+    CallbackContext,
+    CommandHandler,
+    ConversationHandler,
+    Filters,
+    MessageHandler,
+)
+from telegram.utils.helpers import escape_markdown
 
 
 def menu(update: Update, _: CallbackContext) -> int:

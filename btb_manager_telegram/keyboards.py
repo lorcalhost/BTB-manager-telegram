@@ -1,6 +1,5 @@
-from telegram import ReplyKeyboardMarkup
-
 from btb_manager_telegram.utils import i18n_format
+from telegram import ReplyKeyboardMarkup
 
 menu = ReplyKeyboardMarkup(
     [

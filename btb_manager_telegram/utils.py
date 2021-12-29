@@ -1,17 +1,17 @@
 import configparser
-from io import SEEK_CUR
 import json
 import os
 import subprocess
+from io import SEEK_CUR
 from typing import List, Optional
 
 import psutil
-import telegram
 import yaml
-from telegram.utils.helpers import escape_markdown
 
 import i18n
+import telegram
 from btb_manager_telegram import logger, scheduler, settings
+from telegram.utils.helpers import escape_markdown
 
 
 def setup_i18n(lang):
@@ -127,7 +127,9 @@ def setup_coin_list():
     if settings.SUPPORTED_COIN_LIST_FILE is None:
         coin_list_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
     else:
-        coin_list_path = os.path.join(settings.ROOT_PATH, settings.SUPPORTED_COIN_LIST_FILE)
+        coin_list_path = os.path.join(
+            settings.ROOT_PATH, settings.SUPPORTED_COIN_LIST_FILE
+        )
     with open(coin_list_path, "r") as f:
         coin_list = [line.replace("\n", "").replace(" ", "") for line in f.readlines()]
     settings.COIN_LIST = [i for i in coin_list if i != ""]
