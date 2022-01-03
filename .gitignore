@@ -1,6 +1,8 @@
 package.json
 yarn.lock
 node_modules/
+btbmt.pid
+nohup.out
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

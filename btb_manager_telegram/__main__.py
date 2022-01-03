@@ -1,4 +1,5 @@
 import argparse
+import os
 import sys
 import time
 from subprocess import PIPE, run
@@ -120,6 +121,9 @@ def pre_run_main() -> None:
             "If using another currency than USD or EUR, and openexchangerates API key is needed"
         )
 
+    with open("btbmt.pid", "w") as f:
+        f.write(str(os.getpid()))
+
     setup_i18n(settings.LANG)
     setup_root_path_constant()
     retreive_btb_constants()
@@ -218,6 +222,11 @@ def main() -> None:
 
     scheduler_thread.stop()
     scheduler_thread.join()
+
+    try:
+        os.remove("btbmt.pid")
+    except FileNotFoundError:
+        pass
 
     logger.info("The telegram bot has stopped")
 
