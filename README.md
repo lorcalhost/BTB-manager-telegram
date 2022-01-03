@@ -71,6 +71,13 @@ nohup python3 -m btb_manager_telegram -s -l fr -u EUR &
 python3 -m btb_manager_telegram --help
 ```
 
+## Stopping the bot
+If the trade bot has been launched with the telegram bot, stopping the telegram bot will stop the trade bot.
+
+- If the telegram bot has been launched **without** `nohup`, closing the terminal or pressing `CTRL + C` will stop the bot.
+
+- If the telegram bot has been launched **with** `nohup`, the bot can be stopped with the command `kill $(cat btbmt.pid)` (no animal will be hurt in this operation). If this command respond the file `btbmt.pid`, it his very likely the telegram bot is no longer running.
+
 ## Manual upgrade
 First of, stop the telegram bot.
 ```
