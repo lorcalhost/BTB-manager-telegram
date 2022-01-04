@@ -165,9 +165,10 @@ def menu(update: Update, _: CallbackContext) -> int:
         )
 
     elif update.message.text == i18n_format("keyboard.bot_stats"):
-        reply_text_escape_fun(
-            buttons.bot_stats(), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
-        )
+        for mes in buttons.bot_stats():
+            reply_text_escape_fun(
+                mes, reply_markup=keyboards.menu, parse_mode="MarkdownV2"
+            )
 
     elif update.message.text == i18n_format("keyboard.trade_history"):
         for mes in buttons.trade_history():

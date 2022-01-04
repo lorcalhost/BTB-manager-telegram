@@ -4,6 +4,7 @@ import subprocess
 import time
 from configparser import ConfigParser
 from datetime import datetime
+import numpy as np
 
 from prettytable import *
 from prettytable import PrettyTable
@@ -648,51 +649,52 @@ def bot_stats():
         cur.execute("select count(*) from trade_history where selling=0")
         numCoinJumps = cur.fetchall()[0][0]
 
+        message += "`"
         message += "Bot Started  : {}".format(start_date.strftime("%m/%d/%Y, %H:%M:%S"))
         message += "\nNo of Days   : {}".format(numDays)
         message += "\nNo of Jumps  : {} ({:.1f} jumps/day)".format(
             numCoinJumps, numCoinJumps / numDays
         )
         if initialCoinID != "":
-            message += "\nStart Coin   : {:.4f} {} <==> ${:.3f}".format(
+            message += "\nStart Coin   : {:.4f} {} / ${:.3f}".format(
                 initialCoinValue, initialCoinID, initialCoinFiatValue
             )
         else:
-            message += "\nStart Coin   : -- <==> --"
-        message += "\nCurrent Coin : {:.4f} {} <==> ${:.3f}".format(
+            message += "\nStart Coin   : -- / --"
+        message += "\nCurrent Coin : {:.4f} {} / ${:.3f}".format(
             lastCoinValue, lastCoinID, lastCoinFiatValue
         )
 
         if initialCoinID != "":
-            message += "\nHODL         : {:.4f} {} <==> ${:.3f}".format(
+            message += "\nHODL         : {:.4f} {} / ${:.3f}".format(
                 initialCoinValue, initialCoinID, imgStartCoinFiatValue
             )
-            message += "\n\nApprox Profit: {:.2f}% in USD".format(percChangeFiat)
-        else:
-            message += "\nHODL         : -- <==> --"
-
-        if lastCoinID != initialCoinID and initialCoinID != "":
-            message += "\n{} can be approx converted to {:.2f} {}".format(
-                lastCoinID, imgStartCoinValue, initialCoinID
+            changeStartCoin = imgStartCoinValue - initialCoinValue
+            message += "\nProfit       : {}{:.2f}% in USD / {}{:.2f} {}".format(
+                "+" if percChangeFiat >= 0 else "-",
+                percChangeFiat,
+                "+" if changeStartCoin >= 0 else "-",
+                changeStartCoin,
+                initialCoinID
             )
+        else:
+            message += "\nHODL         : -- / --"
+
+        message += "`"
 
         if firstTradeCoin != "" and firstTradeCoin != initialCoinID:
             message += f"\nBot start coin is {firstTradeCoin} but currently not found in supported list."
         elif initialCoinID == "":
             message += "\nBot start coin not found in supported list."
 
-        message += "\n:: Coin progress ::"
-        x = PrettyTable()
-        x.field_names = ["Coin", "From", "To", "%+-", "<->"]
-
-        multiTrades = 0
+        message += "\n\n*Coin progress:*"
+        rows = []
         # Compute Mini Coin Progress
         for coin in coinList:
             jumps = cur.execute(
                 f"select count(*) from trade_history where alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE'"
             ).fetchall()[0][0]
             if jumps > 0:
-                multiTrades += jumps
                 first_date = cur.execute(
                     f"select datetime from trade_history where alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' order by id asc limit 1"
                 ).fetchall()[0][0]
@@ -703,20 +705,22 @@ def bot_stats():
                     f"select alt_trade_amount from trade_history where alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' order by id desc limit 1"
                 ).fetchall()[0][0]
                 grow = (last_value - first_value) / first_value * 100
-                x.add_row(
+                rows.append(
                     [
                         coin[0],
-                        "{:.2f}".format(first_value),
-                        "{:.2f}".format(last_value),
-                        "{:.1f}".format(grow),
-                        "{}".format(jumps),
+                        float(first_value),
+                        float(last_value),
+                        float(grow),
+                        int(jumps),
                     ]
                 )
+        rows = np.array(rows).transpose().tolist()
 
-        x.align = "l"
-        message += str(x)
+        x = tabularize(["Coin", "From", "To", "% ±", "<->"], rows, [4,8,8,8,3], add_spaces=False, align=['left', 'right','right','right','right'])
+        message = [message] + x
+        message = telegram_text_truncator(message)
     except Exception as e:
-        message = "SQLite error: %s" % (" ".join(e.args))
+        message = ["SQLite error: %s" % (" ".join(e.args))]
     return message
 
 
