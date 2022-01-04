@@ -155,7 +155,7 @@ def current_value():
                     f"\t{i18n_format('value.exchange_rate_now', rate=usd_price, coin=current_coin)}\n",
                     f"\t{i18n_format('value.value_change', change=round((balance * usd_price - buy_price) / buy_price * 100, 2))}\n",
                     f"\t{i18n_format('value.value_usd', value=round(balance * usd_price, 2))}\n",
-                    f"\t{i18n_format('value.value_btc', value=round(balance * btc_price))}\n\n",
+                    f"\t{i18n_format('value.value_btc', value=round(balance * btc_price, 5))}\n\n",
                     f"{i18n_format('value.bought_for', value=round(buy_price, 2), coin=bridge)}\n"
                     f"{i18n_format('value.one_day_change_btc', value=return_rate_1_day)}\n",
                     f"{i18n_format('value.seven_day_change_btc', value=return_rate_7_day)}\n",
