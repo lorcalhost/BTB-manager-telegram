@@ -4,10 +4,8 @@ import subprocess
 import time
 from configparser import ConfigParser
 from datetime import datetime
-import numpy as np
 
-from prettytable import *
-from prettytable import PrettyTable
+import numpy as np
 
 import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
@@ -675,7 +673,7 @@ def bot_stats():
                 percChangeFiat,
                 "+" if changeStartCoin >= 0 else "-",
                 changeStartCoin,
-                initialCoinID
+                initialCoinID,
             )
         else:
             message += "\nHODL         : -- / --"
@@ -716,7 +714,13 @@ def bot_stats():
                 )
         rows = np.array(rows).transpose().tolist()
 
-        x = tabularize(["Coin", "From", "To", "% ±", "<->"], rows, [4,8,8,8,3], add_spaces=False, align=['left', 'right','right','right','right'])
+        x = tabularize(
+            ["Coin", "From", "To", "% ±", "<->"],
+            rows,
+            [4, 8, 8, 8, 3],
+            add_spaces=False,
+            align=["left", "right", "right", "right", "right"],
+        )
         message = [message] + x
         message = telegram_text_truncator(message)
     except Exception as e:
