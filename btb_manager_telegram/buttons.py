@@ -5,6 +5,9 @@ import time
 from configparser import ConfigParser
 from datetime import datetime
 
+from prettytable import *
+from prettytable import PrettyTable
+
 import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
@@ -520,6 +523,200 @@ def trade_history():
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
             message = [i18n_format("history.db_error")]
+    return message
+
+
+def bot_stats():
+    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+    message = [i18n_format("database_not_found", path=db_file_path)]
+    if not os.path.exists(db_file_path):
+        return message
+    message = ""
+    try:
+        con = sqlite3.connect(db_file_path)
+
+        cur = con.cursor()
+
+        cur.execute("select symbol from coins where enabled=1")
+        coinList = cur.fetchall()  # access with coinList[Index][0]
+        numCoins = len(coinList)
+
+        cur.execute(
+            "SELECT datetime FROM trade_history where selling=0 and state='COMPLETE' order by id asc limit 1"
+        )
+        bot_start_date = cur.fetchall()[0][0]
+
+        cur.execute("SELECT datetime FROM scout_history order by id desc limit 1")
+        bot_end_date = cur.fetchall()[0][0]
+
+        cur.execute("SELECT * FROM trade_history ")
+        lenTradeHistory = len(cur.fetchall())
+
+        cur.execute(
+            "SELECT alt_coin_id FROM trade_history where id=1 and state='COMPLETE' order by id asc limit 1"
+        )
+        firstTradeCoin = cur.fetchall()[0][0]
+
+        initialCoinID = ""
+        for i in range(1, lenTradeHistory):
+            cur.execute(
+                "SELECT alt_coin_id FROM trade_history where id='{}' and state='COMPLETE' order by id asc limit 1".format(
+                    i
+                )
+            )
+            coinID = cur.fetchall()
+            if len(coinID) > 0:
+                coinID = coinID[0][0]
+            else:
+                continue
+            for coin in coinList:
+                if coinID == coin[0]:
+                    initialCoinID = coinID
+                    cur.execute(
+                        "select alt_trade_amount from trade_history where alt_coin_id='{}' and state='COMPLETE' order by id asc limit 1".format(
+                            initialCoinID
+                        )
+                    )
+                    initialCoinValue = cur.fetchall()[0][0]
+
+                    cur.execute(
+                        "select crypto_trade_amount from trade_history where alt_coin_id='{}' and state='COMPLETE' order by id asc limit 1".format(
+                            initialCoinID
+                        )
+                    )
+                    initialCoinFiatValue = cur.fetchall()[0][0]
+                    break
+            if initialCoinID != "":
+                break
+
+        cur.execute(
+            "select alt_coin_id from trade_history where selling=0 and state='COMPLETE' order by id desc limit 1"
+        )
+        lastCoinID = cur.fetchall()[0][0]
+
+        cur.execute(
+            "select alt_trade_amount from trade_history where selling=0 and state='COMPLETE' order by id desc limit 1"
+        )
+        lastCoinValue = cur.fetchall()[0][0]
+
+        cur.execute(
+            "select current_coin_price from scout_history order by rowid desc limit 1"
+        )
+        lastCoinUSD = cur.fetchall()[0][0]
+
+        lastCoinFiatValue = lastCoinValue * lastCoinUSD
+
+        if lastCoinID != initialCoinID and initialCoinID != "":
+            cur.execute(
+                "select id from pairs where from_coin_id='{}' and to_coin_id='{}'".format(
+                    lastCoinID, initialCoinID
+                )
+            )
+            pairID = cur.fetchall()[0][0]
+            cur.execute(
+                "select other_coin_price from scout_history where pair_id='{}' order by id desc limit 1".format(
+                    pairID
+                )
+            )
+            currentValInitialCoin = cur.fetchall()[0][0]
+        else:
+            cur.execute(
+                "select current_coin_price from scout_history order by id desc limit 1"
+            )
+            currentValInitialCoin = lastCoinUSD
+
+        if initialCoinID != "":
+            imgStartCoinFiatValue = initialCoinValue * currentValInitialCoin
+            imgStartCoinValue = lastCoinFiatValue / currentValInitialCoin
+            imgPercChangeCoin = (
+                (imgStartCoinValue - initialCoinValue) / initialCoinValue * 100
+            )
+
+            percChangeFiat = (
+                (lastCoinFiatValue - imgStartCoinFiatValue)
+                / imgStartCoinFiatValue
+                * 100
+            )
+
+        # No of Days calculation
+        start_date = datetime.strptime(bot_start_date[2:], "%y-%m-%d %H:%M:%S.%f")
+        end_date = datetime.strptime(bot_end_date[2:], "%y-%m-%d %H:%M:%S.%f")
+        numDays = (end_date - start_date).days
+        if numDays == 0:
+            numDays = 1
+
+        cur.execute("select count(*) from trade_history where selling=0")
+        numCoinJumps = cur.fetchall()[0][0]
+
+        message += "Bot Started  : {}".format(start_date.strftime("%m/%d/%Y, %H:%M:%S"))
+        message += "\nNo of Days   : {}".format(numDays)
+        message += "\nNo of Jumps  : {} ({:.1f} jumps/day)".format(
+            numCoinJumps, numCoinJumps / numDays
+        )
+        if initialCoinID != "":
+            message += "\nStart Coin   : {:.4f} {} <==> ${:.3f}".format(
+                initialCoinValue, initialCoinID, initialCoinFiatValue
+            )
+        else:
+            message += "\nStart Coin   : -- <==> --"
+        message += "\nCurrent Coin : {:.4f} {} <==> ${:.3f}".format(
+            lastCoinValue, lastCoinID, lastCoinFiatValue
+        )
+
+        if initialCoinID != "":
+            message += "\nHODL         : {:.4f} {} <==> ${:.3f}".format(
+                initialCoinValue, initialCoinID, imgStartCoinFiatValue
+            )
+            message += "\n\nApprox Profit: {:.2f}% in USD".format(percChangeFiat)
+        else:
+            message += "\nHODL         : -- <==> --"
+
+        if lastCoinID != initialCoinID and initialCoinID != "":
+            message += "\n{} can be approx converted to {:.2f} {}".format(
+                lastCoinID, imgStartCoinValue, initialCoinID
+            )
+
+        if firstTradeCoin != "" and firstTradeCoin != initialCoinID:
+            message += f"\nBot start coin is {firstTradeCoin} but currently not found in supported list."
+        elif initialCoinID == "":
+            message += "\nBot start coin not found in supported list."
+
+        message += "\n:: Coin progress ::"
+        x = PrettyTable()
+        x.field_names = ["Coin", "From", "To", "%+-", "<->"]
+
+        multiTrades = 0
+        # Compute Mini Coin Progress
+        for coin in coinList:
+            jumps = cur.execute(
+                f"select count(*) from trade_history where alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE'"
+            ).fetchall()[0][0]
+            if jumps > 0:
+                multiTrades += jumps
+                first_date = cur.execute(
+                    f"select datetime from trade_history where alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' order by id asc limit 1"
+                ).fetchall()[0][0]
+                first_value = cur.execute(
+                    f"select alt_trade_amount from trade_history where alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' order by id asc limit 1"
+                ).fetchall()[0][0]
+                last_value = cur.execute(
+                    f"select alt_trade_amount from trade_history where alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' order by id desc limit 1"
+                ).fetchall()[0][0]
+                grow = (last_value - first_value) / first_value * 100
+                x.add_row(
+                    [
+                        coin[0],
+                        "{:.2f}".format(first_value),
+                        "{:.2f}".format(last_value),
+                        "{:.1f}".format(grow),
+                        "{}".format(jumps),
+                    ]
+                )
+
+        x.align = "l"
+        message += str(x)
+    except Exception as e:
+        message = "SQLite error: %s" % (" ".join(e.args))
     return message
 
 
