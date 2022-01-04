@@ -685,7 +685,7 @@ def bot_stats():
         elif initialCoinID == "":
             message += "\nBot start coin not found in supported list."
 
-        message += "\n\n*Coin progress:*"
+        message += "\n\n*Coin progress:*\n"
         rows = []
         # Compute Mini Coin Progress
         for coin in coinList:
