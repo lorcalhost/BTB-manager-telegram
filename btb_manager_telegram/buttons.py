@@ -536,30 +536,30 @@ def bot_stats():
 
         cur = con.cursor()
 
-        cur.execute("select symbol from coins where enabled=1")
+        cur.execute("SELECT symbol FROM coins WHERE enabled=1")
         coinList = cur.fetchall()  # access with coinList[Index][0]
         numCoins = len(coinList)
 
         cur.execute(
-            "SELECT datetime FROM trade_history where selling=0 and state='COMPLETE' order by id asc limit 1"
+            "SELECT datetime FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
         )
         bot_start_date = cur.fetchall()[0][0]
 
-        cur.execute("SELECT datetime FROM scout_history order by id desc limit 1")
+        cur.execute("SELECT datetime FROM scout_history ORDER BY id DESC LIMIT 1")
         bot_end_date = cur.fetchall()[0][0]
 
         cur.execute("SELECT * FROM trade_history ")
         lenTradeHistory = len(cur.fetchall())
 
         cur.execute(
-            "SELECT alt_coin_id FROM trade_history where id=1 and state='COMPLETE' order by id asc limit 1"
+            "SELECT alt_coin_id FROM trade_history WHERE id=1 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
         )
         firstTradeCoin = cur.fetchall()[0][0]
 
         initialCoinID = ""
         for i in range(1, lenTradeHistory):
             cur.execute(
-                "SELECT alt_coin_id FROM trade_history where id='{}' and state='COMPLETE' order by id asc limit 1".format(
+                "SELECT alt_coin_id FROM trade_history WHERE id='{}' and state='COMPLETE' ORDER BY id ASC LIMIT 1".format(
                     i
                 )
             )
@@ -572,14 +572,14 @@ def bot_stats():
                 if coinID == coin[0]:
                     initialCoinID = coinID
                     cur.execute(
-                        "select alt_trade_amount from trade_history where alt_coin_id='{}' and state='COMPLETE' order by id asc limit 1".format(
+                        "SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{}' and state='COMPLETE' ORDER BY id ASC LIMIT 1".format(
                             initialCoinID
                         )
                     )
                     initialCoinValue = cur.fetchall()[0][0]
 
                     cur.execute(
-                        "select crypto_trade_amount from trade_history where alt_coin_id='{}' and state='COMPLETE' order by id asc limit 1".format(
+                        "SELECT crypto_trade_amount FROM trade_history WHERE alt_coin_id='{}' and state='COMPLETE' ORDER BY id ASC LIMIT 1".format(
                             initialCoinID
                         )
                     )
@@ -589,17 +589,17 @@ def bot_stats():
                 break
 
         cur.execute(
-            "select alt_coin_id from trade_history where selling=0 and state='COMPLETE' order by id desc limit 1"
+            "SELECT alt_coin_id FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
         )
         lastCoinID = cur.fetchall()[0][0]
 
         cur.execute(
-            "select alt_trade_amount from trade_history where selling=0 and state='COMPLETE' order by id desc limit 1"
+            "SELECT alt_trade_amount FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
         )
         lastCoinValue = cur.fetchall()[0][0]
 
         cur.execute(
-            "select current_coin_price from scout_history order by rowid desc limit 1"
+            "SELECT current_coin_price FROM scout_history ORDER BY rowid DESC LIMIT 1"
         )
         lastCoinUSD = cur.fetchall()[0][0]
 
@@ -607,20 +607,20 @@ def bot_stats():
 
         if lastCoinID != initialCoinID and initialCoinID != "":
             cur.execute(
-                "select id from pairs where from_coin_id='{}' and to_coin_id='{}'".format(
+                "SELECT id FROM pairs WHERE from_coin_id='{}' and to_coin_id='{}'".format(
                     lastCoinID, initialCoinID
                 )
             )
             pairID = cur.fetchall()[0][0]
             cur.execute(
-                "select other_coin_price from scout_history where pair_id='{}' order by id desc limit 1".format(
+                "SELECT other_coin_price FROM scout_history WHERE pair_id='{}' ORDER BY id DESC LIMIT 1".format(
                     pairID
                 )
             )
             currentValInitialCoin = cur.fetchall()[0][0]
         else:
             cur.execute(
-                "select current_coin_price from scout_history order by id desc limit 1"
+                "SELECT current_coin_price FROM scout_history ORDER BY id DESC LIMIT 1"
             )
             currentValInitialCoin = lastCoinUSD
 
@@ -690,17 +690,17 @@ def bot_stats():
         # Compute Mini Coin Progress
         for coin in coinList:
             jumps = cur.execute(
-                f"select count(*) from trade_history where alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE'"
+                f"SELECT COUNT(*) FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE'"
             ).fetchall()[0][0]
             if jumps > 0:
                 first_date = cur.execute(
-                    f"select datetime from trade_history where alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' order by id asc limit 1"
+                    f"SELECT datetime FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
                 ).fetchall()[0][0]
                 first_value = cur.execute(
-                    f"select alt_trade_amount from trade_history where alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' order by id asc limit 1"
+                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
                 ).fetchall()[0][0]
                 last_value = cur.execute(
-                    f"select alt_trade_amount from trade_history where alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' order by id desc limit 1"
+                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
                 ).fetchall()[0][0]
                 grow = (last_value - first_value) / first_value * 100
                 rows.append(
