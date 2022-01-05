@@ -644,31 +644,30 @@ def bot_stats():
         if numDays == 0:
             numDays = 1
 
-        cur.execute("select count(*) from trade_history where selling=0")
+        cur.execute("SELECT count(*) FROM trade_history WHERE selling=0")
         numCoinJumps = cur.fetchall()[0][0]
 
-        message += "`"
-        message += "Bot Started  : {}".format(start_date.strftime("%m/%d/%Y, %H:%M:%S"))
-        message += "\nNo of Days   : {}".format(numDays)
-        message += "\nNo of Jumps  : {} ({:.1f} jumps/day)".format(
-            numCoinJumps, numCoinJumps / numDays
-        )
+        message += f"""`{i18n_format('bot_stats.bot_started')} {start_date.strftime('%m/%d/%Y, %H:%M:%S')}
+{i18n_format('bot_stats.no_days')} {numDays}
+{i18n_format('bot_stats.no_jumps')} {numCoinJumps} ({round(numCoinJumps / numDays,1)} jumps/day)"""
+
         if initialCoinID != "":
-            message += "\nStart Coin   : {:.4f} {} / ${:.3f}".format(
-                initialCoinValue, initialCoinID, initialCoinFiatValue
+            message += "\n{} {:.4f} {} / ${:.3f}".format(
+                i18n_format('bot_stats.start_coin'), initialCoinValue, initialCoinID, initialCoinFiatValue
             )
         else:
-            message += "\nStart Coin   : -- / --"
-        message += "\nCurrent Coin : {:.4f} {} / ${:.3f}".format(
-            lastCoinValue, lastCoinID, lastCoinFiatValue
+            message += f"\n{i18n_format('bot_stats.start_coin')} -- / --"
+        message += "\n{} {:.4f} {} / ${:.3f}".format(
+            i18n_format('bot_stats.current_coin'), lastCoinValue, lastCoinID, lastCoinFiatValue
         )
 
         if initialCoinID != "":
-            message += "\nHODL         : {:.4f} {} / ${:.3f}".format(
-                initialCoinValue, initialCoinID, imgStartCoinFiatValue
+            message += "\n{} {:.4f} {} / ${:.3f}".format(
+                i18n_format('bot_stats.hodl'), initialCoinValue, initialCoinID, imgStartCoinFiatValue
             )
             changeStartCoin = imgStartCoinValue - initialCoinValue
-            message += "\nProfit       : {}{:.2f}% in USD / {}{:.2f} {}".format(
+            message += "\n{} {}{:.2f}% in USD / {}{:.2f} {}".format(
+                i18n_format('bot_stats.profit'),
                 "+" if percChangeFiat >= 0 else "-",
                 percChangeFiat,
                 "+" if changeStartCoin >= 0 else "-",
@@ -676,16 +675,16 @@ def bot_stats():
                 initialCoinID,
             )
         else:
-            message += "\nHODL         : -- / --"
+            message += f"\n{i18n_format('bot_stats.hodl')} -- / --"
 
         message += "`"
 
         if firstTradeCoin != "" and firstTradeCoin != initialCoinID:
-            message += f"\nBot start coin is {firstTradeCoin} but currently not found in supported list."
+            message += f"\n{i18n_format('bot_stats.start_coin_not_found_in_supported_list', firstTradeCoin)}"
         elif initialCoinID == "":
-            message += "\nBot start coin not found in supported list."
+            message += f"\n{i18n_format('bot_stats.start_coin_not_found')}"
 
-        message += "\n\n*Coin progress:*\n"
+        message += f"\n\n*{i18n_format('bot_stats.coin_progress')}*\n"
         rows = []
         # Compute Mini Coin Progress
         for coin in coinList:
@@ -715,7 +714,13 @@ def bot_stats():
         rows = np.array(rows).transpose().tolist()
 
         x = tabularize(
-            ["Coin", "From", "To", "% ±", "<->"],
+            [
+                i18n_format("bot_stats.table.coin"),
+                i18n_format("bot_stats.table.from"),
+                i18n_format("bot_stats.table.to"),
+                "% ±",
+                "<->"
+            ],
             rows,
             [4, 8, 8, 8, 3],
             add_spaces=False,
@@ -724,7 +729,10 @@ def bot_stats():
         message = [message] + x
         message = telegram_text_truncator(message)
     except Exception as e:
-        message = ["SQLite error: %s" % (" ".join(e.args))]
+        logger.error(
+            f"❌ Unable to perform actions on the database: {e}", exc_info=True
+        )
+        message = [i18n_format('bot_stats.db_error')]
     return message
 
 
