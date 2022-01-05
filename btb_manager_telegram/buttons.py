@@ -624,25 +624,10 @@ def bot_stats():
             )
             currentValInitialCoin = lastCoinUSD
 
-        if initialCoinID != "":
-            imgStartCoinFiatValue = initialCoinValue * currentValInitialCoin
-            imgStartCoinValue = lastCoinFiatValue / currentValInitialCoin
-            imgPercChangeCoin = (
-                (imgStartCoinValue - initialCoinValue) / initialCoinValue * 100
-            )
-
-            percChangeFiat = (
-                (lastCoinFiatValue - imgStartCoinFiatValue)
-                / imgStartCoinFiatValue
-                * 100
-            )
-
         # No of Days calculation
         start_date = datetime.strptime(bot_start_date[2:], "%y-%m-%d %H:%M:%S.%f")
         end_date = datetime.strptime(bot_end_date[2:], "%y-%m-%d %H:%M:%S.%f")
         numDays = (end_date - start_date).days
-        if numDays == 0:
-            numDays = 1
 
         cur.execute("SELECT count(*) FROM trade_history WHERE selling=0")
         numCoinJumps = cur.fetchall()[0][0]
@@ -653,23 +638,41 @@ def bot_stats():
 
         if initialCoinID != "":
             message += "\n{} {:.4f} {} / ${:.3f}".format(
-                i18n_format('bot_stats.start_coin'), initialCoinValue, initialCoinID, initialCoinFiatValue
+                i18n_format("bot_stats.start_coin"),
+                initialCoinValue,
+                initialCoinID,
+                initialCoinFiatValue,
             )
         else:
             message += f"\n{i18n_format('bot_stats.start_coin')} -- / --"
         message += "\n{} {:.4f} {} / ${:.3f}".format(
-            i18n_format('bot_stats.current_coin'), lastCoinValue, lastCoinID, lastCoinFiatValue
+            i18n_format("bot_stats.current_coin"),
+            lastCoinValue,
+            lastCoinID,
+            lastCoinFiatValue,
         )
 
         if initialCoinID != "":
+            imgStartCoinFiatValue = initialCoinValue * currentValInitialCoin
+            imgStartCoinValue = lastCoinFiatValue / currentValInitialCoin
             message += "\n{} {:.4f} {} / ${:.3f}".format(
-                i18n_format('bot_stats.hodl'), initialCoinValue, initialCoinID, imgStartCoinFiatValue
+                i18n_format("bot_stats.hodl"),
+                initialCoinValue,
+                initialCoinID,
+                imgStartCoinFiatValue,
             )
-            changeStartCoin = imgStartCoinValue - initialCoinValue
-            message += "\n{} {}{:.2f}% in USD / {}{:.2f} {}".format(
-                i18n_format('bot_stats.profit'),
-                "+" if percChangeFiat >= 0 else "-",
-                percChangeFiat,
+            changeFiat = (
+                (lastCoinFiatValue - imgStartCoinFiatValue)
+                / imgStartCoinFiatValue
+                * 100
+            )
+            changeStartCoin = (
+                (imgStartCoinValue - initialCoinValue) / initialCoinValue * 100
+            )
+            message += "\n{} {}{:.2f}% in USD / {}{:.2f}% in {}".format(
+                i18n_format("bot_stats.profit"),
+                "+" if changeFiat >= 0 else "-",
+                changeFiat,
                 "+" if changeStartCoin >= 0 else "-",
                 changeStartCoin,
                 initialCoinID,
@@ -719,7 +722,7 @@ def bot_stats():
                 i18n_format("bot_stats.table.from"),
                 i18n_format("bot_stats.table.to"),
                 "% ±",
-                "<->"
+                "<->",
             ],
             rows,
             [4, 8, 8, 8, 3],
@@ -729,10 +732,8 @@ def bot_stats():
         message = [message] + x
         message = telegram_text_truncator(message)
     except Exception as e:
-        logger.error(
-            f"❌ Unable to perform actions on the database: {e}", exc_info=True
-        )
-        message = [i18n_format('bot_stats.db_error')]
+        logger.error(f"❌ Unable to perform actions on the database: {e}", exc_info=True)
+        message = [i18n_format("bot_stats.db_error")]
     return message
 
 

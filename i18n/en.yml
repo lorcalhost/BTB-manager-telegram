@@ -233,7 +233,7 @@ keyboard:
   trade_history: "⌛ Trade History"
   panic: "🚨 Panic button"
   check_status: "🔍 Check bot status"
-  bot_stats: "Bot stats"
+  bot_stats: "🚀 Bot stats"
   maintenance: "🛠 Maintenance"
   configurations: "⚙️ Configurations"
   start: "▶ Start trade bot"
