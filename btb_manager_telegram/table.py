@@ -11,14 +11,14 @@ def float_strip(nb, maxchar):
             "Tables does not support colum size of less than 8 for floats"
         )
     if nb == 0:
-        return 0
+        return "0"
     int_part = "-" if nb < 0 else ""
     int_part += str(abs(int(nb)))
     float_part = abs(nb) - abs(int(nb))
     if len(int_part) > maxchar:
         return scientific_notation(nb, maxchar)
     if len(int_part) >= maxchar - 1:
-        return int_part
+        return str(int_part)
     float_part = round(float_part, maxchar - len(int_part) - 1)
     if abs(int(nb)) + float_part == 0:
         return scientific_notation(nb, maxchar)
@@ -99,7 +99,10 @@ def fun_tabularize(col_head, col_data, col_size, add_spaces=True, align="left"):
     for i, size in enumerate(col_size):
         if size == 0:
             col_size[i] = (
-                max([len(str(data)) for data in col_data[i]] + [len(str(col_head[i]))])
+                max(
+                    [len(str(col_data[j][i])) for j in range(len(col_data[0]))]
+                    + [len(str(col_head[i]))]
+                )
                 + 2
             )
 
@@ -138,12 +141,12 @@ def fun_tabularize(col_head, col_data, col_size, add_spaces=True, align="left"):
         table += dash * size
     table += "┤\n"
 
-    for j in range(len(col_data[0])):
+    for j in range(len(col_data)):
         table += "│"
         for i, size in enumerate(col_size):
             if i > 0:
                 table += "│"
-            table += data_to_exact_size(col_data[i][j], size, add_spaces[i], align[i])
+            table += data_to_exact_size(col_data[j][i], size, add_spaces[i], align[i])
         table += "│\n"
 
     table += "└"
@@ -158,14 +161,14 @@ def fun_tabularize(col_head, col_data, col_size, add_spaces=True, align="left"):
     return table
 
 
-def tabularize(col_head, col_data, col_size, add_spaces=True, align="left", nb_row=50):
+def tabularize(heads, rows, sizes, add_spaces=True, align="left", nb_row=50):
     tables = []
-    for i in range(len(col_data[0]) // nb_row + 1):
+    for i in range(len(rows) // nb_row + 1):
         tables.append(
             fun_tabularize(
-                col_head,
-                [col_d[i * nb_row : i * nb_row + nb_row] for col_d in col_data],
-                col_size,
+                heads,
+                rows[i * nb_row : i * nb_row + nb_row],
+                sizes,
                 add_spaces,
                 align,
             )

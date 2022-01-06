@@ -5,8 +5,6 @@ import time
 from configparser import ConfigParser
 from datetime import datetime
 
-import numpy as np
-
 import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
@@ -330,11 +328,7 @@ def current_ratios():
                             i18n_format("ratios.price", bridge=bridge),
                             i18n_format("ratios.ratio"),
                         ],
-                        [
-                            [c[1] for c in query],
-                            [c[2] for c in query],
-                            [c[3] for c in query],
-                        ],
+                        [[q[1], q[2], q[3]] for q in query],
                         [6, 12, 12],
                         align="left",
                         add_spaces=[True, True, False],
@@ -421,12 +415,7 @@ def next_coin():
                             i18n_format("next_coin.current_price"),
                             i18n_format("next_coin.target_price"),
                         ],
-                        [
-                            [c[0] for c in query],
-                            [str(round(c[3] * 100, 2)) for c in query],
-                            [c[1] for c in query],
-                            [c[2] for c in query],
-                        ],
+                        [[q[0], str(round(q[3] * 100, 2)), q[1], q[2]] for q in query],
                         [6, 7, 8, 8],
                         add_spaces=[True, True, False, False],
                         align=["center", "left", "left", "left"],
@@ -710,13 +699,11 @@ def bot_stats():
                         coin[0],
                         float(first_value),
                         float(last_value),
-                        float(grow),
-                        int(jumps),
+                        str(round(grow, 2)) if grow != 0 else "0",
+                        str(jumps),
                     ]
                 )
-        rows = np.array(rows).transpose().tolist()
-
-        x = tabularize(
+        table = tabularize(
             [
                 i18n_format("bot_stats.table.coin"),
                 i18n_format("bot_stats.table.from"),
@@ -729,7 +716,7 @@ def bot_stats():
             add_spaces=False,
             align=["left", "right", "right", "right", "right"],
         )
-        message = [message] + x
+        message = [message] + table
         message = telegram_text_truncator(message)
     except Exception as e:
         logger.error(f"❌ Unable to perform actions on the database: {e}", exc_info=True)
