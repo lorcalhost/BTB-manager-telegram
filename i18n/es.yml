@@ -57,6 +57,7 @@ ratios:
   compared_ratios: "*Ratios comparados a %{coin} en orden decreciente:*"
   price: "Precio %{bridge}"
   ratio: "Ratio"
+  coin: "Moneda"
   gen_error: "❌ Algo salió mal, no fue posible generar los ratios en este momento."
   db_error: "❌ No fue posible obtener los ratios desde la base de datos."
 
@@ -64,6 +65,8 @@ ratios:
 next_coin:
   current_price: "Precio actual"
   target_price: "Precio objetivo"
+  percentage: "%"
+  coin: "Moneda"
   error: "❌ Algo salió mal, no se pudo generar la próxima moneda en este momento."
   db_error: "❌ No se pudo obtener la información desde la base de datos."
 
@@ -77,6 +80,24 @@ history:
   error: "❌ Algo salió mal, no fue posible generar el historial de tradeos en este momento."
   db_error: "❌ No se pudo obtener la información del historial de tradeos desde la base de datos."
 
+
+bot_stats:
+  bot_started: "Inicio del Bot  :"
+  no_days: "Nº de días   :"
+  no_jumps: "Nº de saltos  :"
+  start_coin: "Moneda inicial   :"
+  current_coin: "Moneda actual :"
+  hodl: "HODL¹        :"
+  profit: "Ganancia       :"
+  start_coin_not_found_in_supported_list: "La moneda inicial del bot fue %{firstTradeCoin}, actualmente no se encuentra en la lista de monedas."
+  start_coin_not_found: "Moneda inicial no encontrada en la lista de monedas."
+  coin_progress: "Progreso de las monedas:"
+  table:
+    coin: "Moneda"
+    from: "De"
+    to: "A"
+  HODL_explanation: "Representa el valor actual que tendrías si solo hubieras consevado la moneda inicial"
+  db_error: "❌ No fue posible obtener los ratios desde la base de datos."
 
 btb:
   not_running: "⚠ Binance Trade Bot no está activo."
@@ -181,6 +202,9 @@ script:
   no_config: "No fue posible encontrar `custom_scripts.json` dentro del directorio `config/` de *BTB-manager-telegram* '"
   select: "Elige uno de los scripts personalizados para ejecutarlo."
 
+snapshot:
+  error: "❌ No fue posible obtener una instantánea de la cuenta de Binance en este momento. Mensaje de error:"
+
 graph:
   msg_existing_graphs: "Elige una grafica o crea una nueva. Consejo: La sintaxis es 'MONEDA1,MONEDA2,MONEDA3 NumeroDias'"
   msg_no_graphs: "Usa el boton 'Nueva grafica' para crear una grafica."
@@ -210,6 +234,7 @@ keyboard:
   trade_history: "⌛ Historial de tradeos"
   panic: "🚨 Botón del pánico"
   check_status: "🔍 Revisar estado del bot"
+  bot_stats: "🚀 Estadísticas"
   maintenance: "🛠 Mantenimiento"
   configurations: "⚙️ Configuraciones"
   start: "▶ Iniciar trade bot"
