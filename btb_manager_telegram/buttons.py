@@ -623,7 +623,7 @@ def bot_stats():
 
         message += f"""`{i18n_format('bot_stats.bot_started')} {start_date.strftime('%m/%d/%Y, %H:%M:%S')}
 {i18n_format('bot_stats.no_days')} {numDays}
-{i18n_format('bot_stats.no_jumps')} {numCoinJumps} ({round(numCoinJumps / min(numDays,1),1)} jumps/day)"""
+{i18n_format('bot_stats.no_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"""
 
         if initialCoinID != "":
             message += "\n{} {:.4f} {} / ${:.3f}".format(
