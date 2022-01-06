@@ -252,6 +252,15 @@
         "ideas",
         "code"
       ]
+    },
+    {
+      "login": "renkasiyas",
+      "name": "Ren Kasiyas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7783256?v=4",
+      "profile": "https://github.com/renkasiyas",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,
