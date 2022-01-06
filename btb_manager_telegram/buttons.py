@@ -651,18 +651,16 @@ def bot_stats():
                 imgStartCoinFiatValue,
             )
             changeFiat = (
-                (lastCoinFiatValue - imgStartCoinFiatValue)
-                / imgStartCoinFiatValue
-                * 100
+                (lastCoinFiatValue - initialCoinFiatValue) / initialCoinFiatValue * 100
             )
             changeStartCoin = (
                 (imgStartCoinValue - initialCoinValue) / initialCoinValue * 100
             )
-            message += "\n{} {}{:.2f}% in USD / {}{:.2f}% in {}".format(
+            message += "\n{} {}{:.2f}% USD / {}{:.2f}% {}".format(
                 i18n_format("bot_stats.profit"),
-                "+" if changeFiat >= 0 else "-",
+                "+" if changeFiat >= 0 else "",
                 changeFiat,
-                "+" if changeStartCoin >= 0 else "-",
+                "+" if changeStartCoin >= 0 else "",
                 changeStartCoin,
                 initialCoinID,
             )
@@ -716,7 +714,10 @@ def bot_stats():
             add_spaces=False,
             align=["left", "right", "right", "right", "right"],
         )
-        message = [message] + table
+        message = [message]
+        message += table
+        message += [f"¹ _{i18n_format('bot_stats.HODL_explanation')}_"]
+
         message = telegram_text_truncator(message)
     except Exception as e:
         logger.error(f"❌ Unable to perform actions on the database: {e}", exc_info=True)

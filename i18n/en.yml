@@ -87,7 +87,7 @@ bot_stats:
   no_jumps: "No of Jumps  :"
   start_coin: "Start Coin   :"
   current_coin: "Current Coin :"
-  hodl: "HODL         :"
+  hodl: "HODL¹        :"
   profit: "Profit       :"
   start_coin_not_found_in_supported_list: "Bot start coin is %{firstTradeCoin} but currently not found in supported list."
   start_coin_not_found: "Bot start coin not found in supported list."
@@ -96,6 +96,7 @@ bot_stats:
     coin: "Coin"
     from: "From"
     to: "To"
+  HODL_explanation: "Represents what you would currently have if you were simply holding on your start coin"
   db_error: "❌ Unable to fetch statistics from database."
 
 btb:
