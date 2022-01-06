@@ -81,6 +81,24 @@ history:
   db_error: "❌ Unable to fetch trade history from database."
 
 
+bot_stats:
+  bot_started: "Bot started  :"
+  no_days: "No of Days   :"
+  no_jumps: "No of Jumps  :"
+  start_coin: "Start Coin   :"
+  current_coin: "Current Coin :"
+  hodl: "HODL¹        :"
+  profit: "Profit       :"
+  start_coin_not_found_in_supported_list: "Bot start coin is %{firstTradeCoin} but currently not found in supported list."
+  start_coin_not_found: "Bot start coin not found in supported list."
+  coin_progress: "Coin progress:"
+  table:
+    coin: "Coin"
+    from: "From"
+    to: "To"
+  HODL_explanation: "Represents what you would currently have if you were simply holding on your start coin"
+  db_error: "❌ Unable to fetch statistics from database."
+
 btb:
   not_running: "⚠ Binance Trade Bot is not running."
   running: "✔ Binance Trade Bot is running."
@@ -216,6 +234,7 @@ keyboard:
   trade_history: "⌛ Trade History"
   panic: "🚨 Panic button"
   check_status: "🔍 Check bot status"
+  bot_stats: "🚀 Bot stats"
   maintenance: "🛠 Maintenance"
   configurations: "⚙️ Configurations"
   start: "▶ Start trade bot"

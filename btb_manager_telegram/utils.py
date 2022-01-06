@@ -39,7 +39,7 @@ def i18n_format(key, **kwargs):
 
 
 def escape_tg(message):
-    escape_char = (".", "-", "?", "!", ">", "{", "}")
+    escape_char = (".", "-", "?", "!", ">", "{", "}", "(", ")", "=", "+", "|")
     escaped_message = ""
     is_escaped = False
     for cur_char in message:
