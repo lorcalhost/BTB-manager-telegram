@@ -91,7 +91,9 @@ def current_value():
                     query_1_day_done = False
                     for r in reports:
                         if (
-                            r["time"] < int(last_update.timestamp()) - timedelta(days=1).total_seconds()
+                            r["time"]
+                            < int(last_update.timestamp())
+                            - timedelta(days=1).total_seconds()
                             and not query_1_day_done
                         ):
                             query_1_day = (
@@ -100,7 +102,11 @@ def current_value():
                                 r["tickers"]["BTC"],
                             )
                             query_1_day_done = True
-                        if r["time"] < int(last_update.timestamp()) - timedelta(days=7).total_seconds():
+                        if (
+                            r["time"]
+                            < int(last_update.timestamp())
+                            - timedelta(days=7).total_seconds()
+                        ):
                             query_7_day = (
                                 r["balances"][current_coin],
                                 r["tickers"][current_coin],
