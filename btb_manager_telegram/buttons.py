@@ -3,7 +3,7 @@ import sqlite3
 import subprocess
 import time
 from configparser import ConfigParser
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
@@ -91,7 +91,7 @@ def current_value():
                     query_1_day_done = False
                     for r in reports:
                         if (
-                            r["time"] < int(last_update.timestamp()) - 86400
+                            r["time"] < int(last_update.timestamp()) - timedelta(days=1).total_seconds()
                             and not query_1_day_done
                         ):
                             query_1_day = (
@@ -100,7 +100,7 @@ def current_value():
                                 r["tickers"]["BTC"],
                             )
                             query_1_day_done = True
-                        if r["time"] < int(last_update.timestamp()) - 604800:
+                        if r["time"] < int(last_update.timestamp()) - timedelta(days=7).total_seconds():
                             query_7_day = (
                                 r["balances"][current_coin],
                                 r["tickers"][current_coin],
