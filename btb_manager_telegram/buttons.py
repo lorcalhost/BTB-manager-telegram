@@ -113,12 +113,12 @@ def current_value():
                 if amount_btc_now != 0:
                     if amount_btc_1_day != 0:
                         return_rate_1_day = (
-                            amount_btc_now - amount_btc_1_day
-                        ) / amount_btc_1_day
+                            (amount_btc_now - amount_btc_1_day) / amount_btc_1_day * 100
+                        )
                     if amount_btc_7_day != 0:
                         return_rate_7_day = (
-                            amount_btc_now - amount_btc_7_day
-                        ) / amount_btc_7_day
+                            (amount_btc_now - amount_btc_7_day) / amount_btc_7_day * 100
+                        )
 
             except Exception as e:
                 logger.error(
