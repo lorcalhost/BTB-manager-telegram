@@ -91,15 +91,20 @@ def current_value():
                 query_1_day_done = False
                 for r in reports:
                     if (
-                        r["time"] < int(last_update.timestamp()) - timedelta(days=1).total_seconds()
+                        r["time"]
+                        < int(last_update.timestamp())
+                        - timedelta(days=1).total_seconds()
                         and not query_1_day_done
                     ):
-                        amount_btc_1_day = r["total_usdt"]/r["tickers"]["BTC"]
+                        amount_btc_1_day = r["total_usdt"] / r["tickers"]["BTC"]
                         query_1_day_done = True
-                    if r["time"] < int(last_update.timestamp()) - timedelta(days=7).total_seconds():
-                        amount_btc_7_day = r["total_usdt"]/r["tickers"]["BTC"]
+                    if (
+                        r["time"]
+                        < int(last_update.timestamp())
+                        - timedelta(days=7).total_seconds()
+                    ):
+                        amount_btc_7_day = r["total_usdt"] / r["tickers"]["BTC"]
                         break
-
 
                 amount_btc_now = balance * btc_price
 
@@ -107,9 +112,13 @@ def current_value():
 
                 if amount_btc_now != 0:
                     if amount_btc_1_day != 0:
-                        return_rate_1_day = (amount_btc_now-amount_btc_1_day)/amount_btc_1_day
+                        return_rate_1_day = (
+                            amount_btc_now - amount_btc_1_day
+                        ) / amount_btc_1_day
                     if amount_btc_7_day != 0:
-                        return_rate_7_day = (amount_btc_now-amount_btc_7_day)/amount_btc_7_day
+                        return_rate_7_day = (
+                            amount_btc_now - amount_btc_7_day
+                        ) / amount_btc_7_day
 
             except Exception as e:
                 logger.error(
