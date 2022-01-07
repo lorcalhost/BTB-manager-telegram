@@ -86,74 +86,31 @@ def current_value():
                 reports = get_previous_reports()
                 reports.reverse()
 
-                query_1_day, query_7_day = [], []
-                try:
-                    query_1_day_done = False
-                    for r in reports:
-                        if (
-                            r["time"] < int(last_update.timestamp()) - 86400
-                            and not query_1_day_done
-                        ):
-                            query_1_day = (
-                                r["balances"][current_coin],
-                                r["tickers"][current_coin],
-                                r["tickers"]["BTC"],
-                            )
-                            query_1_day_done = True
-                        if r["time"] < int(last_update.timestamp()) - 604800:
-                            query_7_day = (
-                                r["balances"][current_coin],
-                                r["tickers"][current_coin],
-                                r["tickers"]["BTC"],
-                            )
-                            break
-                except:
-                    pass
+                amount_btc_1_day, amount_btc_7_day = 0, 0
+
+                query_1_day_done = False
+                for r in reports:
+                    if (
+                        r["time"] < int(last_update.timestamp()) - 86400
+                        and not query_1_day_done
+                    ):
+                        amount_btc_1_day = r["total_usdt"]/r["tickers"]["BTC"]
+                        query_1_day_done = True
+                    if r["time"] < int(last_update.timestamp()) - 604800:
+                        amount_btc_7_day = r["total_usdt"]/r["tickers"]["BTC"]
+                        break
+
+
+                amount_btc_now = balance * btc_price
 
                 return_rate_1_day, return_rate_7_day = 0, 0
-                (
-                    balance_1_day,
-                    usd_price_1_day,
-                    btc_price_1_day,
-                    balance_7_day,
-                    usd_price_7_day,
-                    btc_price_7_day,
-                ) = (
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                )
 
-                if (
-                    query_1_day != []
-                    and all(elem for elem in query_1_day)
-                    and usd_price != 0
-                ):
-                    balance_1_day, usd_price_1_day, btc_price_1_day = query_1_day
-                    btc_price_1_day = usd_price_1_day / btc_price_1_day
-                    return_rate_1_day = round(
-                        (balance * btc_price - balance_1_day * btc_price_1_day)
-                        / (balance_1_day * btc_price_1_day)
-                        * 100,
-                        2,
-                    )
+                if amount_btc_now != 0:
+                    if amount_btc_1_day != 0:
+                        return_rate_1_day = (amount_btc_now-amount_btc_1_day)/amount_btc_1_day
+                    if amount_btc_7_day != 0:
+                        return_rate_7_day = (amount_btc_now-amount_btc_7_day)/amount_btc_7_day
 
-                if (
-                    query_7_day != []
-                    and all(elem for elem in query_7_day)
-                    and usd_price != 0
-                ):
-                    balance_7_day, usd_price_7_day, btc_price_7_day = query_7_day
-                    btc_price_7_day = usd_price_7_day / btc_price_7_day
-                    return_rate_7_day = round(
-                        (balance * btc_price - balance_7_day * btc_price_7_day)
-                        / (balance_7_day * btc_price_7_day)
-                        * 100,
-                        2,
-                    )
             except Exception as e:
                 logger.error(
                     f"❌ Unable to fetch current coin information from database: {e}",
@@ -177,8 +134,8 @@ def current_value():
                     f"\t{i18n_format('value.value_usd', value=round(balance * usd_price, 2))}\n",
                     f"\t{i18n_format('value.value_btc', value=round(balance * btc_price, 5))}\n\n",
                     f"{i18n_format('value.bought_for', value=round(buy_price, 2), coin=bridge)}\n"
-                    f"{i18n_format('value.one_day_change_btc', value=return_rate_1_day)}\n",
-                    f"{i18n_format('value.seven_day_change_btc', value=return_rate_7_day)}\n",
+                    f"{i18n_format('value.one_day_change_btc', value=round(return_rate_1_day, 2))}\n",
+                    f"{i18n_format('value.seven_day_change_btc', value=round(return_rate_7_day, 2))}\n",
                 ]
                 message = telegram_text_truncator(m_list)
                 con.close()
