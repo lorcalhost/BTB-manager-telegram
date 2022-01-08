@@ -514,6 +514,11 @@ def trade_history():
     return message
 
 
+def retrieve_value_db(dbFetch):
+    if len(dbFetch) > 0:
+        return dbFetch[0][0]
+    return None
+
 def bot_stats():
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     message = [i18n_format("database_not_found", path=db_file_path)]
@@ -532,18 +537,31 @@ def bot_stats():
         cur.execute(
             "SELECT datetime FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
         )
-        bot_start_date = cur.fetchall()[0][0]
-
+        bot_start_date  = retrieve_value_db(cur.fetchall()) 
+        if bot_start_date == None:
+            message = [i18n_format("bot_stats.error.date_error")]
+            return message
+        
         cur.execute("SELECT datetime FROM scout_history ORDER BY id DESC LIMIT 1")
-        bot_end_date = cur.fetchall()[0][0]
+        bot_end_date = retrieve_value_db(cur.fetchall())
+        if bot_end_date == None:
+            message = [i18n_format("bot_stats.error.date_error")]
+            return message
 
         cur.execute("SELECT * FROM trade_history ")
         lenTradeHistory = len(cur.fetchall())
-
+        if not lenTradeHistory > 0:
+            message = [i18n_format("bot_stats.error.empty_trade_history")]  
+            return message
+        
         cur.execute(
             "SELECT alt_coin_id FROM trade_history WHERE id=1 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
         )
-        firstTradeCoin = cur.fetchall()[0][0]
+
+        firstTradeCoin = retrieve_value_db(cur.fetchall())
+        if firstTradeCoin == None:
+            message = [i18n_format("bot_stats.error.first_coin_error")]
+            return message
 
         initialCoinID = ""
         for i in range(1, lenTradeHistory):
@@ -565,14 +583,20 @@ def bot_stats():
                             initialCoinID
                         )
                     )
-                    initialCoinValue = cur.fetchall()[0][0]
+                    initialCoinValue = retrieve_value_db(cur.fetchall())
+                    if initialCoinValue == None:
+                        message = [i18n_format("bot_stats.error.first_coin_error")]
+                        return message
 
                     cur.execute(
                         "SELECT crypto_trade_amount FROM trade_history WHERE alt_coin_id='{}' and state='COMPLETE' ORDER BY id ASC LIMIT 1".format(
                             initialCoinID
                         )
                     )
-                    initialCoinFiatValue = cur.fetchall()[0][0]
+                    initialCoinFiatValue = retrieve_value_db(cur.fetchall())
+                    if initialCoinFiatValue == None:
+                        message = [i18n_format("bot_stats.error.first_coin_error")]
+                        return message
                     break
             if initialCoinID != "":
                 break
@@ -580,33 +604,52 @@ def bot_stats():
         cur.execute(
             "SELECT alt_coin_id FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
         )
-        lastCoinID = cur.fetchall()[0][0]
-
+        lastCoinID = retrieve_value_db(cur.fetchall())
+        if  lastCoinID == None:
+            message = [i18n_format("bot_stats.error.last_coin_error")]
+            return message
+        
         cur.execute(
             "SELECT alt_trade_amount FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
         )
-        lastCoinValue = cur.fetchall()[0][0]
+        lastCoinValue = retrieve_value_db(cur.fetchall())
+        if  lastCoinValue == None:
+            message = [i18n_format("bot_stats.error.last_coin_error")]
+            return message
 
         cur.execute(
             "SELECT current_coin_price FROM scout_history ORDER BY rowid DESC LIMIT 1"
         )
-        lastCoinUSD = cur.fetchall()[0][0]
+        lastCoinUSD = retrieve_value_db(cur.fetchall())
+        if lastCoinUSD == None:
+            message = [i18n_format("bot_stats.error.last_coin_error")]
+            return message
 
         lastCoinFiatValue = lastCoinValue * lastCoinUSD
 
         if lastCoinID != initialCoinID and initialCoinID != "":
+            
             cur.execute(
                 "SELECT id FROM pairs WHERE from_coin_id='{}' and to_coin_id='{}'".format(
                     lastCoinID, initialCoinID
                 )
             )
-            pairID = cur.fetchall()[0][0]
+            pairID = retrieve_value_db(cur.fetchall())
+            if pairID == None:
+                logger.error(f"❌ Unable to retrieve Pair ID of <{lastCoinID}> and <{initialCoinID}>, error code = 1")
+                message = [i18n_format("bot_stats.error.value_error", error_code=1)]
+                return message
+
             cur.execute(
                 "SELECT other_coin_price FROM scout_history WHERE pair_id='{}' ORDER BY id DESC LIMIT 1".format(
                     pairID
                 )
             )
-            currentValInitialCoin = cur.fetchall()[0][0]
+            currentValInitialCoin = retrieve_value_db(cur.fetchall())
+            if currentValInitialCoin == None:
+                logger.error(f"❌ Unable to retrieve current price of bot's start coin <{initialCoinID}>, error code = 2 ")
+                message = [i18n_format("bot_stats.error.value_error", error_code=2)]
+                return message
         else:
             cur.execute(
                 "SELECT current_coin_price FROM scout_history ORDER BY id DESC LIMIT 1"
@@ -678,19 +721,34 @@ def bot_stats():
         rows = []
         # Compute Mini Coin Progress
         for coin in coinList:
-            jumps = cur.execute(
+            cur.execute(
                 f"SELECT COUNT(*) FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE'"
-            ).fetchall()[0][0]
-            if jumps > 0:
-                first_date = cur.execute(
+            )
+            jumps = cur.fetchall()
+            if len(jumps) > 0:
+                jumps = len(jumps)
+                
+                cur.execute(
                     f"SELECT datetime FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
-                ).fetchall()[0][0]
-                first_value = cur.execute(
+                )
+                first_date = retrieve_value_db(cur.fetchall())
+                if first_date == None:
+                    continue
+                
+                cur.execute(
                     f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
-                ).fetchall()[0][0]
-                last_value = cur.execute(
+                )
+                first_value = retrieve_value_db(cur.fetchall())
+                if first_value == None:
+                    continue
+
+                cur.execute(
                     f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
-                ).fetchall()[0][0]
+                )
+                last_value = retrieve_value_db(cur.fetchall())
+                if last_value == None:
+                    continue
+                
                 grow = (last_value - first_value) / first_value * 100
                 rows.append(
                     [
@@ -721,7 +779,7 @@ def bot_stats():
         message = telegram_text_truncator(message)
     except Exception as e:
         logger.error(f"❌ Unable to perform actions on the database: {e}", exc_info=True)
-        message = [i18n_format("bot_stats.db_error")]
+        message = [i18n_format("bot_stats.error.db_error")]
     return message
 
 

@@ -98,6 +98,12 @@ bot_stats:
     to: "To"
   HODL_explanation: "Represents what you would currently have if you were simply holding on your start coin"
   db_error: "❌ Unable to fetch statistics from database."
+  error:
+    date_error: "❌ Unable to fetch date information."
+    empty_trade_history: "❌ Trade History is empty, wait for trades to get statistics."
+    first_coin_error: "❌ Failed to retrieve bot's start coin info from database."
+    last_coin_error: "❌ Failed to retrieve bot's current coin info from database."
+    value_error: "❌ Error retieving info from db. Error Code = `%{error_code}`."
 
 btb:
   not_running: "⚠ Binance Trade Bot is not running."
