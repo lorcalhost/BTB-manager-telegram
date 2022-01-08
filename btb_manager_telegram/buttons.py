@@ -714,7 +714,7 @@ def bot_stats():
         message += "`"
 
         if firstTradeCoin != "" and firstTradeCoin != initialCoinID:
-            message += f"\n{i18n_format('bot_stats.start_coin_not_found_in_supported_list', firstTradeCoin)}"
+            message += f"\n{i18n_format('bot_stats.start_coin_not_found_in_supported_list', firstTradeCoin = firstTradeCoin)}"
         elif initialCoinID == "":
             message += f"\n{i18n_format('bot_stats.start_coin_not_found')}"
 
