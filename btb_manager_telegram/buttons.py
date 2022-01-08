@@ -554,6 +554,7 @@ def bot_stats():
             message = [i18n_format("bot_stats.error.empty_trade_history")]  
             return message
         
+        # Retrieve first traded coin from database to later compare with supported coin list
         cur.execute(
             "SELECT alt_coin_id FROM trade_history WHERE id=1 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
         )
@@ -564,7 +565,7 @@ def bot_stats():
             return message
 
         initialCoinID = ""
-        for i in range(1, lenTradeHistory):
+        for i in range(1, lenTradeHistory + 1):
             cur.execute(
                 "SELECT alt_coin_id FROM trade_history WHERE id='{}' and state='COMPLETE' ORDER BY id ASC LIMIT 1".format(
                     i
