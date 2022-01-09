@@ -5,9 +5,12 @@ import time
 from configparser import ConfigParser
 from datetime import datetime
 
+import ipdb
+
 import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
+from btb_manager_telegram.report import get_previous_reports
 from btb_manager_telegram.table import tabularize
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
@@ -511,6 +514,115 @@ def trade_history():
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
             message = [i18n_format("history.db_error")]
+    return message
+
+
+def coin_forecast():
+    logger.info("Coin Forecast button pressed.")
+    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+    message = [i18n_format("database_not_found", path=db_file_path)]
+
+    if not os.path.exists(db_file_path):
+        return message
+
+    message = ""
+    try:
+        con = sqlite3.connect(db_file_path)
+
+        cur = con.cursor()
+        # get current coin - calcualate equivalent value in initial coin bridge
+        try:
+            cur.execute(
+                f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount
+                    FROM 'trade_history'
+                    WHERE selling=0 and state='COMPLETE'
+                    ORDER BY id DESC LIMIT 1;"""
+            )
+            query = cur.fetchone()
+            currentCoinID, currentCoinBridgeID, currentCoinAmount = query
+            # calculate current live price of current coin
+            currentCoinLiveUSDTPrice = get_current_price(currentCoinID, "USDT")
+            currentCoinLiveUSDTValue = currentCoinAmount * currentCoinLiveUSDTPrice
+
+            message += "`{:.2f} {} can be approx. converted to other coins for following quantities.\n`".format(
+                currentCoinAmount, currentCoinID
+            )
+
+        except:
+            logger.error("Unable to retrieve current coin info.")
+            message = [i18n_format("coin_forecast.error.current_coin_error")]
+            return message
+
+        rows = []
+        cur.execute(f"SELECT * FROM pairs WHERE from_coin_id='{currentCoinID}'")
+        coinPairs = cur.fetchall()
+
+        for pair in coinPairs:
+            pairID = pair[0]
+            coin = pair[2]
+
+            liveCoinPrice = 1
+            try:
+                cur.execute(
+                    f"SELECT other_coin_price FROM scout_history WHERE pair_id='{pairID}' order by id DESC limit 1"
+                )
+                liveCoinPrice = retrieve_value_db(cur.fetchall())
+            except:
+                liveCoinPrice = get_current_price(coin, "USDT")
+
+            forecastAmount = currentCoinLiveUSDTValue / liveCoinPrice
+
+            try:
+                cur.execute(
+                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' \
+                    and selling=0 and state='COMPLETE' order by id DESC limit 1"
+                )
+
+                previousAmount = retrieve_value_db(cur.fetchall())
+                if previousAmount != None:
+                    changePercentage = (
+                        (forecastAmount - previousAmount) / previousAmount * 100
+                    )
+                    rows.append(
+                        [
+                            coin,
+                            float(forecastAmount),
+                            float(previousAmount),
+                            str(round(changePercentage, 2))
+                            if changePercentage != 0
+                            else "0",
+                        ]
+                    )
+                else:
+                    rows.append(
+                        [coin, float(forecastAmount), "--", "--",]
+                    )
+            except:
+                rows.append(
+                    [coin, float(forecastAmount), "--", "--",]
+                )
+
+        table = tabularize(
+            [
+                i18n_format("coin_forecast.table.coin"),
+                i18n_format("coin_forecast.table.forecast"),
+                i18n_format("coin_forecast.table.previous"),
+                "% ±",
+            ],
+            rows,
+            [4, 8, 8, 8],
+            add_spaces=False,
+            align=["left", "right", "right", "right"],
+        )
+
+        message = [message]
+        message += table
+
+        message = telegram_text_truncator(message)
+    except Exception as e:
+        logger.error(f"❌ Unable to perform actions on the database: {e}", exc_info=True)
+        message = [i18n_format("coin_forecast.error.db_error")]
+
     return message
 
 
