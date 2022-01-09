@@ -6,6 +6,7 @@ from configparser import ConfigParser
 from datetime import datetime
 
 import i18n
+
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
 from btb_manager_telegram.table import tabularize
@@ -555,112 +556,77 @@ def bot_stats():
             message = [i18n_format("bot_stats.error.empty_trade_history")]
             return message
 
-        # Retrieve first traded coin from database to later compare with supported coin list
-        cur.execute(
-            "SELECT alt_coin_id FROM trade_history WHERE id=1 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
-        )
-
-        firstTradeCoin = retrieve_value_db(cur.fetchall())
-        if firstTradeCoin == None:
+        initialCoinID = ""
+        try:
+            cur.execute(
+                f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount, crypto_trade_amount
+                FROM 'trade_history'
+                WHERE selling=0 and state='COMPLETE'
+                ORDER BY id ASC LIMIT 1;"""
+            )
+            query = cur.fetchone()
+            (
+                initialCoinID,
+                initialCoinbridgeID,
+                initialCoinAmount,
+                initialCoinFiatValue,
+            ) = query
+        except:
+            logger.error("Unable to retreieve information of bot's first trade.")
             message = [i18n_format("bot_stats.error.first_coin_error")]
             return message
 
-        initialCoinID = ""
-        for i in range(1, lenTradeHistory + 1):
+        try:
             cur.execute(
-                "SELECT alt_coin_id FROM trade_history WHERE id='{}' and state='COMPLETE' ORDER BY id ASC LIMIT 1".format(
-                    i
-                )
+                f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount
+                    FROM 'trade_history'
+                    WHERE selling=0 and state='COMPLETE'
+                    ORDER BY id DESC LIMIT 1;"""
             )
-            coinID = cur.fetchall()
-            if len(coinID) > 0:
-                coinID = coinID[0][0]
-            else:
-                continue
-            for coin in coinList:
-                if coinID == coin[0]:
-                    initialCoinID = coinID
-                    cur.execute(
-                        "SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{}' and state='COMPLETE' ORDER BY id ASC LIMIT 1".format(
-                            initialCoinID
-                        )
-                    )
-                    initialCoinValue = retrieve_value_db(cur.fetchall())
-                    if initialCoinValue == None:
-                        message = [i18n_format("bot_stats.error.first_coin_error")]
-                        return message
+            query = cur.fetchone()
+            currentCoinID, currentCoinBridgeID, currentCoinAmount = query
 
-                    cur.execute(
-                        "SELECT crypto_trade_amount FROM trade_history WHERE alt_coin_id='{}' and state='COMPLETE' ORDER BY id ASC LIMIT 1".format(
-                            initialCoinID
-                        )
-                    )
-                    initialCoinFiatValue = retrieve_value_db(cur.fetchall())
-                    if initialCoinFiatValue == None:
-                        message = [i18n_format("bot_stats.error.first_coin_error")]
-                        return message
-                    break
-            if initialCoinID != "":
-                break
-
-        cur.execute(
-            "SELECT alt_coin_id FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
-        )
-        lastCoinID = retrieve_value_db(cur.fetchall())
-        if lastCoinID == None:
-            message = [i18n_format("bot_stats.error.last_coin_error")]
+        except:
+            logger.error("Unable to retrieve current coin info.")
+            message = [i18n_format("bot_stats.error.current_coin_error")]
             return message
 
-        cur.execute(
-            "SELECT alt_trade_amount FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
-        )
-        lastCoinValue = retrieve_value_db(cur.fetchall())
-        if lastCoinValue == None:
-            message = [i18n_format("bot_stats.error.last_coin_error")]
+        try:
+            # get usd price live from binance, when BTC is used
+            # as bridge, db has same value for both usd and btc
+            cur.execute(
+                f"""SELECT btc_price
+                    FROM 'coin_value'
+                    WHERE coin_id = '{currentCoinID}'
+                    ORDER BY datetime DESC LIMIT 1;"""
+            )
+
+            query = cur.fetchone()
+
+            currentCoinBTCPrice = float(query[0])
+            currentCoinUSDPrice = get_current_price(currentCoinID, "USDT")
+
+        except Exception as e:
+            logger.error(
+                f"❌ Unable to perform actions on the database: {e}", exc_info=True
+            )
+            message = [i18n_format("bot_stats.error.current_coin_error")]
             return message
 
-        cur.execute(
-            "SELECT current_coin_price FROM scout_history ORDER BY rowid DESC LIMIT 1"
-        )
-        lastCoinUSD = retrieve_value_db(cur.fetchall())
-        if lastCoinUSD == None:
-            message = [i18n_format("bot_stats.error.last_coin_error")]
-            return message
+        currentCoinUSDValue = currentCoinAmount * currentCoinUSDPrice
+        currentCoinBTCValue = currentCoinAmount * currentCoinBTCPrice
 
-        lastCoinFiatValue = lastCoinValue * lastCoinUSD
-
-        if lastCoinID != initialCoinID and initialCoinID != "":
-
-            cur.execute(
-                "SELECT id FROM pairs WHERE from_coin_id='{}' and to_coin_id='{}'".format(
-                    lastCoinID, initialCoinID
-                )
-            )
-            pairID = retrieve_value_db(cur.fetchall())
-            if pairID == None:
-                logger.error(
-                    f"❌ Unable to retrieve Pair ID of <{lastCoinID}> and <{initialCoinID}>, error code = 1"
-                )
-                message = [i18n_format("bot_stats.error.value_error", error_code=1)]
-                return message
-
-            cur.execute(
-                "SELECT other_coin_price FROM scout_history WHERE pair_id='{}' ORDER BY id DESC LIMIT 1".format(
-                    pairID
-                )
-            )
-            currentValInitialCoin = retrieve_value_db(cur.fetchall())
-            if currentValInitialCoin == None:
+        if currentCoinID != initialCoinID and initialCoinID != "":
+            try:
+                currentInitialCoinUSDPrice = get_current_price(initialCoinID, "USDT")
+            except:
                 logger.error(
                     f"❌ Unable to retrieve current price of bot's start coin <{initialCoinID}>, error code = 2 "
                 )
                 message = [i18n_format("bot_stats.error.value_error", error_code=2)]
                 return message
         else:
-            cur.execute(
-                "SELECT current_coin_price FROM scout_history ORDER BY id DESC LIMIT 1"
-            )
-            currentValInitialCoin = lastCoinUSD
+            currentInitialCoinUSDPrice = currentCoinUSDValue
 
         # No of Days calculation
         start_date = datetime.strptime(bot_start_date[2:], "%y-%m-%d %H:%M:%S.%f")
@@ -675,52 +641,101 @@ def bot_stats():
 {i18n_format('bot_stats.no_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"""
 
         if initialCoinID != "":
-            message += "\n{} {:.4f} {} / ${:.3f}".format(
+            if initialCoinbridgeID == "BTC":
+                displayCurrency = "₿ "
+            else:
+                displayCurrency = "$"
+            message += "\n{} {:.4f} {} / {}{:.3f}".format(
                 i18n_format("bot_stats.start_coin"),
-                initialCoinValue,
+                initialCoinAmount,
                 initialCoinID,
+                displayCurrency,
                 initialCoinFiatValue,
             )
         else:
             message += f"\n{i18n_format('bot_stats.start_coin')} -- / --"
-        message += "\n{} {:.4f} {} / ${:.3f}".format(
-            i18n_format("bot_stats.current_coin"),
-            lastCoinValue,
-            lastCoinID,
-            lastCoinFiatValue,
-        )
+
+        if initialCoinbridgeID == "BTC":
+            message += "\n{} {:.4f} {} / ₿ {:.3f}".format(
+                i18n_format("bot_stats.current_coin"),
+                currentCoinAmount,
+                currentCoinID,
+                currentCoinBTCValue,
+            )
+        else:
+            message += "\n{} {:.4f} {} / $ {:.3f}".format(
+                i18n_format("bot_stats.current_coin"),
+                currentCoinAmount,
+                currentCoinID,
+                currentCoinUSDValue,
+            )
 
         if initialCoinID != "":
-            imgStartCoinFiatValue = initialCoinValue * currentValInitialCoin
-            imgStartCoinValue = lastCoinFiatValue / currentValInitialCoin
-            message += "\n{} {:.4f} {} / ${:.3f}".format(
-                i18n_format("bot_stats.hodl"),
-                initialCoinValue,
-                initialCoinID,
-                imgStartCoinFiatValue,
+            buyHoldInitialCoinUSDValue = initialCoinAmount * currentInitialCoinUSDPrice
+            buyHoldInitialCoinBTCValue = buyHoldInitialCoinUSDValue / get_current_price(
+                "BTC", "USDT"
             )
+            convertibleStartCoinAmount = (
+                currentCoinUSDValue / currentInitialCoinUSDPrice
+            )
+
+            # Initial Coin Bridge = BTC, Current Coin Bridge = BTC -- show profit in BTC
+            # Initial Coin Bridge = BTC, Current Coin Bridge = USDT -- show profit in BTC
+            # Initial Coin Bridge = USDT, Current Coin Bridge = BTC -- show profit in USD
+
+            # default
+            displayCurrency = "USD "
             changeFiat = (
-                (lastCoinFiatValue - initialCoinFiatValue) / initialCoinFiatValue * 100
+                (currentCoinUSDValue - initialCoinFiatValue)
+                / initialCoinFiatValue
+                * 100
             )
+            # initialCoinFiatValue - can be in terms USDT or BTC depending on Bridge
+            #
+            if initialCoinbridgeID == "BTC":
+                # calculate profit in terms of BTC
+                changeFiat = (
+                    (currentCoinBTCValue - initialCoinFiatValue)
+                    / initialCoinFiatValue
+                    * 100
+                )
+                displayCurrency = "BTC "
+
             changeStartCoin = (
-                (imgStartCoinValue - initialCoinValue) / initialCoinValue * 100
+                (convertibleStartCoinAmount - initialCoinAmount)
+                / initialCoinAmount
+                * 100
             )
-            message += "\n{} {}{:.2f}% USD / {}{:.2f}% {}".format(
+
+            message += "\n{} {}{:.2f}% {} / {}{:.2f}% {}".format(
                 i18n_format("bot_stats.profit"),
                 "+" if changeFiat >= 0 else "",
                 changeFiat,
+                displayCurrency,
                 "+" if changeStartCoin >= 0 else "",
                 changeStartCoin,
                 initialCoinID,
             )
+            if initialCoinbridgeID == "BTC":
+                message += "\n{} {:.4f} {} / ₿ {:.3f}".format(
+                    i18n_format("bot_stats.hodl"),
+                    initialCoinAmount,
+                    initialCoinID,
+                    buyHoldInitialCoinBTCValue,
+                )
+            else:
+                message += "\n{} {:.4f} {} / ${:.3f}".format(
+                    i18n_format("bot_stats.hodl"),
+                    initialCoinAmount,
+                    initialCoinID,
+                    buyHoldInitialCoinUSDValue,
+                )
         else:
             message += f"\n{i18n_format('bot_stats.hodl')} -- / --"
 
         message += "`"
 
-        if firstTradeCoin != "" and firstTradeCoin != initialCoinID:
-            message += f"\n{i18n_format('bot_stats.start_coin_not_found_in_supported_list', firstTradeCoin = firstTradeCoin)}"
-        elif initialCoinID == "":
+        if initialCoinID == "":
             message += f"\n{i18n_format('bot_stats.start_coin_not_found')}"
 
         message += f"\n\n*{i18n_format('bot_stats.coin_progress')}*\n"
@@ -730,10 +745,8 @@ def bot_stats():
             cur.execute(
                 f"SELECT COUNT(*) FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE'"
             )
-            jumps = cur.fetchall()
-            if len(jumps) > 0:
-                jumps = len(jumps)
-
+            jumps = retrieve_value_db(cur.fetchall())
+            if jumps != None:
                 cur.execute(
                     f"SELECT datetime FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
                 )
@@ -780,7 +793,6 @@ def bot_stats():
         )
         message = [message]
         message += table
-        message += [f"¹ _{i18n_format('bot_stats.HODL_explanation')}_"]
 
         message = telegram_text_truncator(message)
     except Exception as e:

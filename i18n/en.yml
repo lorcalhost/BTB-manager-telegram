@@ -87,8 +87,8 @@ bot_stats:
   no_jumps: "No of Jumps  :"
   start_coin: "Start Coin   :"
   current_coin: "Current Coin :"
-  hodl: "HODL¹        :"
-  profit: "Profit       :"
+  hodl: "Buy & Hold   :"
+  profit: "Bot Profit   :"
   start_coin_not_found_in_supported_list: "Bot start coin is %{firstTradeCoin} but currently not found in supported list."
   start_coin_not_found: "Bot start coin not found in supported list."
   coin_progress: "Coin progress:"
@@ -102,7 +102,7 @@ bot_stats:
     date_error: "❌ Unable to fetch date information."
     empty_trade_history: "❌ Trade History is empty, wait for trades to get statistics."
     first_coin_error: "❌ Failed to retrieve bot's start coin info from database."
-    last_coin_error: "❌ Failed to retrieve bot's current coin info from database."
+    current_coin_error: "❌ Failed to retrieve bot's current coin info from database."
     value_error: "❌ Error retieving info from db. Error Code = `%{error_code}`."
 
 btb:
