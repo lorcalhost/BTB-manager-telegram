@@ -564,7 +564,7 @@ def bot_stats():
             cur.execute(
                 f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount, crypto_trade_amount
                 FROM 'trade_history'
-                WHERE selling=0 and state='COMPLETE'
+                WHERE id=1 and state='COMPLETE'
                 ORDER BY id ASC LIMIT 1;"""
             )
             query = cur.fetchone()
