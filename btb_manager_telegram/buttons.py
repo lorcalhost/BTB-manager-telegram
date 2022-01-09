@@ -526,6 +526,9 @@ def bot_stats():
     if not os.path.exists(db_file_path):
         return message
     message = ""
+
+    displayCurrencySymbols = {"BTC": "₿", "USDT": "$", "BUSD": "$"}
+
     try:
         con = sqlite3.connect(db_file_path)
 
@@ -555,6 +558,7 @@ def bot_stats():
             message = [i18n_format("bot_stats.error.empty_trade_history")]
             return message
 
+        # get first trade and its bridge - all stats must be in this bridge
         initialCoinID = ""
         try:
             cur.execute(
@@ -570,11 +574,31 @@ def bot_stats():
                 initialCoinAmount,
                 initialCoinFiatValue,
             ) = query
+
+            if initialCoinbridgeID in displayCurrencySymbols:
+                displayCurrency = displayCurrencySymbols[initialCoinbridgeID]
+            else:
+                displayCurrency = initialCoinbridgeID
+
+            # calculate current live price of initial/start coin
+            initialCoinLiveUSDTPrice = initialCoinLiveBridgePrice = get_current_price(
+                initialCoinID, "USDT"
+            )
+            if initialCoinbridgeID != "USDT":
+                initialCoinLiveBridgePrice = get_current_price(
+                    initialCoinID, "USDT"
+                ) / get_current_price(initialCoinbridgeID, "USDT")
+
+            initialCoinLiveBridgeValue = (
+                initialCoinAmount * initialCoinLiveBridgePrice
+            )  # this is the buy & hold value
+
         except:
             logger.error("Unable to retreieve information of bot's first trade.")
             message = [i18n_format("bot_stats.error.first_coin_error")]
             return message
 
+        # get current coin - calcualate equivalent value in initial coin bridge
         try:
             cur.execute(
                 f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount
@@ -591,19 +615,16 @@ def bot_stats():
             return message
 
         try:
-            # get usd price live from binance, when BTC is used
-            # as bridge, db has same value for both usd and btc
-            cur.execute(
-                f"""SELECT btc_price
-                    FROM 'coin_value'
-                    WHERE coin_id = '{currentCoinID}'
-                    ORDER BY datetime DESC LIMIT 1;"""
+            # calculate current live price of current coin
+            currentCoinLiveUSDTPrice = currentCoinLiveBridgePrice = get_current_price(
+                currentCoinID, "USDT"
             )
+            if initialCoinbridgeID != "USDT":
+                currentCoinLiveBridgePrice = get_current_price(
+                    currentCoinID, "USDT"
+                ) / get_current_price(initialCoinbridgeID, "USDT")
 
-            query = cur.fetchone()
-
-            currentCoinBTCPrice = float(query[0])
-            currentCoinUSDPrice = get_current_price(currentCoinID, "USDT")
+            currentCoinLiveBridgeValue = currentCoinAmount * currentCoinLiveBridgePrice
 
         except Exception as e:
             logger.error(
@@ -611,21 +632,6 @@ def bot_stats():
             )
             message = [i18n_format("bot_stats.error.current_coin_error")]
             return message
-
-        currentCoinUSDValue = currentCoinAmount * currentCoinUSDPrice
-        currentCoinBTCValue = currentCoinAmount * currentCoinBTCPrice
-
-        if currentCoinID != initialCoinID and initialCoinID != "":
-            try:
-                currentInitialCoinUSDPrice = get_current_price(initialCoinID, "USDT")
-            except:
-                logger.error(
-                    f"❌ Unable to retrieve current price of bot's start coin <{initialCoinID}>, error code = 2 "
-                )
-                message = [i18n_format("bot_stats.error.value_error", error_code=2)]
-                return message
-        else:
-            currentInitialCoinUSDPrice = currentCoinUSDValue
 
         # No of Days calculation
         start_date = datetime.strptime(bot_start_date[2:], "%y-%m-%d %H:%M:%S.%f")
@@ -640,11 +646,7 @@ def bot_stats():
 {i18n_format('bot_stats.no_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"""
 
         if initialCoinID != "":
-            if initialCoinbridgeID == "BTC":
-                displayCurrency = "₿ "
-            else:
-                displayCurrency = "$"
-            message += "\n{} {:.4f} {} / {}{:.3f}".format(
+            message += "\n{} {:.4f} {} / {} {:.3f}".format(
                 i18n_format("bot_stats.start_coin"),
                 initialCoinAmount,
                 initialCoinID,
@@ -654,51 +656,25 @@ def bot_stats():
         else:
             message += f"\n{i18n_format('bot_stats.start_coin')} -- / --"
 
-        if initialCoinbridgeID == "BTC":
-            message += "\n{} {:.4f} {} / ₿ {:.3f}".format(
-                i18n_format("bot_stats.current_coin"),
-                currentCoinAmount,
-                currentCoinID,
-                currentCoinBTCValue,
-            )
-        else:
-            message += "\n{} {:.4f} {} / $ {:.3f}".format(
-                i18n_format("bot_stats.current_coin"),
-                currentCoinAmount,
-                currentCoinID,
-                currentCoinUSDValue,
-            )
+        message += "\n{} {:.4f} {} / {} {:.3f}".format(
+            i18n_format("bot_stats.current_coin"),
+            currentCoinAmount,
+            currentCoinID,
+            displayCurrency,
+            currentCoinLiveBridgeValue,
+        )
 
         if initialCoinID != "":
-            buyHoldInitialCoinUSDValue = initialCoinAmount * currentInitialCoinUSDPrice
-            buyHoldInitialCoinBTCValue = buyHoldInitialCoinUSDValue / get_current_price(
-                "BTC", "USDT"
-            )
             convertibleStartCoinAmount = (
-                currentCoinUSDValue / currentInitialCoinUSDPrice
+                currentCoinLiveBridgeValue / initialCoinLiveBridgePrice
             )
 
-            # Initial Coin Bridge = BTC, Current Coin Bridge = BTC -- show profit in BTC
-            # Initial Coin Bridge = BTC, Current Coin Bridge = USDT -- show profit in BTC
-            # Initial Coin Bridge = USDT, Current Coin Bridge = BTC -- show profit in USD
-
-            # default
-            displayCurrency = "USD "
+            # always show profit in bot start coin's Bridge
             changeFiat = (
-                (currentCoinUSDValue - initialCoinFiatValue)
+                (currentCoinLiveBridgeValue - initialCoinFiatValue)
                 / initialCoinFiatValue
                 * 100
             )
-            # initialCoinFiatValue - can be in terms USDT or BTC depending on Bridge
-            #
-            if initialCoinbridgeID == "BTC":
-                # calculate profit in terms of BTC
-                changeFiat = (
-                    (currentCoinBTCValue - initialCoinFiatValue)
-                    / initialCoinFiatValue
-                    * 100
-                )
-                displayCurrency = "BTC "
 
             changeStartCoin = (
                 (convertibleStartCoinAmount - initialCoinAmount)
@@ -715,20 +691,14 @@ def bot_stats():
                 changeStartCoin,
                 initialCoinID,
             )
-            if initialCoinbridgeID == "BTC":
-                message += "\n{} {:.4f} {} / ₿ {:.3f}".format(
-                    i18n_format("bot_stats.hodl"),
-                    initialCoinAmount,
-                    initialCoinID,
-                    buyHoldInitialCoinBTCValue,
-                )
-            else:
-                message += "\n{} {:.4f} {} / ${:.3f}".format(
-                    i18n_format("bot_stats.hodl"),
-                    initialCoinAmount,
-                    initialCoinID,
-                    buyHoldInitialCoinUSDValue,
-                )
+            message += "\n{} {:.4f} {} / {} {:.3f}".format(
+                i18n_format("bot_stats.hodl"),
+                initialCoinAmount,
+                initialCoinID,
+                displayCurrency,
+                initialCoinLiveBridgeValue,
+            )
+
         else:
             message += f"\n{i18n_format('bot_stats.hodl')} -- / --"
 
