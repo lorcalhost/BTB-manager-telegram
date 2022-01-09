@@ -80,6 +80,14 @@ history:
   error: "❌ Something went wrong, unable to generate trade history at this time."
   db_error: "❌ Unable to fetch trade history from database."
 
+coin_forecast:
+  table:
+    coin: "Coin"
+    forecast: "Forecast"
+    previous: "Previous"
+  error:
+    db_error: "❌ Unable to fetch statistics from database."
+    current_coin_error: "❌ Failed to retrieve bot's current coin info from database."    
 
 bot_stats:
   bot_started: "Bot started  :"
@@ -241,6 +249,7 @@ keyboard:
   panic: "🚨 Panic button"
   check_status: "🔍 Check bot status"
   bot_stats: "🚀 Bot stats"
+  coin_forecast: "⚖️ Coin Forecast"
   maintenance: "🛠 Maintenance"
   configurations: "⚙️ Configurations"
   start: "▶ Start trade bot"
