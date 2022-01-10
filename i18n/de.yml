@@ -98,6 +98,7 @@ bot_stats:
     to: "Bis"
   HODL_explanation: "Stellt dar, was du derzeit hättest, wenn du einfach deine Startmünze halten würdest"
   db_error: "❌ Statistik kann nicht aus der Datenbank abgerufen werden"
+  can_be_converted: "kann ungefähr umgewandelt werden in"
 
 btb:
   not_running: "⚠ Binance Trade Bot läuft nicht."
