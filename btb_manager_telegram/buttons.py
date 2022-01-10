@@ -666,6 +666,14 @@ def bot_stats():
             )
         else:
             message += f"\n{i18n_format('bot_stats.hodl')} -- / --"
+            
+        if initialCoinID != lastCoinID:
+            message += "\n{} {} {:.2f} {}".format(
+                lastCoinID,
+                i18n_format("bot_stats.can_be_converted"),
+                imgStartCoinValue,
+                initialCoinID,
+            )
 
         message += "`"
 
