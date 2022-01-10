@@ -98,6 +98,7 @@ bot_stats:
     to: "A"
   HODL_explanation: "Representa el valor actual que tendrías si solo hubieras consevado la moneda inicial"
   db_error: "❌ No fue posible obtener los ratios desde la base de datos."
+  can_be_converted: "se puede convertir aproximadamente a"
 
 btb:
   not_running: "⚠ Binance Trade Bot no está activo."
