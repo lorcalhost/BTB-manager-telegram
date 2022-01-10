@@ -93,11 +93,18 @@ def current_value():
                 delta = days_deltas[0]
                 for report in reports:
                     if ts_now - report["time"] > timedelta(days=delta).total_seconds():
-                        if ts_now - report["time"] - timedelta(days=delta).total_seconds() < timedelta(hours=2).total_seconds():
-                            amount_btc_old = report["total_usdt"] / report["tickers"]["BTC"]
+                        if (
+                            ts_now
+                            - report["time"]
+                            - timedelta(days=delta).total_seconds()
+                            < timedelta(hours=2).total_seconds()
+                        ):
+                            amount_btc_old = (
+                                report["total_usdt"] / report["tickers"]["BTC"]
+                            )
                             rate = (amount_btc_now - amount_btc_old) / amount_btc_old
                             rate_str = "+" if rate >= 0 else ""
-                            rate_str += str(round(rate*100, 2))
+                            rate_str += str(round(rate * 100, 2))
                             rate_str += " %"
                         else:
                             rate_str = "N/A"
@@ -105,7 +112,7 @@ def current_value():
                         if len(return_rates) == len(days_deltas):
                             break
                         delta = days_deltas[len(return_rates)]
-                return_rates += ["N/A"]*(len(days_deltas)-len(return_rates))
+                return_rates += ["N/A"] * (len(days_deltas) - len(return_rates))
 
             except Exception as e:
                 logger.error(
@@ -128,10 +135,12 @@ def current_value():
                     f"\t{i18n_format('value.value_change', change=round((balance * usd_price - buy_price) / buy_price * 100, 2))}\n",
                     f"\t{i18n_format('value.value_usd', value=round(balance * usd_price, 2))}\n",
                     f"\t{i18n_format('value.value_btc', value=round(balance * btc_price, 5))}\n\n",
-                    f"{i18n_format('value.bought_for', value=round(buy_price, 2), coin=bridge)}\n"
+                    f"{i18n_format('value.bought_for', value=round(buy_price, 2), coin=bridge)}\n",
                 ]
                 for i_delta, delta in enumerate(days_deltas):
-                    m_list.append(f"{i18n_format('value.change_btc', days=delta, value=return_rates[i_delta])}\n")
+                    m_list.append(
+                        f"{i18n_format('value.change_btc', days=delta, value=return_rates[i_delta])}\n"
+                    )
 
                 message = telegram_text_truncator(m_list)
                 con.close()
