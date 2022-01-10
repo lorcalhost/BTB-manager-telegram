@@ -81,6 +81,24 @@ history:
   db_error: "❌ Handelshistorie kann nicht aus der Datenbank abgerufen werden."
 
 
+bot_stats:
+  bot_started: "Bot startete  :"
+  no_days: "Nr von Tagen   :"
+  no_jumps: "Nr von Sprüngen  :"
+  start_coin: "Start-Coin   :"
+  current_coin: "Aktueller Coin :"
+  hodl: "HODL¹        :"
+  profit: "Profit       :"
+  start_coin_not_found_in_supported_list: "Bot-Start-Coin ist %{firstTradeCoin} wird aber derzeit nicht in der Coin-Liste gefunden."
+  start_coin_not_found: "Bot-Start-Coin kann nicht in der Coin-Liste gefunden werden."
+  coin_progress: "Coin Fortschritt:"
+  table:
+    coin: "Coin"
+    from: "Von"
+    to: "Bis"
+  HODL_explanation: "Stellt dar, was du derzeit hättest, wenn du einfach deine Startmünze halten würdest"
+  db_error: "❌ Statistik kann nicht aus der Datenbank abgerufen werden"
+
 btb:
   not_running: "⚠ Binance Trade Bot läuft nicht."
   running: "✔ Binance Trade Bot läuft."
@@ -184,6 +202,9 @@ script:
   no_config: "Die Datei `custom_scripts.json` kann im `config/`-Verzeichnis von *BTB-manager-telegram* nicht gefunden werden."
   select: "Wähle eines deiner benutzerdefinierten Skripts aus, um es auszuführen."
 
+snapshot:
+  error: "❌ Momentan kann kein Snapshot des Binance-Kontos erstellt werden. Fehlermeldung:"
+
 graph:
   msg_existing_graphs: "Wähle ein Graph oder erstelle ein neuen. Hinweis : Hinweis: Das Syntax ist 'COIN1,COIN2,COIN3 AnzahlTage'"
   msg_no_graphs: "Benutze die 'Neuer Graph' Schaltfläche zum Erstellen eines neuen Graph."
@@ -213,6 +234,7 @@ keyboard:
   trade_history: "⌛ Handelshistorie"
   panic: "🚨 Panikknopf"
   check_status: "🔍 Bot-Status prüfen"
+  bot_stats: "🚀 Bot Statistiken"
   maintenance: "🛠 Wartung"
   configurations: "⚙️ Konfiguration"
   start: "▶ Starte Handelsbot"

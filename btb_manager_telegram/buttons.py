@@ -328,11 +328,7 @@ def current_ratios():
                             i18n_format("ratios.price", bridge=bridge),
                             i18n_format("ratios.ratio"),
                         ],
-                        [
-                            [c[1] for c in query],
-                            [c[2] for c in query],
-                            [c[3] for c in query],
-                        ],
+                        [[q[1], q[2], q[3]] for q in query],
                         [6, 12, 12],
                         align="left",
                         add_spaces=[True, True, False],
@@ -419,12 +415,7 @@ def next_coin():
                             i18n_format("next_coin.current_price"),
                             i18n_format("next_coin.target_price"),
                         ],
-                        [
-                            [c[0] for c in query],
-                            [str(round(c[3] * 100, 2)) for c in query],
-                            [c[1] for c in query],
-                            [c[2] for c in query],
-                        ],
+                        [[q[0], str(round(q[3] * 100, 2)), q[1], q[2]] for q in query],
                         [6, 7, 8, 8],
                         add_spaces=[True, True, False, False],
                         align=["center", "left", "left", "left"],
@@ -520,6 +511,217 @@ def trade_history():
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
             message = [i18n_format("history.db_error")]
+    return message
+
+
+def bot_stats():
+    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+    message = [i18n_format("database_not_found", path=db_file_path)]
+    if not os.path.exists(db_file_path):
+        return message
+    message = ""
+    try:
+        con = sqlite3.connect(db_file_path)
+
+        cur = con.cursor()
+
+        cur.execute("SELECT symbol FROM coins WHERE enabled=1")
+        coinList = cur.fetchall()  # access with coinList[Index][0]
+        numCoins = len(coinList)
+
+        cur.execute(
+            "SELECT datetime FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
+        )
+        bot_start_date = cur.fetchall()[0][0]
+
+        cur.execute("SELECT datetime FROM scout_history ORDER BY id DESC LIMIT 1")
+        bot_end_date = cur.fetchall()[0][0]
+
+        cur.execute("SELECT * FROM trade_history ")
+        lenTradeHistory = len(cur.fetchall())
+
+        cur.execute(
+            "SELECT alt_coin_id FROM trade_history WHERE id=1 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
+        )
+        firstTradeCoin = cur.fetchall()[0][0]
+
+        initialCoinID = ""
+        for i in range(1, lenTradeHistory):
+            cur.execute(
+                "SELECT alt_coin_id FROM trade_history WHERE id='{}' and state='COMPLETE' ORDER BY id ASC LIMIT 1".format(
+                    i
+                )
+            )
+            coinID = cur.fetchall()
+            if len(coinID) > 0:
+                coinID = coinID[0][0]
+            else:
+                continue
+            for coin in coinList:
+                if coinID == coin[0]:
+                    initialCoinID = coinID
+                    cur.execute(
+                        "SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{}' and state='COMPLETE' ORDER BY id ASC LIMIT 1".format(
+                            initialCoinID
+                        )
+                    )
+                    initialCoinValue = cur.fetchall()[0][0]
+
+                    cur.execute(
+                        "SELECT crypto_trade_amount FROM trade_history WHERE alt_coin_id='{}' and state='COMPLETE' ORDER BY id ASC LIMIT 1".format(
+                            initialCoinID
+                        )
+                    )
+                    initialCoinFiatValue = cur.fetchall()[0][0]
+                    break
+            if initialCoinID != "":
+                break
+
+        cur.execute(
+            "SELECT alt_coin_id FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
+        )
+        lastCoinID = cur.fetchall()[0][0]
+
+        cur.execute(
+            "SELECT alt_trade_amount FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
+        )
+        lastCoinValue = cur.fetchall()[0][0]
+
+        cur.execute(
+            "SELECT current_coin_price FROM scout_history ORDER BY rowid DESC LIMIT 1"
+        )
+        lastCoinUSD = cur.fetchall()[0][0]
+
+        lastCoinFiatValue = lastCoinValue * lastCoinUSD
+
+        if lastCoinID != initialCoinID and initialCoinID != "":
+            cur.execute(
+                "SELECT id FROM pairs WHERE from_coin_id='{}' and to_coin_id='{}'".format(
+                    lastCoinID, initialCoinID
+                )
+            )
+            pairID = cur.fetchall()[0][0]
+            cur.execute(
+                "SELECT other_coin_price FROM scout_history WHERE pair_id='{}' ORDER BY id DESC LIMIT 1".format(
+                    pairID
+                )
+            )
+            currentValInitialCoin = cur.fetchall()[0][0]
+        else:
+            cur.execute(
+                "SELECT current_coin_price FROM scout_history ORDER BY id DESC LIMIT 1"
+            )
+            currentValInitialCoin = lastCoinUSD
+
+        # No of Days calculation
+        start_date = datetime.strptime(bot_start_date[2:], "%y-%m-%d %H:%M:%S.%f")
+        end_date = datetime.strptime(bot_end_date[2:], "%y-%m-%d %H:%M:%S.%f")
+        numDays = (end_date - start_date).days
+
+        cur.execute("SELECT count(*) FROM trade_history WHERE selling=0")
+        numCoinJumps = cur.fetchall()[0][0]
+
+        message += f"""`{i18n_format('bot_stats.bot_started')} {start_date.strftime('%m/%d/%Y, %H:%M:%S')}
+{i18n_format('bot_stats.no_days')} {numDays}
+{i18n_format('bot_stats.no_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"""
+
+        if initialCoinID != "":
+            message += "\n{} {:.4f} {} / ${:.3f}".format(
+                i18n_format("bot_stats.start_coin"),
+                initialCoinValue,
+                initialCoinID,
+                initialCoinFiatValue,
+            )
+        else:
+            message += f"\n{i18n_format('bot_stats.start_coin')} -- / --"
+        message += "\n{} {:.4f} {} / ${:.3f}".format(
+            i18n_format("bot_stats.current_coin"),
+            lastCoinValue,
+            lastCoinID,
+            lastCoinFiatValue,
+        )
+
+        if initialCoinID != "":
+            imgStartCoinFiatValue = initialCoinValue * currentValInitialCoin
+            imgStartCoinValue = lastCoinFiatValue / currentValInitialCoin
+            message += "\n{} {:.4f} {} / ${:.3f}".format(
+                i18n_format("bot_stats.hodl"),
+                initialCoinValue,
+                initialCoinID,
+                imgStartCoinFiatValue,
+            )
+            changeFiat = (
+                (lastCoinFiatValue - initialCoinFiatValue) / initialCoinFiatValue * 100
+            )
+            changeStartCoin = (
+                (imgStartCoinValue - initialCoinValue) / initialCoinValue * 100
+            )
+            message += "\n{} {}{:.2f}% USD / {}{:.2f}% {}".format(
+                i18n_format("bot_stats.profit"),
+                "+" if changeFiat >= 0 else "",
+                changeFiat,
+                "+" if changeStartCoin >= 0 else "",
+                changeStartCoin,
+                initialCoinID,
+            )
+        else:
+            message += f"\n{i18n_format('bot_stats.hodl')} -- / --"
+
+        message += "`"
+
+        if firstTradeCoin != "" and firstTradeCoin != initialCoinID:
+            message += f"\n{i18n_format('bot_stats.start_coin_not_found_in_supported_list', firstTradeCoin)}"
+        elif initialCoinID == "":
+            message += f"\n{i18n_format('bot_stats.start_coin_not_found')}"
+
+        message += f"\n\n*{i18n_format('bot_stats.coin_progress')}*\n"
+        rows = []
+        # Compute Mini Coin Progress
+        for coin in coinList:
+            jumps = cur.execute(
+                f"SELECT COUNT(*) FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE'"
+            ).fetchall()[0][0]
+            if jumps > 0:
+                first_date = cur.execute(
+                    f"SELECT datetime FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
+                ).fetchall()[0][0]
+                first_value = cur.execute(
+                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
+                ).fetchall()[0][0]
+                last_value = cur.execute(
+                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
+                ).fetchall()[0][0]
+                grow = (last_value - first_value) / first_value * 100
+                rows.append(
+                    [
+                        coin[0],
+                        float(first_value),
+                        float(last_value),
+                        str(round(grow, 2)) if grow != 0 else "0",
+                        str(jumps),
+                    ]
+                )
+        table = tabularize(
+            [
+                i18n_format("bot_stats.table.coin"),
+                i18n_format("bot_stats.table.from"),
+                i18n_format("bot_stats.table.to"),
+                "% ±",
+                "<->",
+            ],
+            rows,
+            [4, 8, 8, 8, 3],
+            add_spaces=False,
+            align=["left", "right", "right", "right", "right"],
+        )
+        message = [message]
+        message += table
+        message += [f"¹ _{i18n_format('bot_stats.HODL_explanation')}_"]
+
+        message = telegram_text_truncator(message)
+    except Exception as e:
+        logger.error(f"❌ Unable to perform actions on the database: {e}", exc_info=True)
+        message = [i18n_format("bot_stats.db_error")]
     return message
 
 
