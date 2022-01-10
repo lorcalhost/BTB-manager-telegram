@@ -98,6 +98,7 @@ bot_stats:
     to: "To"
   HODL_explanation: "Represents what you would currently have if you were simply holding on your start coin"
   db_error: "❌ Unable to fetch statistics from database."
+  can_be_converted: "can be approx converted to"
 
 btb:
   not_running: "⚠ Binance Trade Bot is not running."
