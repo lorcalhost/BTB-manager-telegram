@@ -86,39 +86,26 @@ def current_value():
                 reports = get_previous_reports()
                 reports.reverse()
 
-                amount_btc_1_day, amount_btc_7_day = 0, 0
-
-                query_1_day_done = False
-                for r in reports:
-                    if (
-                        r["time"]
-                        < int(last_update.timestamp())
-                        - timedelta(days=1).total_seconds()
-                        and not query_1_day_done
-                    ):
-                        amount_btc_1_day = r["total_usdt"] / r["tickers"]["BTC"]
-                        query_1_day_done = True
-                    if (
-                        r["time"]
-                        < int(last_update.timestamp())
-                        - timedelta(days=7).total_seconds()
-                    ):
-                        amount_btc_7_day = r["total_usdt"] / r["tickers"]["BTC"]
-                        break
-
+                days_deltas = [1, 7, 30]
+                return_rates = []
                 amount_btc_now = balance * btc_price
-
-                return_rate_1_day, return_rate_7_day = 0, 0
-
-                if amount_btc_now != 0:
-                    if amount_btc_1_day != 0:
-                        return_rate_1_day = (
-                            (amount_btc_now - amount_btc_1_day) / amount_btc_1_day * 100
-                        )
-                    if amount_btc_7_day != 0:
-                        return_rate_7_day = (
-                            (amount_btc_now - amount_btc_7_day) / amount_btc_7_day * 100
-                        )
+                ts_now = int(last_update.timestamp())
+                delta = days_deltas[0]
+                for report in reports:
+                    if ts_now - report["time"] > timedelta(days=delta).total_seconds():
+                        if ts_now - report["time"] - timedelta(days=delta).total_seconds() < timedelta(hours=2).total_seconds():
+                            amount_btc_old = report["total_usdt"] / report["tickers"]["BTC"]
+                            rate = (amount_btc_now - amount_btc_old) / amount_btc_old
+                            rate_str = "+" if rate >= 0 else ""
+                            rate_str += str(round(rate*100, 2))
+                            rate_str += " %"
+                        else:
+                            rate_str = "N/A"
+                        return_rates.append(rate_str)
+                        if len(return_rates) == len(days_deltas):
+                            break
+                        delta = days_deltas[len(return_rates)]
+                return_rates += ["N/A"]*(len(days_deltas)-len(return_rates))
 
             except Exception as e:
                 logger.error(
@@ -131,7 +118,6 @@ def current_value():
                     i18n_format("value.no_during_trade"),
                 ]
 
-            # Generate message
             try:
                 m_list = [
                     f"\n{i18n_format('value.last_update', update=last_update.strftime('%H:%M:%S %d/%m/%Y'))}\n\n",
@@ -143,9 +129,10 @@ def current_value():
                     f"\t{i18n_format('value.value_usd', value=round(balance * usd_price, 2))}\n",
                     f"\t{i18n_format('value.value_btc', value=round(balance * btc_price, 5))}\n\n",
                     f"{i18n_format('value.bought_for', value=round(buy_price, 2), coin=bridge)}\n"
-                    f"{i18n_format('value.one_day_change_btc', value=round(return_rate_1_day, 2))}\n",
-                    f"{i18n_format('value.seven_day_change_btc', value=round(return_rate_7_day, 2))}\n",
                 ]
+                for i_delta, delta in enumerate(days_deltas):
+                    m_list.append(f"{i18n_format('value.change_btc', days=delta, value=return_rates[i_delta])}\n")
+
                 message = telegram_text_truncator(m_list)
                 con.close()
             except Exception as e:
