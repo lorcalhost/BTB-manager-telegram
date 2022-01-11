@@ -693,7 +693,7 @@ def bot_stats():
             jumps = query[0][0]
 
             cur.execute(
-                f"SELECT datetime, alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
+                f"SELECT datetime, alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and state='COMPLETE' ORDER BY id ASC LIMIT 1"
             )
             query = cur.fetchall()
             if len(query) == 0:
