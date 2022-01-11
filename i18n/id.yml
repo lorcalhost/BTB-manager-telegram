@@ -35,7 +35,7 @@ value:
   balance: "- Saldo            : `%{balance}` *%{coin}*"
   exchange_rate_purchased: "- Harga pembelian  : `%{rate}` *%{coin}*/*%{bridge}*"
   exchange_rate_now: "- Harga saat ini   : `%{rate}` *%{coin}*/*USD*"
-  value_change: "- Perubahan harga: `%{change}` *%*"
+  value_change: "- Perubahan harga  : `%{change}` *%*"
   value_usd: "- Nilai dalam *USD*: `%{value}` *USD*"
   value_btc: "- Nilai dalam *BTC*: `%{value}` *BTC*"
   bought_for: "_Pembelian sejumlah_ `%{value}` *%{coin}*"
