@@ -507,7 +507,6 @@ def bot_stats():
 
     try:
         con = sqlite3.connect(db_file_path)
-
         cur = con.cursor()
 
         cur.execute(
@@ -531,6 +530,8 @@ def bot_stats():
         if not lenTradeHistory > 0:
             message = [i18n_format("bot_stats.error.empty_trade_history")]
             return message
+
+        reports = get_previous_reports()
 
         # get first trade and its bridge - all stats must be in this bridge
         initialCoinID = ""
@@ -607,7 +608,6 @@ def bot_stats():
             message = [i18n_format("bot_stats.error.current_coin_error")]
             return message
 
-        # No of Days calculation
         start_date = datetime.strptime(bot_start_date[2:], "%y-%m-%d %H:%M:%S.%f")
         end_date = datetime.strptime(bot_end_date[2:], "%y-%m-%d %H:%M:%S.%f")
         numDays = (end_date - start_date).days
@@ -615,9 +615,8 @@ def bot_stats():
         cur.execute("SELECT count(*) FROM trade_history WHERE selling=0")
         numCoinJumps = cur.fetchall()[0][0]
 
-        message += f"""`{i18n_format('bot_stats.bot_started')} {start_date.strftime('%m/%d/%Y, %H:%M:%S')}
-{i18n_format('bot_stats.no_days')} {numDays}
-{i18n_format('bot_stats.no_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"""
+        message += f"`{i18n_format('bot_stats.bot_started', date=start_date.strftime('%d/%m/%y'), no_days=numDays)}"
+        message += f"\n{i18n_format('bot_stats.no_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"
 
         if initialCoinID != "":
             message += "\n{} {:.4f} {} / {} {:.3f}".format(
@@ -676,13 +675,20 @@ def bot_stats():
         else:
             message += f"\n{i18n_format('bot_stats.hodl')} -- / --"
 
-        message += "`"
-
         if initialCoinID == "":
             message += f"\n{i18n_format('bot_stats.start_coin_not_found')}"
 
+        max_usd = max(reports, key=lambda a: a["total_usdt"])["total_usdt"]
+        min_usd = min(reports, key=lambda a: a["total_usdt"])["total_usdt"]
+        btc_vals = [a["total_usdt"] / a["tickers"]["BTC"] for a in reports]
+        max_btc = max(btc_vals)
+        min_btc = min(btc_vals)
+
+        message += f"\n{i18n_format('bot_stats.min_max_usd')} {round(min_usd,2)} / {round(max_usd,2)}"
+        message += f"\n{i18n_format('bot_stats.min_max_btc')} {round(min_btc,5)} / {round(max_btc,5)}"
+        message += "`"
+
         rows = []
-        # Compute Mini Coin Progress
         for coin in settings.COIN_LIST:
             cur.execute(
                 f"SELECT COUNT(*) FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE'"
