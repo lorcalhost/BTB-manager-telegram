@@ -240,7 +240,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/54760464?v=4",
       "profile": "https://github.com/maromalo",
       "contributions": [
-        "bug"
+        "bug",
+        "code"
       ]
     },
     {
@@ -251,6 +252,15 @@
       "contributions": [
         "ideas",
         "code"
+      ]
+    },
+    {
+      "login": "renkasiyas",
+      "name": "Ren Kasiyas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7783256?v=4",
+      "profile": "https://github.com/renkasiyas",
+      "contributions": [
+        "translation"
       ]
     }
   ],
