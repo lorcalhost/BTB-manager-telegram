@@ -39,8 +39,6 @@ value:
   value_usd: "- Valeur actuelle en *USD* : `%{value}` *USD*"
   value_btc: "- Valeur actuelle en *BTC*: `%{value}` *BTC*"
   bought_for: "_Acheté pour_ `%{value}` *%{coin}*"
-  one_day_change_btc: "Évolution sur 24h en BTC: `%{value}` %"
-  seven_day_change_btc: "Évolution sur 7j en BTC: `%{value}` %"
 
 
 progress:

@@ -3,11 +3,12 @@ import sqlite3
 import subprocess
 import time
 from configparser import ConfigParser
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
+from btb_manager_telegram.report import get_previous_reports
 from btb_manager_telegram.table import tabularize
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
@@ -67,25 +68,6 @@ def current_value():
                         ORDER BY datetime DESC LIMIT 1;"""
                 )
                 query = cur.fetchone()
-
-                cur.execute(
-                    """SELECT cv.balance, cv.usd_price
-                        FROM coin_value as cv
-                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
-                        AND cv.datetime < (SELECT th.datetime FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
-                        ORDER BY cv.datetime DESC LIMIT 1;"""
-                )
-                query_1_day = cur.fetchone()
-
-                cur.execute(
-                    """SELECT cv.balance, cv.usd_price
-                        FROM coin_value as cv
-                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
-                        AND cv.datetime < (SELECT th.datetime FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
-                        ORDER BY cv.datetime DESC LIMIT 1;"""
-                )
-                query_7_day = cur.fetchone()
-
                 if query is None:
                     return [
                         i18n_format("value.no_information", current_coin=current_coin),
@@ -101,39 +83,37 @@ def current_value():
                     btc_price = 0
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
 
-                return_rate_1_day, return_rate_7_day = 0, 0
-                balance_1_day, usd_price_1_day, balance_7_day, usd_price_7_day = (
-                    0,
-                    0,
-                    0,
-                    0,
-                )
+                reports = get_previous_reports()
+                reports.reverse()
 
-                if (
-                    query_1_day is not None
-                    and all(elem is not None for elem in query_1_day)
-                    and usd_price != 0
-                ):
-                    balance_1_day, usd_price_1_day = query_1_day
-                    return_rate_1_day = round(
-                        (balance * usd_price - balance_1_day * usd_price_1_day)
-                        / (balance_1_day * usd_price_1_day)
-                        * 100,
-                        2,
-                    )
+                days_deltas = [1, 7, 30]
+                return_rates = []
+                amount_btc_now = balance * btc_price
+                ts_now = int(last_update.timestamp())
+                delta = days_deltas[0]
+                for report in reports:
+                    if ts_now - report["time"] > timedelta(days=delta).total_seconds():
+                        if (
+                            ts_now
+                            - report["time"]
+                            - timedelta(days=delta).total_seconds()
+                            < timedelta(hours=2).total_seconds()
+                        ):
+                            amount_btc_old = (
+                                report["total_usdt"] / report["tickers"]["BTC"]
+                            )
+                            rate = (amount_btc_now - amount_btc_old) / amount_btc_old
+                            rate_str = "+" if rate >= 0 else ""
+                            rate_str += str(round(rate * 100, 2))
+                            rate_str += " %"
+                        else:
+                            rate_str = "N/A"
+                        return_rates.append(rate_str)
+                        if len(return_rates) == len(days_deltas):
+                            break
+                        delta = days_deltas[len(return_rates)]
+                return_rates += ["N/A"] * (len(days_deltas) - len(return_rates))
 
-                if (
-                    query_7_day is not None
-                    and all(elem is not None for elem in query_7_day)
-                    and usd_price != 0
-                ):
-                    balance_7_day, usd_price_7_day = query_7_day
-                    return_rate_7_day = round(
-                        (balance * usd_price - balance_7_day * usd_price_7_day)
-                        / (balance_7_day * usd_price_7_day)
-                        * 100,
-                        2,
-                    )
             except Exception as e:
                 logger.error(
                     f"❌ Unable to fetch current coin information from database: {e}",
@@ -145,7 +125,6 @@ def current_value():
                     i18n_format("value.no_during_trade"),
                 ]
 
-            # Generate message
             try:
                 m_list = [
                     f"\n{i18n_format('value.last_update', update=last_update.strftime('%H:%M:%S %d/%m/%Y'))}\n\n",
@@ -156,10 +135,13 @@ def current_value():
                     f"\t{i18n_format('value.value_change', change=round((balance * usd_price - buy_price) / buy_price * 100, 2))}\n",
                     f"\t{i18n_format('value.value_usd', value=round(balance * usd_price, 2))}\n",
                     f"\t{i18n_format('value.value_btc', value=round(balance * btc_price, 5))}\n\n",
-                    f"{i18n_format('value.bought_for', value=round(buy_price, 2), coin=bridge)}\n"
-                    f"{i18n_format('value.one_day_change_btc', value=return_rate_1_day)}\n",
-                    f"{i18n_format('value.seven_day_change_btc', value=return_rate_7_day)}\n",
+                    f"{i18n_format('value.bought_for', value=round(buy_price, 2), coin=bridge)}\n",
                 ]
+                for i_delta, delta in enumerate(days_deltas):
+                    m_list.append(
+                        f"{i18n_format('value.change_btc', days=delta, value=return_rates[i_delta])}\n"
+                    )
+
                 message = telegram_text_truncator(m_list)
                 con.close()
             except Exception as e:
