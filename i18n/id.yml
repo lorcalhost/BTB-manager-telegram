@@ -58,7 +58,7 @@ ratios:
   ratio: "Rasio"
   coin: "Koin"
   gen_error: "❌ Terjadi kesalahan, tidak dapat menampilkan rasio saat ini."
-  db_error: "❌ tidak dapat menampilkan rasio dari database."
+  db_error: "❌ Tidak dapat menampilkan rasio dari database."
 
 
 next_coin:
@@ -67,7 +67,7 @@ next_coin:
   percentage: "%"
   coin: "Koin"
   error: "❌Terjadi kesalahan, tidak dapat menampilkan data koin selanjutnya."
-  db_error: "❌ tidak dapat menampilkan koin selanjutnya dari database."
+  db_error: "❌ Tidak dapat menampilkan koin selanjutnya dari database."
 
 
 history:
@@ -77,15 +77,15 @@ history:
   bought: "Membeli"
   status: "Status: _*%{status}*_"
   error: "❌ Terjadi kesalahan, tidak dapat menampilkan riwayat pembelian saat ini."
-  db_error: "❌ tidak dapat menampilkan riwayat pembelian dari database."
+  db_error: "❌ Tidak dapat menampilkan riwayat pembelian dari database."
 
 
 bot_stats:
-  bot_started: "Tanggal awal Bot:"
+  bot_started: "Tanggal Awal Bot:"
   no_days: "Jumlah Hari     :"
-  no_jumps: "Jumlah lompatan :"
+  no_jumps: "Jumlah Lompatan :"
   start_coin: "Koin Permulaan  :"
-  current_coin: "Koin saat ini   :"
+  current_coin: "Koin Saat Ini   :"
   hodl: "HODL¹           :"
   profit: "Profit          :"
   start_coin_not_found_in_supported_list: "Koin awal Bot adalah %{firstTradeCoin} namun saat ini tidak terdaftar di file _*supported_coin_list*_."
@@ -128,12 +128,12 @@ panic:
   open_buy_order: "Kamu memiliki pembelian yang masih berjalan sebesar `%{amount1}` *%{coin1}* untuk `%{amount2}` *%{coin2}*."
   limit_buy_price: "Batas harga pembelian:"
   stop_and_cancel: "Apakah kamu ini mematikan _Binance Trade Bot_ dan membatalkan pembelian yang masih berjalan?"
-  order_already_complete: "saldo kamu saat ini *%{coin}*."
+  order_already_complete: "Saldo kamu saat ini *%{coin}*."
   ask_stop_bot: "Apakah kamu ingin mematikan _Binance Trade Bot_?"
   open_sell_order: "Kamu memiliki penjualan `%{amount1}` *%{coin1}* untuk `%{amount2}` *%{coin2}*."
   limit_sell_price: "Batas harga penjualan:"
   error: "❌ Terjadi kesalahan, Tombol panik tidak dapat berfungsi saat ini."
-  db_error: "❌ tidak dapat melakukan perintah tersebut kepada database"
+  db_error: "❌ Tidak dapat melakukan perintah tersebut kepada database"
 
 
 coin_list:
