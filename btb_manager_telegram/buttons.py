@@ -496,12 +496,6 @@ def trade_history():
     return message
 
 
-def retrieve_value_db(dbFetch):
-    if len(dbFetch) > 0:
-        return dbFetch[0][0]
-    return None
-
-
 def bot_stats():
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     message = [i18n_format("database_not_found", path=db_file_path)]
@@ -519,16 +513,18 @@ def bot_stats():
         cur.execute(
             "SELECT datetime FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
         )
-        bot_start_date = retrieve_value_db(cur.fetchall())
-        if bot_start_date == None:
+        query = cur.fetchall()
+        if len(query) == 0:
             message = [i18n_format("bot_stats.error.date_error")]
             return message
+        bot_start_date = query[0][0]
 
         cur.execute("SELECT datetime FROM scout_history ORDER BY id DESC LIMIT 1")
-        bot_end_date = retrieve_value_db(cur.fetchall())
-        if bot_end_date == None:
+        query = cur.fetchall()
+        if len(query) == 0:
             message = [i18n_format("bot_stats.error.date_error")]
             return message
+        bot_end_date = query[0][0]
 
         cur.execute("SELECT * FROM trade_history ")
         lenTradeHistory = len(cur.fetchall())
@@ -691,30 +687,26 @@ def bot_stats():
             cur.execute(
                 f"SELECT COUNT(*) FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE'"
             )
-            jumps = retrieve_value_db(cur.fetchall())
-            if jumps is None:
+            query = cur.fetchall()
+            if len(query) == 0:
                 continue
+            jumps = query[0][0]
 
             cur.execute(
-                f"SELECT datetime FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
+                f"SELECT datetime, alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
             )
-            first_date = retrieve_value_db(cur.fetchall())
-            if first_date == None:
+            query = cur.fetchall()
+            if len(query) == 0:
                 continue
-
-            cur.execute(
-                f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
-            )
-            first_value = retrieve_value_db(cur.fetchall())
-            if first_value == None:
-                continue
+            first_date, first_value = query[0]
 
             cur.execute(
                 f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
             )
-            last_value = retrieve_value_db(cur.fetchall())
-            if last_value == None:
+            query = cur.fetchall()
+            if len(query) == 0:
                 continue
+            last_value = query[0][0]
 
             grow = (last_value - first_value) / first_value * 100
             rows.append(
