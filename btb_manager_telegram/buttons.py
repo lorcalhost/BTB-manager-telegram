@@ -515,11 +515,7 @@ def bot_stats():
         con = sqlite3.connect(db_file_path)
 
         cur = con.cursor()
-
-        cur.execute("SELECT symbol FROM coins WHERE enabled=1")
-        coinList = cur.fetchall()  # access with coinList[Index][0]
-        numCoins = len(coinList)
-
+        
         cur.execute(
             "SELECT datetime FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
         )
@@ -692,28 +688,28 @@ def bot_stats():
         message += f"\n\n*{i18n_format('bot_stats.coin_progress')}*\n"
         rows = []
         # Compute Mini Coin Progress
-        for coin in coinList:
+        for coin in settings.COIN_LIST:
             cur.execute(
-                f"SELECT COUNT(*) FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE'"
+                f"SELECT COUNT(*) FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE'"
             )
             jumps = retrieve_value_db(cur.fetchall())
             if jumps != None:
                 cur.execute(
-                    f"SELECT datetime FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
+                    f"SELECT datetime FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
                 )
                 first_date = retrieve_value_db(cur.fetchall())
                 if first_date == None:
                     continue
 
                 cur.execute(
-                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
+                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
                 )
                 first_value = retrieve_value_db(cur.fetchall())
                 if first_value == None:
                     continue
 
                 cur.execute(
-                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
+                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
                 )
                 last_value = retrieve_value_db(cur.fetchall())
                 if last_value == None:
@@ -722,7 +718,7 @@ def bot_stats():
                 grow = (last_value - first_value) / first_value * 100
                 rows.append(
                     [
-                        coin[0],
+                        coin,
                         float(first_value),
                         float(last_value),
                         str(round(grow, 2)) if grow != 0 else "0",
