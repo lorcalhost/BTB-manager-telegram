@@ -98,6 +98,7 @@ def current_value():
                             - report["time"]
                             - timedelta(days=delta).total_seconds()
                             < timedelta(hours=2).total_seconds()
+                            and report["total_usdt"] > 0
                         ):
                             amount_btc_old = (
                                 report["total_usdt"] / report["tickers"]["BTC"]
