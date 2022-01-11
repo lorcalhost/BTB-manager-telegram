@@ -103,6 +103,7 @@ bot_stats:
     first_coin_error: "❌ Failed to retrieve bot's start coin info from database."
     current_coin_error: "❌ Failed to retrieve bot's current coin info from database."
     value_error: "❌ Error retieving info from db. Error Code = `%{error_code}`."
+    no_progress: "No progress data can be shown, because no trade has been done yet."
 
 btb:
   not_running: "⚠ Binance Trade Bot is not running."

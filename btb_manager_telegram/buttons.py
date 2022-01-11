@@ -515,7 +515,7 @@ def bot_stats():
         con = sqlite3.connect(db_file_path)
 
         cur = con.cursor()
-        
+
         cur.execute(
             "SELECT datetime FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
         )
@@ -685,7 +685,6 @@ def bot_stats():
         if initialCoinID == "":
             message += f"\n{i18n_format('bot_stats.start_coin_not_found')}"
 
-        message += f"\n\n*{i18n_format('bot_stats.coin_progress')}*\n"
         rows = []
         # Compute Mini Coin Progress
         for coin in settings.COIN_LIST:
@@ -693,53 +692,62 @@ def bot_stats():
                 f"SELECT COUNT(*) FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE'"
             )
             jumps = retrieve_value_db(cur.fetchall())
-            if jumps != None:
-                cur.execute(
-                    f"SELECT datetime FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
-                )
-                first_date = retrieve_value_db(cur.fetchall())
-                if first_date == None:
-                    continue
+            if jumps is None:
+                continue
 
-                cur.execute(
-                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
-                )
-                first_value = retrieve_value_db(cur.fetchall())
-                if first_value == None:
-                    continue
+            cur.execute(
+                f"SELECT datetime FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
+            )
+            first_date = retrieve_value_db(cur.fetchall())
+            if first_date == None:
+                continue
 
-                cur.execute(
-                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
-                )
-                last_value = retrieve_value_db(cur.fetchall())
-                if last_value == None:
-                    continue
+            cur.execute(
+                f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
+            )
+            first_value = retrieve_value_db(cur.fetchall())
+            if first_value == None:
+                continue
 
-                grow = (last_value - first_value) / first_value * 100
-                rows.append(
-                    [
-                        coin,
-                        float(first_value),
-                        float(last_value),
-                        str(round(grow, 2)) if grow != 0 else "0",
-                        str(jumps),
-                    ]
-                )
-        table = tabularize(
-            [
-                i18n_format("bot_stats.table.coin"),
-                i18n_format("bot_stats.table.from"),
-                i18n_format("bot_stats.table.to"),
-                "% ±",
-                "<->",
-            ],
-            rows,
-            [4, 8, 8, 8, 3],
-            add_spaces=False,
-            align=["left", "right", "right", "right", "right"],
-        )
-        message = [message]
-        message += table
+            cur.execute(
+                f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
+            )
+            last_value = retrieve_value_db(cur.fetchall())
+            if last_value == None:
+                continue
+
+            grow = (last_value - first_value) / first_value * 100
+            rows.append(
+                [
+                    coin,
+                    float(first_value),
+                    float(last_value),
+                    str(round(grow, 2)) if grow != 0 else "0",
+                    str(jumps),
+                ]
+            )
+
+        if len(rows) == 0:
+            message += f"\n\n{i18n_format('bot_stats.error.no_progress')}\n"
+            message = [message]
+
+        else:
+            table = tabularize(
+                [
+                    i18n_format("bot_stats.table.coin"),
+                    i18n_format("bot_stats.table.from"),
+                    i18n_format("bot_stats.table.to"),
+                    "% ±",
+                    "<->",
+                ],
+                rows,
+                [4, 8, 8, 8, 3],
+                add_spaces=False,
+                align=["left", "right", "right", "right", "right"],
+            )
+            message += f"\n\n*{i18n_format('bot_stats.coin_progress')}*\n"
+            message = [message]
+            message += table
 
         message = telegram_text_truncator(message)
     except Exception as e:
