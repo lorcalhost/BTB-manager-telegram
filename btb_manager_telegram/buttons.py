@@ -499,7 +499,7 @@ def trade_history():
 def coin_forecast():
     logger.info("Coin Forecast button pressed.")
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
-    message = [i18n_format("database_not_found", path=db_file_path)]
+    message = [i18n.t("database_not_found", path=db_file_path)]
 
     if not os.path.exists(db_file_path):
         return message
@@ -529,7 +529,7 @@ def coin_forecast():
 
         except:
             logger.error("Unable to retrieve current coin info.")
-            message = [i18n_format("coin_forecast.error.current_coin_error")]
+            message = [i18n.t("coin_forecast.error.current_coin_error")]
             return message
 
         rows = []
@@ -583,9 +583,9 @@ def coin_forecast():
 
         table = tabularize(
             [
-                i18n_format("coin_forecast.table.coin"),
-                i18n_format("coin_forecast.table.forecast"),
-                i18n_format("coin_forecast.table.previous"),
+                i18n.t("coin_forecast.table.coin"),
+                i18n.t("coin_forecast.table.forecast"),
+                i18n.t("coin_forecast.table.previous"),
                 "% ±",
             ],
             rows,
@@ -600,7 +600,7 @@ def coin_forecast():
         message = telegram_text_truncator(message)
     except Exception as e:
         logger.error(f"❌ Unable to perform actions on the database: {e}", exc_info=True)
-        message = [i18n_format("coin_forecast.error.db_error")]
+        message = [i18n.t("coin_forecast.error.db_error")]
 
     return message
 
