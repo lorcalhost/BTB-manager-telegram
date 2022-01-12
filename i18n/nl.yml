@@ -11,7 +11,7 @@ select_option: "Selecteer één van de opties."
 welcome:
   hello: "Hallo *%{name}*!"
   welcome: "Welkom bij de _Binance Trader Bot Telegram Manager_."
-  developed_by: "Deze Telegram bot is ontwikkeld door @lorcalhost."
+  developed_by: "Deze Telegram bot is ontwikkeld door %{contributors}."
   project_link: "Lees meer over dit project [hier](https://github.com/lorcalhost/BTB-manager-telegram)."
   donation: "*Als je mijn werk leuk vindt, [overweeg dan om het project te ondersteunen door middel van een kleine donatie](https://github.com/sponsors/lorcalhost). ❤*"
   how_to_start: "*Om het gesprek te starten, klikt u op de knop `/start`*"
@@ -39,8 +39,6 @@ value:
   value_usd: "- Waarde in *USD*: `%{value}` *USD*"
   value_btc: "- Waarde in *BTC*: `%{value}` *BTC*"
   bought_for: "_Gekocht voor_ `%{value}` *%{coin}*"
-  one_day_change_btc: "1 dag verandering BTC: `%{value}` %"
-  seven_day_change_btc: "7 dagen verandering BTC: `%{value}` %"
 
 
 progress:

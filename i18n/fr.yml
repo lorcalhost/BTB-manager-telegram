@@ -11,7 +11,7 @@ select_option: "Sélectionnez une option"
 welcome:
   hello: "Bonjour %{name}!"
   welcome: "Bienvenue sur le manager télégram du _Binance Trade Bot_."
-  developed_by: "Ce bot est développé collaborativement par lorcalhost, NovusEdge, titulebolide, Lisiadito, DmytroLitvinov, sydekumf, bloodf, idkravitz, neuhausj, MasaiasuOse, tntwist, kydrenw, pwnfoo, santiagocarod, stgo-eo and shhhmel."
+  developed_by: "Ce bot est développé par %{contributors}."
   project_link: "Retrouvez le projet [ici](https://github.com/lorcalhost/BTB-manager-telegram)."
   donation: "*Si vous appréciez mon travail, [supportez moi avec un petit don](https://github.com/sponsors/lorcalhost). ❤*"
   how_to_start: "*Pour démarrer la discussion, appuyez sur le bouton `/start`*"
@@ -39,8 +39,7 @@ value:
   value_usd: "- Valeur actuelle en *USD* : `%{value}` *USD*"
   value_btc: "- Valeur actuelle en *BTC*: `%{value}` *BTC*"
   bought_for: "_Acheté pour_ `%{value}` *%{coin}*"
-  one_day_change_btc: "Évolution sur 24h en BTC: `%{value}` %"
-  seven_day_change_btc: "Évolution sur 7j en BTC: `%{value}` %"
+  change_btc: "Evolution en BTC pour les %{days} dernier jours: `%{value}`"
 
 
 progress:
@@ -57,14 +56,19 @@ ratios:
   compared_ratios: "*Ratio de monnaies à %{coin} en ordre décroissant :*"
   price: "Prix %{bridge}"
   ratio: "Ratio"
+  coin: "Coin"
   gen_error: "❌ Quelque chose s'est mal passé, impossible de générer les ratios."
   db_error: "❌ Impossible de récuperer les ratios depuis la base de données."
+
 
 next_coin:
   current_price: "Prix actuel"
   target_price: "Prix cible"
+  percentage: "%"
+  coin: "Coin"
   error: "❌ Quelque chose s'est mal passé, impossible de déterminer la prochaine monnaie."
   db_error: "❌ Impossible de récuperer les prochaines monnaies depuis la base de données."
+
 
 history:
   last_x_trades: "**%{trades}** derniers trades:"
@@ -74,6 +78,31 @@ history:
   status: "État : _*%{status}*_"
   error: "❌ Quelque chose s'est mal passé, impossible de générer l'historique de trade."
   db_error: "❌ Impossible de récuperer l'historique des trades depuis la base de données."
+
+
+bot_stats:
+  bot_started:  "Démarré le       : %{date} (il y a %{no_days} jours)"
+  nb_jumps:     "Nb de sauts      :"
+  start_coin:   "Monnaie départ   :"
+  current_coin: "Monnaie actuelle :"
+  hodl:         "Achat & Hold     :"
+  profit:       "Profit du bot    :"
+  min_max_usd:  "Min/Max USD      :"
+  min_max_btc:  "Min/Max BTC      :"
+  coin_progress: "Progression des monnaies :"
+  table:
+    coin: "Coin"
+    from: "From"
+    to: "To"
+  error:
+    db_error: "❌ Impossible de récupérer les statistiques de la base de données"
+    date_error: "❌ Impossible de récupérer les informations de date" 
+    empty_trade_history: "❌ L'historique de trade est vide. Attendes que des trades se fasse pour en obtenir."
+    first_coin_error: "❌ Impossible de récuperer la monnaie de départ depuis la base de données."
+    current_coin_error: "❌ Impossible de récuperer la monnaie actuelle depuis la base de données."
+    value_error: "❌ Impossible de récupérer des infos depuis la base de donnée. Message d'erreur : `%{error_code}`."
+    start_coin_not_found: "❌ La monnaie de départ ne peut pas être trouvée dans la liste de monnaies supportée"
+
 
 btb:
   not_running: "⚠ Le bot de trading n'est pas lancé ."
@@ -92,7 +121,7 @@ btb:
 
 log:
   error: "❌ Impossible de trouver les logs ici : `%{path}`."
-
+  last_4000_characters: "Dernier *4000* caractères dans le fichier de log :"
 
 
 panic:
@@ -111,6 +140,7 @@ panic:
   limit_sell_price: "Ordre limite au prix de :"
   error: "❌ Quelque chose s' est mal passé, le panic button ne fonctionne pas."
   db_error: "❌ Impossible de réaliser les actions nécéssaires sur la base de données."
+
 
 coin_list:
   success: "✔ La liste de monnaies a été changé en :"
@@ -177,6 +207,34 @@ script:
   no_config: "Impossible de trouver le fichier `custom_scripts.json`."
   select: "Sélectionnez l'un de vos script."
 
+
+snapshot:
+  error: "❌ Impossible d'effectuer un cliché de votre compte binance pour le moment. Message d'erreur :"
+
+
+graph:
+  msg_existing_graphs: "Choisissez un graphique ou créez-en un nouveau. La syntaxe est MONNAIE1,MONNAIE2,MONNAIE3 NombreDeJours"
+  msg_no_graphs: "Utilisez le bouton 'Nouveau graphique' pour créer un nouveau graphique."
+  error: "Une erreur a eu lieu lors de la génération du graphique. Merci de signaler cette erreur. Message d'erreur :"
+  relative_amount: "Évolution relative en quantité (%)"
+  amount: "Quantité"
+  relative_price: "Évolution relative du prix en %{currency} (%)"
+  price: "Prix en %{currency}"
+  exit: "👌 Sorti"
+  not_enough_points: "Aucun graphique ne peut être généré car moins d'une sauvegarde du portefeuille est disponible. Merci de patienter une heure qu'une nouvelle sauvegarde soit faite."
+  bad_graph: "La commande que vous avez rentrée est mal formatée, veuillez réessayer."
+  new_graph:
+    a: "Ecrivez le graphique que vous voulez créer"
+    b: "La syntaxe est la suivante ! `MONNAIE1,MONNAIE2,... NombreDeJours`"
+    c: "Si `NombreDeJours` est mis à 0, le graphique va être fait sur l'intégralité de l'historique"
+    d: "Si la liste de monnaies est remplacée par `*`, tous les monnaies enregistrées vont être tracées"
+    e: "Exemples :"
+    f: "`USD 7` va tracer la valeur de votre portefeuille en USD sur les 7 derniers jours"
+    g: "`USD,BTC 0` va tracer la valeur de votre portefeuille en USD et en BTC sur l'intégralité de l'historique enregistré"
+    h: "`* 14` va tracer la valeur de votre portefeuille exprimée sur toutes les monnaies enregistrées sur les 14 derniers jours"
+    i: "Écrivez `/stop` pour sortir"
+
+
 keyboard:
   current_value: "💵 Valeur actuelle"
   progress: "📈 Progression"
@@ -184,6 +242,7 @@ keyboard:
   trade_history: "⌛ Historique des trades"
   panic: "🚨 Panic button"
   check_status: "🔍 Verifier l'état du bot"
+  bot_stats: "🚀 Stats du bot"
   maintenance: "🛠 Maintenance"
   configurations: "⚙️ Configurations"
   start: "▶ Démarrer le bot de trading"
@@ -209,3 +268,5 @@ keyboard:
   confirm: "⚠ Confirmer"
   stop_bot: "⚠ Arrêter le bot"
   next_coin: "🔀 Prochaine monnaie"
+  graph: "📊 Graphiques"
+  new_graph: "➕ Nouveau graphique"

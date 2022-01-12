@@ -11,7 +11,7 @@ select_option: "Bitte wähle eine der Optionen aus."
 welcome:
   hello: "Hallo *%{name}*!"
   welcome: "Willkommen beim _Binance Trade Bot Manager Telegramm_."
-  developed_by: "Dieser Telegram Bot wurder von @lorcalhost entwickelt."
+  developed_by: "Dieser Telegram Bot wurder von %{contributors} entwickelt."
   project_link: "Finde [hier](https://github.com/lorcalhost/BTB-manager-telegram) mehr über das Projekt heraus."
   donation: "*Wenn du meine Arbeit magst, [überlege bitte das Projekt mit einer kleinen Spende zu unterstützen](https://github.com/sponsors/lorcalhost). ❤*"
   how_to_start: "*Zum Starten der Unterhaltung, klicke auf die Schaltfläche `/start`*"
@@ -39,8 +39,6 @@ value:
   value_usd: "- Wert in *USD*: `%{value}` *USD*"
   value_btc: "- Wert in *BTC*: `%{value}` *BTC*"
   bought_for: "_Gekauft für_ `%{value}` *%{coin}*"
-  one_day_change_btc: "1 Tag Änderung BTC: `%{value}` %"
-  seven_day_change_btc: "7 Tage Änderung BTC: `%{value}` %"
 
 
 progress:
@@ -80,6 +78,24 @@ history:
   error: "❌ Etwas ist schief gelaufen, Handelshistorie kann derzeit nicht erstellt werden."
   db_error: "❌ Handelshistorie kann nicht aus der Datenbank abgerufen werden."
 
+
+bot_stats:
+  bot_started: "Bot startete  :"
+  no_days: "Nr von Tagen   :"
+  no_jumps: "Nr von Sprüngen  :"
+  start_coin: "Start-Coin   :"
+  current_coin: "Aktueller Coin :"
+  hodl: "HODL¹        :"
+  profit: "Profit       :"
+  start_coin_not_found_in_supported_list: "Bot-Start-Coin ist %{firstTradeCoin} wird aber derzeit nicht in der Coin-Liste gefunden."
+  start_coin_not_found: "Bot-Start-Coin kann nicht in der Coin-Liste gefunden werden."
+  coin_progress: "Coin Fortschritt:"
+  table:
+    coin: "Coin"
+    from: "Von"
+    to: "Bis"
+  HODL_explanation: "Stellt dar, was du derzeit hättest, wenn du einfach deine Startmünze halten würdest"
+  db_error: "❌ Statistik kann nicht aus der Datenbank abgerufen werden"
 
 btb:
   not_running: "⚠ Binance Trade Bot läuft nicht."
@@ -184,6 +200,9 @@ script:
   no_config: "Die Datei `custom_scripts.json` kann im `config/`-Verzeichnis von *BTB-manager-telegram* nicht gefunden werden."
   select: "Wähle eines deiner benutzerdefinierten Skripts aus, um es auszuführen."
 
+snapshot:
+  error: "❌ Momentan kann kein Snapshot des Binance-Kontos erstellt werden. Fehlermeldung:"
+
 graph:
   msg_existing_graphs: "Wähle ein Graph oder erstelle ein neuen. Hinweis : Hinweis: Das Syntax ist 'COIN1,COIN2,COIN3 AnzahlTage'"
   msg_no_graphs: "Benutze die 'Neuer Graph' Schaltfläche zum Erstellen eines neuen Graph."
@@ -213,6 +232,7 @@ keyboard:
   trade_history: "⌛ Handelshistorie"
   panic: "🚨 Panikknopf"
   check_status: "🔍 Bot-Status prüfen"
+  bot_stats: "🚀 Bot Statistiken"
   maintenance: "🛠 Wartung"
   configurations: "⚙️ Konfiguration"
   start: "▶ Starte Handelsbot"
