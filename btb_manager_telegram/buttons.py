@@ -541,43 +541,35 @@ def bot_stats():
         numDays = (end_date - start_date).days
 
         # get first trade and its bridge - all stats must be in this bridge
-        initialCoinID = ""
-        try:
-            cur.execute(
-                f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount, crypto_trade_amount
-                FROM 'trade_history'
-                WHERE id=1 and state='COMPLETE'
-                ORDER BY id ASC LIMIT 1;"""
-            )
-            (
-                initialCoinID,
-                initialCoinbridgeID,
-                initialCoinAmount,
-                initialCoinFiatValue,
-            ) = cur.fetchone()
-
-        except Exception as e:
-            logger.error(
-                f"Unable to perform actions on the database: {e}", exc_info=True
-            )
+        cur.execute(
+            f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount, crypto_trade_amount
+            FROM 'trade_history'
+            WHERE id=1 and state='COMPLETE'
+            ORDER BY id ASC LIMIT 1;"""
+        )
+        query = cur.fetchone()
+        if query is None:
+            logger.error(i18n_format("bot_stats.error.first_coin_error"))
             message = [i18n_format("bot_stats.error.first_coin_error")]
             return message
-
-        try:
-            cur.execute(
-                f"""SELECT alt_coin_id, alt_trade_amount
-                    FROM 'trade_history'
-                    WHERE selling=0 and state='COMPLETE'
-                    ORDER BY id DESC LIMIT 1;"""
-            )
-            currentCoinID, currentCoinAmount = cur.fetchone()
-
-        except Exception as e:
-            logger.error(
-                f"Unable to perform actions on the database: {e}", exc_info=True
-            )
+        (
+            initialCoinID,
+            initialCoinbridgeID,
+            initialCoinAmount,
+            initialCoinFiatValue,
+        ) = query
+            
+        cur.execute(
+            f"""SELECT alt_coin_id, alt_trade_amount
+            FROM 'trade_history'
+            WHERE selling=0 and state='COMPLETE'
+            ORDER BY id DESC LIMIT 1;"""
+        )
+        if query is None:
+            logger.error(i18n_format("bot_stats.error.current_coin_error"))
             message = [i18n_format("bot_stats.error.current_coin_error")]
             return message
+        currentCoinID, currentCoinAmount = cur.fetchone()
 
         displayCurrency = (
             "$" if initialCoinbridgeID in stableCoins else initialCoinbridgeID
