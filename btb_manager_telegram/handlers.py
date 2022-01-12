@@ -339,6 +339,29 @@ def menu(update: Update, _: CallbackContext) -> int:
     return MENU
 
 
+def start(update: Update, _: CallbackContext) -> int:
+    logger.info("Started conversation.")
+
+    keyboard = [["Begin"]]
+    message = (
+        f"Hi *{escape_markdown(update.message.from_user.first_name, version=2)}*\!\n"
+        f"Welcome to _Binace Trade Bot Manager Telegram_\.\n\n"
+        f"This Telegram bot was developed by @lorcalhost\.\n"
+        f"Find out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)\.\n\n"
+        f"If you like the bot please [consider supporting the project 🍻](https://www.buymeacoffee.com/lorcalhost)\."
+    )
+    reply_markup = ReplyKeyboardMarkup(
+        keyboard, one_time_keyboard=True, resize_keyboard=True
+    )
+    update.message.reply_text(
+        message,
+        reply_markup=reply_markup,
+        parse_mode="MarkdownV2",
+        disable_web_page_preview=True,
+    )
+    return MENU
+
+
 def edit_coin(update: Update, _: CallbackContext) -> int:
     logger.info(f"Editing coin list. ({update.message.text})")
 
@@ -558,9 +581,9 @@ def panic(update: Update, _: CallbackContext) -> int:
 
         # Get last trade
         cur.execute(
-            """SELECT alt_coin_id, crypto_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1;"""
+            """SELECT alt_coin_id, crypto_coin_id, crypto_starting_balance FROM trade_history ORDER BY datetime DESC LIMIT 1;"""
         )
-        alt_coin_id, crypto_coin_id = cur.fetchone()
+        alt_coin_id, crypto_coin_id, crypto_amount = cur.fetchone()
 
         # Get Binance api keys and tld
         user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
@@ -571,39 +594,47 @@ def panic(update: Update, _: CallbackContext) -> int:
             api_secret_key = config.get("binance_user_config", "api_secret_key")
             tld = config.get("binance_user_config", "tld")
 
-        if update.message.text != i18n_format("keyboard.stop_sell"):
+        if update.message.text == i18n_format("keyboard.stop_sell"):
             params = {
                 "symbol": f"{alt_coin_id}{crypto_coin_id}",
                 "side": "SELL",
                 "type": "MARKET",
+                "quantity": crypto_amount,
             }
-            message = send_signed_request(
-                api_key,
-                api_secret_key,
-                f"https://api.binance.{tld}",
-                "POST",
-                "/api/v3/order",
-                payload=params,
+            message = escape_markdown(
+                "`"
+                + send_signed_request(
+                    api_key,
+                    api_secret_key,
+                    f"https://api.binance.{tld}",
+                    "POST",
+                    "/api/v3/order",
+                    payload=params,
+                )
+                + "`",
+                version=2,
             )
 
         if update.message.text != i18n_format("keyboard.stop_cancel"):
             params = {"symbol": f"{alt_coin_id}{crypto_coin_id}"}
-            message = send_signed_request(
-                api_key,
-                api_secret_key,
-                f"https://api.binance.{tld}",
-                "DELETE",
-                "/api/v3/openOrders",
-                payload=params,
+            message = escape_markdown(
+                "`"
+                + send_signed_request(
+                    api_key,
+                    api_secret_key,
+                    f"https://api.binance.{tld}",
+                    "DELETE",
+                    "/api/v3/openOrders",
+                    payload=params,
+                )
+                + "`",
+                version=2,
             )
 
-        if update.message.text != i18n_format("keyboard.stop_bot"):
+        if update.message.text == i18n_format("keyboard.stop_bot"):
             message = i18n_format("killed_bot")
     else:
-        message = (
-            f"{i18n_format('exited_no_change')}\n"
-            f"{i18n_format('update.btb.not_updated')}"
-        )
+        message = i18n_format('panic.exited')
 
     reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
     return MENU
