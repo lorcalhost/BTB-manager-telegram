@@ -27,17 +27,6 @@ def format_float(num):
     return f"{num:0.8f}".rstrip("0").rstrip(".")
 
 
-def i18n_format(key, **kwargs):
-    for k, val in kwargs.items():
-        try:
-            float(val)
-            val = format_float(val)
-        except:
-            pass
-        kwargs[k] = str(val)
-    return i18n.t(key, **kwargs)
-
-
 def escape_tg(message):
     escape_char = (".", "-", "?", "!", ">", "{", "}", "=", "+", "|")
     escaped_message = ""
@@ -234,8 +223,8 @@ def update_checker():
             logger.info("BTB Manager Telegram update found.")
 
             message = (
-                f"{i18n_format('update.tgb.available')}\n\n"
-                f"{i18n_format('update.tgb.instruction')}"
+                f"{i18n.t('update.tgb.available')}\n\n"
+                f"{i18n.t('update.tgb.instruction')}"
             )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
@@ -251,8 +240,8 @@ def update_checker():
             logger.info("Binance Trade Bot update found.")
 
             message = (
-                f"{i18n_format('update.btb.available')}\n\n"
-                f"{i18n_format('update.btb.instruction')}"
+                f"{i18n.t('update.btb.available')}\n\n"
+                f"{i18n.t('update.btb.instruction')}"
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
@@ -290,7 +279,7 @@ def get_custom_scripts_keyboard():
     custom_scripts_path = "./config/custom_scripts.json"
     keyboard = []
     custom_script_exist = False
-    message = i18n_format("script.no_script")
+    message = i18n.t("script.no_script")
 
     if os.path.exists(custom_scripts_path):
         with open(custom_scripts_path) as f:
@@ -300,12 +289,12 @@ def get_custom_scripts_keyboard():
 
         if len(keyboard) >= 1:
             custom_script_exist = True
-            message = i18n_format("script.select")
+            message = i18n.t("script.select")
     else:
         logger.warning(
             "Unable to find custom_scripts.json file inside BTB-manager-telegram's config/ directory."
         )
-        message = i18n_format("script.no_config")
+        message = i18n.t("script.no_config")
 
-    keyboard.append([i18n_format("keyboard.cancel")])
+    keyboard.append([i18n.t("keyboard.cancel")])
     return keyboard, custom_script_exist, message
