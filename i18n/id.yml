@@ -1,5 +1,5 @@
 exited_no_change: "👌 Keluar tanpa melakukan perubahan."
-stop_to_stop: "Ketik /stop untuk berhenti mengubah dan keluar tanpa melakukan perubahan."
+stop_to_stop: "Ketik */stop* untuk berhenti mengubah dan keluar tanpa melakukan perubahan."
 bye: "Sampai jumpa! semoga kita bisa berbincang lagi nanti."
 killed_bot: "Menghentikan _Binance Trade Bot_!"
 logging_enabled_error: "⚠ Pastikan logging untuk _Binance Trade Bot_ telah diaktifkan."
@@ -81,24 +81,31 @@ history:
 
 
 bot_stats:
-  bot_started: "Tanggal Awal Bot:"
-  no_days: "Jumlah Hari     :"
+  bot_started: "Tanggal Mulai   : %{date} (%{no_days} days ago)"
   no_jumps: "Jumlah Lompatan :"
   start_coin: "Koin Permulaan  :"
   current_coin: "Koin Saat Ini   :"
   hodl: "HODL¹           :"
   profit: "Profit          :"
-  start_coin_not_found_in_supported_list: "Koin awal Bot adalah %{firstTradeCoin} namun saat ini tidak terdaftar di file _*supported_coin_list*_."
-  start_coin_not_found: "Koin awal tidak ditemukan di file _*supported_coin_list*_."
-  coin_progress: "Progress koin:"
+  min_max_usd: "Min/Max USD     :"
+  min_max_btc: "Min/Max BTC     :"
+  coin_progress: "Progress koin   :"
+  HODL_explanation: "Mewakili nilai yang akan kamu miliki jika kamu hanya HOLD koin awal kamu"
   table:
     coin: "Koin"
-    from: "Jumlah Awal"
-    to: "Jumlah Saat Ini"
-  HODL_explanation: "Mewakili nilai yang akan kamu miliki jika kamu hanya HOLD koin awal kamu"
-  db_error: "❌ Tidak dapat menampilkan statistik dari database."
+    from: "Awal"
+    to: "Saat Ini"
+  error:
+    db_error: "❌ Gagal menampilkan statistik dari database."
+    date_error: "❌ Gagal menampilkan informasi tanggal."
+    empty_trade_history: "❌ Riwayat perdagangan kosong, mohon menunggu perdagangan masuk dalam perhitungan statistik."
+    first_coin_error: "❌ Tidak dapat memperoleh data koin awal dari database."
+    current_coin_error: "❌ Tidak dapat memperoleh data koin saat ini dari database."
+    value_error: "❌ Gagal mendapatkan info dari database. Kode kesalahan = `%{error_code}`."
+    no_progress: "Tidak ada data perkembangan yang bisa ditampilkan, karena perdagangan belum dilakukan."
+    start_coin_not_found: "Koin awal Bot tidak ditemukan di dalam file supported coin list."
   
-  btb:
+btb:
   not_running: "⚠ Binance Trade Bot tidak berjalan."
   running: "✔ Binance Trade Bot berjalan."
   already_running: "⚠ Binance Trade Bot telah berjalan."
@@ -119,13 +126,13 @@ log:
 
 
 panic:
-  holding: "Saat ini kamu memiliki `%{amount1}` *%{coin1}* yang dibeli pada `%{amount2}` *%{coin2}*."
+  holding: "Saat ini kamu memiliki `%{amount1}` *%{coin1}* yang dibeli seharga `%{amount2}` *%{coin2}*."
   rate_when_bought: "Harga saat pembelian:"
   current_rate: "Harga saat ini:"
   current_value: "Jumlah saat ini:"
   change: "Selisih:"
-  stop_and_sell: "Apakah kamu ingin mematikan _Binance Trade Bot_ dan menjual sesuai dengan harga market saat ini?"
-  open_buy_order: "Kamu memiliki pembelian yang masih berjalan sebesar `%{amount1}` *%{coin1}* untuk `%{amount2}` *%{coin2}*."
+  stop_and_sell: "Apakah kamu ingin mematikan _Binance Trade Bot_ dan menjual sesuai harga market sekarang?"
+  open_buy_order: "Kamu memiliki pembelian yang masih berjalan sebesar `%{amount1}` *%{coin1}* seharga `%{amount2}` *%{coin2}*."
   limit_buy_price: "Batas harga pembelian:"
   stop_and_cancel: "Apakah kamu ini mematikan _Binance Trade Bot_ dan membatalkan pembelian yang masih berjalan?"
   order_already_complete: "Saldo kamu saat ini *%{coin}*."
@@ -172,11 +179,10 @@ db:
 
 
 update:
-  now: "Apakah kamu ingin memperbarui Telegram Bot sekarang?"
-
+  now: "Apakah kamu ingin memperbarui sekarang?"
   tgb:
-    updating: "Telegram Manager sedang diperbarui. Harap tunggu sejenak sebelum dijalankan ulang."
-    version_error: "Terjadi kesalahan saat mencoba mengunduh informasi versi Telegram Manager."
+    updating: "Telegram Manager sedang diperbarui. Harap tunggu sejenak sebelum memulai Telegram Manager lagi."
+    version_error: "Terjadi kesalahan saat memeriksa informasi versi Telegram Manager."
     error: "Tidak dapat memperbarui Telegram Manager"
     not_updated: "Telegram Manager *tidak* diperbarui."
     up_to_date: "Telegram Manager kamu saat ini adalah versi terbaru."
