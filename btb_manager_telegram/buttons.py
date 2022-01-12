@@ -558,7 +558,7 @@ def bot_stats():
             initialCoinAmount,
             initialCoinFiatValue,
         ) = query
-            
+
         cur.execute(
             f"""SELECT alt_coin_id, alt_trade_amount
             FROM 'trade_history'
