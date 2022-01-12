@@ -503,7 +503,7 @@ def bot_stats():
         return message
     message = ""
 
-    displayCurrencySymbols = {"BTC": "₿", "USDT": "$", "BUSD": "$"}
+    stableCoins = ["USDT", "USD", "BUSD", "USDC", "DAI"]
 
     try:
         con = sqlite3.connect(db_file_path)
@@ -531,7 +531,14 @@ def bot_stats():
             message = [i18n_format("bot_stats.error.empty_trade_history")]
             return message
 
+        cur.execute("SELECT count(*) FROM trade_history WHERE selling=0")
+        numCoinJumps = cur.fetchall()[0][0]
+
         reports = get_previous_reports()
+
+        start_date = datetime.strptime(bot_start_date[2:], "%y-%m-%d %H:%M:%S.%f")
+        end_date = datetime.strptime(bot_end_date[2:], "%y-%m-%d %H:%M:%S.%f")
+        numDays = (end_date - start_date).days
 
         # get first trade and its bridge - all stats must be in this bridge
         initialCoinID = ""
@@ -542,99 +549,77 @@ def bot_stats():
                 WHERE id=1 and state='COMPLETE'
                 ORDER BY id ASC LIMIT 1;"""
             )
-            query = cur.fetchone()
             (
                 initialCoinID,
                 initialCoinbridgeID,
                 initialCoinAmount,
                 initialCoinFiatValue,
-            ) = query
+            ) = cur.fetchone()
 
-            if initialCoinbridgeID in displayCurrencySymbols:
-                displayCurrency = displayCurrencySymbols[initialCoinbridgeID]
-            else:
-                displayCurrency = initialCoinbridgeID
-
-            # calculate current live price of initial/start coin
-            initialCoinLiveUSDTPrice = initialCoinLiveBridgePrice = get_current_price(
-                initialCoinID, "USDT"
+        except Exception as e:
+            logger.error(
+                f"Unable to perform actions on the database: {e}", exc_info=True
             )
-            if initialCoinbridgeID != "USDT":
-                initialCoinLiveBridgePrice = get_current_price(
-                    initialCoinID, "USDT"
-                ) / get_current_price(initialCoinbridgeID, "USDT")
-
-            initialCoinLiveBridgeValue = (
-                initialCoinAmount * initialCoinLiveBridgePrice
-            )  # this is the buy & hold value
-
-        except:
-            logger.error("Unable to retreieve information of bot's first trade.")
             message = [i18n_format("bot_stats.error.first_coin_error")]
             return message
 
-        # get current coin - calcualate equivalent value in initial coin bridge
         try:
             cur.execute(
-                f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount
+                f"""SELECT alt_coin_id, alt_trade_amount
                     FROM 'trade_history'
                     WHERE selling=0 and state='COMPLETE'
                     ORDER BY id DESC LIMIT 1;"""
             )
-            query = cur.fetchone()
-            currentCoinID, currentCoinBridgeID, currentCoinAmount = query
-
-        except:
-            logger.error("Unable to retrieve current coin info.")
-            message = [i18n_format("bot_stats.error.current_coin_error")]
-            return message
-
-        try:
-            # calculate current live price of current coin
-            currentCoinLiveUSDTPrice = currentCoinLiveBridgePrice = get_current_price(
-                currentCoinID, "USDT"
-            )
-            if initialCoinbridgeID != "USDT":
-                currentCoinLiveBridgePrice = get_current_price(
-                    currentCoinID, "USDT"
-                ) / get_current_price(initialCoinbridgeID, "USDT")
-
-            currentCoinLiveBridgeValue = currentCoinAmount * currentCoinLiveBridgePrice
+            currentCoinID, currentCoinAmount = cur.fetchone()
 
         except Exception as e:
             logger.error(
-                f"❌ Unable to perform actions on the database: {e}", exc_info=True
+                f"Unable to perform actions on the database: {e}", exc_info=True
             )
             message = [i18n_format("bot_stats.error.current_coin_error")]
             return message
 
-        start_date = datetime.strptime(bot_start_date[2:], "%y-%m-%d %H:%M:%S.%f")
-        end_date = datetime.strptime(bot_end_date[2:], "%y-%m-%d %H:%M:%S.%f")
-        numDays = (end_date - start_date).days
+        displayCurrency = (
+            "$" if initialCoinbridgeID in stableCoins else initialCoinbridgeID
+        )
 
-        cur.execute("SELECT count(*) FROM trade_history WHERE selling=0")
-        numCoinJumps = cur.fetchall()[0][0]
+        if initialCoinbridgeID in stableCoins:
+            initialCoinLiveBridgePrice = get_current_price(initialCoinID, "USDT")
+            currentCoinLiveBridgePrice = get_current_price(currentCoinID, "USDT")
+        else:
+            initialCoinLiveBridgePrice = get_current_price(
+                initialCoinID, "USDT"
+            ) / get_current_price(initialCoinbridgeID, "USDT")
+            currentCoinLiveBridgePrice = get_current_price(
+                currentCoinID, "USDT"
+            ) / get_current_price(initialCoinbridgeID, "USDT")
+
+        initialCoinLiveBridgeValue = (
+            initialCoinAmount * initialCoinLiveBridgePrice
+        )  # buy & hold value
+
+        currentCoinLiveBridgeValue = currentCoinAmount * currentCoinLiveBridgePrice
 
         message += f"`{i18n_format('bot_stats.bot_started', date=start_date.strftime('%d/%m/%y'), no_days=numDays)}"
-        message += f"\n{i18n_format('bot_stats.no_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"
+        message += f"\n{i18n_format('bot_stats.nb_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"
 
         if initialCoinID != "":
-            message += "\n{} {:.4f} {} / {} {:.3f}".format(
+            message += "\n{} {:.4f} {} / {:.3f} {}".format(
                 i18n_format("bot_stats.start_coin"),
                 initialCoinAmount,
                 initialCoinID,
-                displayCurrency,
                 initialCoinFiatValue,
+                displayCurrency,
             )
         else:
             message += f"\n{i18n_format('bot_stats.start_coin')} -- / --"
 
-        message += "\n{} {:.4f} {} / {} {:.3f}".format(
+        message += "\n{} {:.4f} {} / {:.3f} {}".format(
             i18n_format("bot_stats.current_coin"),
             currentCoinAmount,
             currentCoinID,
-            displayCurrency,
             currentCoinLiveBridgeValue,
+            displayCurrency,
         )
 
         if initialCoinID != "":
@@ -657,26 +642,26 @@ def bot_stats():
 
             message += "\n{} {}{:.2f}% {} / {}{:.2f}% {}".format(
                 i18n_format("bot_stats.profit"),
-                "+" if changeFiat >= 0 else "",
-                changeFiat,
-                displayCurrency,
                 "+" if changeStartCoin >= 0 else "",
                 changeStartCoin,
                 initialCoinID,
+                "+" if changeFiat >= 0 else "",
+                changeFiat,
+                displayCurrency,
             )
-            message += "\n{} {:.4f} {} / {} {:.3f}".format(
+            message += "\n{} {:.4f} {} / {:.3f} {}".format(
                 i18n_format("bot_stats.hodl"),
                 initialCoinAmount,
                 initialCoinID,
-                displayCurrency,
                 initialCoinLiveBridgeValue,
+                displayCurrency,
             )
 
         else:
             message += f"\n{i18n_format('bot_stats.hodl')} -- / --"
 
         if initialCoinID == "":
-            message += f"\n{i18n_format('bot_stats.start_coin_not_found')}"
+            message += f"\n{i18n_format('bot_stats.error.start_coin_not_found')}"
 
         max_usd = max(reports, key=lambda a: a["total_usdt"])["total_usdt"]
         min_usd = min(reports, key=lambda a: a["total_usdt"])["total_usdt"]
