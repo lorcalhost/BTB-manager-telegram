@@ -3,7 +3,7 @@ import sqlite3
 import subprocess
 import time
 from configparser import ConfigParser
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
@@ -68,25 +68,6 @@ def current_value():
                         ORDER BY datetime DESC LIMIT 1;"""
                 )
                 query = cur.fetchone()
-
-                cur.execute(
-                    """SELECT cv.balance, cv.usd_price
-                        FROM coin_value as cv
-                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
-                        AND cv.datetime < (SELECT th.datetime FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-1 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
-                        ORDER BY cv.datetime DESC LIMIT 1;"""
-                )
-                query_1_day = cur.fetchone()
-
-                cur.execute(
-                    """SELECT cv.balance, cv.usd_price
-                        FROM coin_value as cv
-                        WHERE cv.coin_id = (SELECT th.alt_coin_id FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
-                        AND cv.datetime < (SELECT th.datetime FROM trade_history as th WHERE th.datetime < DATETIME ('now', '-7 day') AND th.selling = 0 ORDER BY th.datetime DESC LIMIT 1)
-                        ORDER BY cv.datetime DESC LIMIT 1;"""
-                )
-                query_7_day = cur.fetchone()
-
                 if query is None:
                     return [
                         i18n_format("value.no_information", current_coin=current_coin),
@@ -102,39 +83,38 @@ def current_value():
                     btc_price = 0
                 last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
 
-                return_rate_1_day, return_rate_7_day = 0, 0
-                balance_1_day, usd_price_1_day, balance_7_day, usd_price_7_day = (
-                    0,
-                    0,
-                    0,
-                    0,
-                )
+                reports = get_previous_reports()
+                reports.reverse()
 
-                if (
-                    query_1_day is not None
-                    and all(elem is not None for elem in query_1_day)
-                    and usd_price != 0
-                ):
-                    balance_1_day, usd_price_1_day = query_1_day
-                    return_rate_1_day = round(
-                        (balance * usd_price - balance_1_day * usd_price_1_day)
-                        / (balance_1_day * usd_price_1_day)
-                        * 100,
-                        2,
-                    )
+                days_deltas = [1, 7, 30]
+                return_rates = []
+                amount_btc_now = balance * btc_price
+                ts_now = int(last_update.timestamp())
+                delta = days_deltas[0]
+                for report in reports:
+                    if ts_now - report["time"] > timedelta(days=delta).total_seconds():
+                        if (
+                            ts_now
+                            - report["time"]
+                            - timedelta(days=delta).total_seconds()
+                            < timedelta(hours=2).total_seconds()
+                            and report["total_usdt"] > 0
+                        ):
+                            amount_btc_old = (
+                                report["total_usdt"] / report["tickers"]["BTC"]
+                            )
+                            rate = (amount_btc_now - amount_btc_old) / amount_btc_old
+                            rate_str = "+" if rate >= 0 else ""
+                            rate_str += str(round(rate * 100, 2))
+                            rate_str += " %"
+                        else:
+                            rate_str = "N/A"
+                        return_rates.append(rate_str)
+                        if len(return_rates) == len(days_deltas):
+                            break
+                        delta = days_deltas[len(return_rates)]
+                return_rates += ["N/A"] * (len(days_deltas) - len(return_rates))
 
-                if (
-                    query_7_day is not None
-                    and all(elem is not None for elem in query_7_day)
-                    and usd_price != 0
-                ):
-                    balance_7_day, usd_price_7_day = query_7_day
-                    return_rate_7_day = round(
-                        (balance * usd_price - balance_7_day * usd_price_7_day)
-                        / (balance_7_day * usd_price_7_day)
-                        * 100,
-                        2,
-                    )
             except Exception as e:
                 logger.error(
                     f"❌ Unable to fetch current coin information from database: {e}",
@@ -146,7 +126,6 @@ def current_value():
                     i18n_format("value.no_during_trade"),
                 ]
 
-            # Generate message
             try:
                 m_list = [
                     f"\n{i18n_format('value.last_update', update=last_update.strftime('%H:%M:%S %d/%m/%Y'))}\n\n",
@@ -157,10 +136,13 @@ def current_value():
                     f"\t{i18n_format('value.value_change', change=round((balance * usd_price - buy_price) / buy_price * 100, 2))}\n",
                     f"\t{i18n_format('value.value_usd', value=round(balance * usd_price, 2))}\n",
                     f"\t{i18n_format('value.value_btc', value=round(balance * btc_price, 5))}\n\n",
-                    f"{i18n_format('value.bought_for', value=round(buy_price, 2), coin=bridge)}\n"
-                    f"{i18n_format('value.one_day_change_btc', value=return_rate_1_day)}\n",
-                    f"{i18n_format('value.seven_day_change_btc', value=return_rate_7_day)}\n",
+                    f"{i18n_format('value.bought_for', value=round(buy_price, 2), coin=bridge)}\n",
                 ]
+                for i_delta, delta in enumerate(days_deltas):
+                    m_list.append(
+                        f"{i18n_format('value.change_btc', days=delta, value=return_rates[i_delta])}\n"
+                    )
+
                 message = telegram_text_truncator(m_list)
                 con.close()
             except Exception as e:
@@ -637,30 +619,27 @@ def bot_stats():
         return message
     message = ""
 
-    displayCurrencySymbols = {"BTC": "₿", "USDT": "$", "BUSD": "$"}
+    stableCoins = ["USDT", "USD", "BUSD", "USDC", "DAI"]
 
     try:
         con = sqlite3.connect(db_file_path)
-
         cur = con.cursor()
-
-        cur.execute("SELECT symbol FROM coins WHERE enabled=1")
-        coinList = cur.fetchall()  # access with coinList[Index][0]
-        numCoins = len(coinList)
 
         cur.execute(
             "SELECT datetime FROM trade_history WHERE selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
         )
-        bot_start_date = retrieve_value_db(cur.fetchall())
-        if bot_start_date == None:
+        query = cur.fetchall()
+        if len(query) == 0:
             message = [i18n_format("bot_stats.error.date_error")]
             return message
+        bot_start_date = query[0][0]
 
         cur.execute("SELECT datetime FROM scout_history ORDER BY id DESC LIMIT 1")
-        bot_end_date = retrieve_value_db(cur.fetchall())
-        if bot_end_date == None:
+        query = cur.fetchall()
+        if len(query) == 0:
             message = [i18n_format("bot_stats.error.date_error")]
             return message
+        bot_end_date = query[0][0]
 
         cur.execute("SELECT * FROM trade_history ")
         lenTradeHistory = len(cur.fetchall())
@@ -668,110 +647,85 @@ def bot_stats():
             message = [i18n_format("bot_stats.error.empty_trade_history")]
             return message
 
-        # get first trade and its bridge - all stats must be in this bridge
-        initialCoinID = ""
-        try:
-            cur.execute(
-                f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount, crypto_trade_amount
-                FROM 'trade_history'
-                WHERE id=1 and state='COMPLETE'
-                ORDER BY id ASC LIMIT 1;"""
-            )
-            query = cur.fetchone()
-            (
-                initialCoinID,
-                initialCoinbridgeID,
-                initialCoinAmount,
-                initialCoinFiatValue,
-            ) = query
+        cur.execute("SELECT count(*) FROM trade_history WHERE selling=0")
+        numCoinJumps = cur.fetchall()[0][0]
 
-            if initialCoinbridgeID in displayCurrencySymbols:
-                displayCurrency = displayCurrencySymbols[initialCoinbridgeID]
-            else:
-                displayCurrency = initialCoinbridgeID
+        reports = get_previous_reports()
 
-            # calculate current live price of initial/start coin
-            initialCoinLiveUSDTPrice = initialCoinLiveBridgePrice = get_current_price(
-                initialCoinID, "USDT"
-            )
-            if initialCoinbridgeID != "USDT":
-                initialCoinLiveBridgePrice = get_current_price(
-                    initialCoinID, "USDT"
-                ) / get_current_price(initialCoinbridgeID, "USDT")
-
-            initialCoinLiveBridgeValue = (
-                initialCoinAmount * initialCoinLiveBridgePrice
-            )  # this is the buy & hold value
-
-        except:
-            logger.error("Unable to retreieve information of bot's first trade.")
-            message = [i18n_format("bot_stats.error.first_coin_error")]
-            return message
-
-        # get current coin - calcualate equivalent value in initial coin bridge
-        try:
-            cur.execute(
-                f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount
-                    FROM 'trade_history'
-                    WHERE selling=0 and state='COMPLETE'
-                    ORDER BY id DESC LIMIT 1;"""
-            )
-            query = cur.fetchone()
-            currentCoinID, currentCoinBridgeID, currentCoinAmount = query
-
-        except:
-            logger.error("Unable to retrieve current coin info.")
-            message = [i18n_format("bot_stats.error.current_coin_error")]
-            return message
-
-        try:
-            # calculate current live price of current coin
-            currentCoinLiveUSDTPrice = currentCoinLiveBridgePrice = get_current_price(
-                currentCoinID, "USDT"
-            )
-            if initialCoinbridgeID != "USDT":
-                currentCoinLiveBridgePrice = get_current_price(
-                    currentCoinID, "USDT"
-                ) / get_current_price(initialCoinbridgeID, "USDT")
-
-            currentCoinLiveBridgeValue = currentCoinAmount * currentCoinLiveBridgePrice
-
-        except Exception as e:
-            logger.error(
-                f"❌ Unable to perform actions on the database: {e}", exc_info=True
-            )
-            message = [i18n_format("bot_stats.error.current_coin_error")]
-            return message
-
-        # No of Days calculation
         start_date = datetime.strptime(bot_start_date[2:], "%y-%m-%d %H:%M:%S.%f")
         end_date = datetime.strptime(bot_end_date[2:], "%y-%m-%d %H:%M:%S.%f")
         numDays = (end_date - start_date).days
 
-        cur.execute("SELECT count(*) FROM trade_history WHERE selling=0")
-        numCoinJumps = cur.fetchall()[0][0]
+        # get first trade and its bridge - all stats must be in this bridge
+        cur.execute(
+            f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount, crypto_trade_amount
+            FROM 'trade_history' WHERE state='COMPLETE' ORDER BY id ASC LIMIT 1;"""
+        )
+        query = cur.fetchone()
+        if query is None:
+            logger.error(i18n_format("bot_stats.error.first_coin_error"))
+            message = [i18n_format("bot_stats.error.first_coin_error")]
+            return message
+        (
+            initialCoinID,
+            initialCoinbridgeID,
+            initialCoinAmount,
+            initialCoinFiatValue,
+        ) = query
 
-        message += f"""`{i18n_format('bot_stats.bot_started')} {start_date.strftime('%m/%d/%Y, %H:%M:%S')}
-{i18n_format('bot_stats.no_days')} {numDays}
-{i18n_format('bot_stats.no_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"""
+        cur.execute(
+            f"""SELECT alt_coin_id, alt_trade_amount
+            FROM 'trade_history'
+            WHERE selling=0 and state='COMPLETE'
+            ORDER BY id DESC LIMIT 1;"""
+        )
+        if query is None:
+            logger.error(i18n_format("bot_stats.error.current_coin_error"))
+            message = [i18n_format("bot_stats.error.current_coin_error")]
+            return message
+        currentCoinID, currentCoinAmount = cur.fetchone()
+
+        displayCurrency = (
+            "$" if initialCoinbridgeID in stableCoins else initialCoinbridgeID
+        )
+
+        if initialCoinbridgeID in stableCoins:
+            initialCoinLiveBridgePrice = get_current_price(initialCoinID, "USDT")
+            currentCoinLiveBridgePrice = get_current_price(currentCoinID, "USDT")
+        else:
+            initialCoinLiveBridgePrice = get_current_price(
+                initialCoinID, "USDT"
+            ) / get_current_price(initialCoinbridgeID, "USDT")
+            currentCoinLiveBridgePrice = get_current_price(
+                currentCoinID, "USDT"
+            ) / get_current_price(initialCoinbridgeID, "USDT")
+
+        initialCoinLiveBridgeValue = (
+            initialCoinAmount * initialCoinLiveBridgePrice
+        )  # buy & hold value
+
+        currentCoinLiveBridgeValue = currentCoinAmount * currentCoinLiveBridgePrice
+
+        message += f"`{i18n_format('bot_stats.bot_started', date=start_date.strftime('%d/%m/%y'), no_days=numDays)}"
+        message += f"\n{i18n_format('bot_stats.nb_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"
 
         if initialCoinID != "":
-            message += "\n{} {:.4f} {} / {} {:.3f}".format(
+            message += "\n{} {:.4f} {} / {:.3f} {}".format(
                 i18n_format("bot_stats.start_coin"),
                 initialCoinAmount,
                 initialCoinID,
-                displayCurrency,
                 initialCoinFiatValue,
+                displayCurrency,
             )
         else:
             message += f"\n{i18n_format('bot_stats.start_coin')} -- / --"
 
-        message += "\n{} {:.4f} {} / {} {:.3f}".format(
+        message += "\n{} {:.4f} {} / {:.3f} {}".format(
             i18n_format("bot_stats.current_coin"),
             currentCoinAmount,
             currentCoinID,
-            displayCurrency,
             currentCoinLiveBridgeValue,
+            displayCurrency,
         )
 
         if initialCoinID != "":
@@ -794,84 +748,95 @@ def bot_stats():
 
             message += "\n{} {}{:.2f}% {} / {}{:.2f}% {}".format(
                 i18n_format("bot_stats.profit"),
-                "+" if changeFiat >= 0 else "",
-                changeFiat,
-                displayCurrency,
                 "+" if changeStartCoin >= 0 else "",
                 changeStartCoin,
                 initialCoinID,
+                "+" if changeFiat >= 0 else "",
+                changeFiat,
+                displayCurrency,
             )
-            message += "\n{} {:.4f} {} / {} {:.3f}".format(
+            message += "\n{} {:.4f} {} / {:.3f} {}".format(
                 i18n_format("bot_stats.hodl"),
                 initialCoinAmount,
                 initialCoinID,
-                displayCurrency,
                 initialCoinLiveBridgeValue,
+                displayCurrency,
             )
 
         else:
             message += f"\n{i18n_format('bot_stats.hodl')} -- / --"
 
+        if initialCoinID == "":
+            message += f"\n{i18n_format('bot_stats.error.start_coin_not_found')}"
+
+        max_usd = max(reports, key=lambda a: a["total_usdt"])["total_usdt"]
+        min_usd = min(reports, key=lambda a: a["total_usdt"])["total_usdt"]
+        btc_vals = [a["total_usdt"] / a["tickers"]["BTC"] for a in reports]
+        max_btc = max(btc_vals)
+        min_btc = min(btc_vals)
+
+        message += f"\n{i18n_format('bot_stats.min_max_usd')} {round(min_usd,2)} / {round(max_usd,2)}"
+        message += f"\n{i18n_format('bot_stats.min_max_btc')} {round(min_btc,5)} / {round(max_btc,5)}"
         message += "`"
 
-        if initialCoinID == "":
-            message += f"\n{i18n_format('bot_stats.start_coin_not_found')}"
-
-        message += f"\n\n*{i18n_format('bot_stats.coin_progress')}*\n"
         rows = []
-        # Compute Mini Coin Progress
-        for coin in coinList:
+        for coin in settings.COIN_LIST:
             cur.execute(
-                f"SELECT COUNT(*) FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE'"
+                f"SELECT COUNT(*) FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE'"
             )
-            jumps = retrieve_value_db(cur.fetchall())
-            if jumps != None:
-                cur.execute(
-                    f"SELECT datetime FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
-                )
-                first_date = retrieve_value_db(cur.fetchall())
-                if first_date == None:
-                    continue
+            query = cur.fetchall()
+            if len(query) == 0:
+                continue
+            jumps = query[0][0]
 
-                cur.execute(
-                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id ASC LIMIT 1"
-                )
-                first_value = retrieve_value_db(cur.fetchall())
-                if first_value == None:
-                    continue
+            cur.execute(
+                f"SELECT datetime, alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and state='COMPLETE' ORDER BY id ASC LIMIT 1"
+            )
+            query = cur.fetchall()
+            if len(query) == 0:
+                continue
+            first_date, first_value = query[0]
 
-                cur.execute(
-                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin[0]}' and selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
-                )
-                last_value = retrieve_value_db(cur.fetchall())
-                if last_value == None:
-                    continue
+            cur.execute(
+                f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' and selling=0 and state='COMPLETE' ORDER BY id DESC LIMIT 1"
+            )
+            query = cur.fetchall()
+            if len(query) == 0:
+                continue
+            last_value = query[0][0]
 
-                grow = (last_value - first_value) / first_value * 100
-                rows.append(
-                    [
-                        coin[0],
-                        float(first_value),
-                        float(last_value),
-                        str(round(grow, 2)) if grow != 0 else "0",
-                        str(jumps),
-                    ]
-                )
-        table = tabularize(
-            [
-                i18n_format("bot_stats.table.coin"),
-                i18n_format("bot_stats.table.from"),
-                i18n_format("bot_stats.table.to"),
-                "% ±",
-                "<->",
-            ],
-            rows,
-            [4, 8, 8, 8, 3],
-            add_spaces=False,
-            align=["left", "right", "right", "right", "right"],
-        )
-        message = [message]
-        message += table
+            grow = (last_value - first_value) / first_value * 100
+            rows.append(
+                [
+                    coin,
+                    float(first_value),
+                    float(last_value),
+                    str(round(grow, 2)) if grow != 0 else "0",
+                    str(jumps),
+                ]
+            )
+
+        if len(rows) == 0:
+            message += f"\n\n{i18n_format('bot_stats.error.no_progress')}\n"
+            message = [message]
+
+        else:
+            table = tabularize(
+                [
+                    i18n_format("bot_stats.table.coin"),
+                    i18n_format("bot_stats.table.from"),
+                    i18n_format("bot_stats.table.to"),
+                    "% ±",
+                    "<->",
+                ],
+                rows,
+                [4, 8, 8, 8, 3],
+                add_spaces=False,
+                align=["left", "right", "right", "right", "right"],
+            )
+            message += f"\n\n*{i18n_format('bot_stats.coin_progress')}*\n"
+            message = [message]
+            message += table
 
         message = telegram_text_truncator(message)
     except Exception as e:
