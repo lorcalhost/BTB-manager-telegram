@@ -702,7 +702,7 @@ def bot_stats():
             )
 
         if len(rows) == 0:
-            message += f"\n\n{i18n_format('bot_stats.error.no_progress')}\n"
+            message += f"\n\n{i18n_format('bot_stats.error.empty_trade_history')}\n"
             message = [message]
 
         else:

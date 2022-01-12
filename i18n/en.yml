@@ -81,16 +81,15 @@ history:
 
 
 bot_stats:
-  bot_started: "Bot started  : %{date} (%{no_days} days ago)"
-  nb_jumps: "No of Jumps  :"
-  start_coin: "Start Coin   :"
+  bot_started:  "Bot started  : %{date} (%{no_days} days ago)"
+  nb_jumps:     "No of Jumps  :"
+  start_coin:   "Start Coin   :"
   current_coin: "Current Coin :"
-  hodl: "Buy & Hold   :"
-  profit: "Bot Profit   :"
-  min_max_usd: "Min/Max USD  :"
-  min_max_btc: "Min/Max BTC  :"
+  hodl:         "Buy & Hold   :"
+  profit:       "Bot Profit   :"
+  min_max_usd:  "Min/Max USD  :"
+  min_max_btc:  "Min/Max BTC  :"
   coin_progress: "Coin progress:"
-  HODL_explanation: "Represents what you would currently have if you were simply holding on your start coin"
   table:
     coin: "Coin"
     from: "From"
@@ -102,8 +101,7 @@ bot_stats:
     first_coin_error: "❌ Failed to retrieve bot's start coin info from database."
     current_coin_error: "❌ Failed to retrieve bot's current coin info from database."
     value_error: "❌ Error retieving info from db. Error Code = `%{error_code}`."
-    no_progress: "No progress data can be shown, because no trade has been done yet."
-    start_coin_not_found: "Bot start coin not found in supported list."
+    start_coin_not_found: "❌ Bot start coin not found in supported list."
 
 btb:
   not_running: "⚠ Binance Trade Bot is not running."
@@ -207,8 +205,10 @@ script:
   no_config: "Unable to find `custom_scripts.json` file inside *BTB-manager-telegram* 's `config/` directory."
   select: "Select one of your custom scripts to execute it."
 
+
 snapshot:
   error: "❌ Unable to take a snapshot of the binance account for the moment. Error message:"
+
 
 graph:
   msg_existing_graphs: "Choose a graph or create a new one. Hint : the syntax is 'COIN1,COIN2,COIN3 NumberOfDays'"
@@ -231,6 +231,7 @@ graph:
     g: "`USD,BTC 0` will plot your holding represented both in USD and BTC over all the recorded data"
     h: "`* 14` will plot your holdings in all recorded coins over the last 14 days"
     i: "Write `/stop` to exit"
+
 
 keyboard:
   current_value: "💵 Current value"
