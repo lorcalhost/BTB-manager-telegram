@@ -1,6 +1,6 @@
 from telegram import ReplyKeyboardMarkup
 
-from btb_manager_telegram.utils import i18n_format
+import i18n
 
 menu = ReplyKeyboardMarkup(
     [
@@ -16,20 +16,20 @@ menu = ReplyKeyboardMarkup(
 
 config = ReplyKeyboardMarkup(
     [
-        [i18n_format("keyboard.start"), i18n_format("keyboard.stop")],
-        [i18n_format("keyboard.read_logs"), i18n_format("keyboard.delete_db")],
-        [i18n_format("keyboard.edit_cfg"), i18n_format("keyboard.edit_coin_list")],
-        [i18n_format("keyboard.export_db"), i18n_format("keyboard.back")],
+        [i18n.t("keyboard.start"), i18n.t("keyboard.stop")],
+        [i18n.t("keyboard.read_logs"), i18n.t("keyboard.delete_db")],
+        [i18n.t("keyboard.edit_cfg"), i18n.t("keyboard.edit_coin_list")],
+        [i18n.t("keyboard.export_db"), i18n.t("keyboard.back")],
     ],
     resize_keyboard=True,
 )
 
 maintenance = ReplyKeyboardMarkup(
     [
-        [i18n_format("keyboard.update_tgb")],
-        [i18n_format("keyboard.update_btb")],
-        [i18n_format("keyboard.execute_script")],
-        [i18n_format("keyboard.back")],
+        [i18n.t("keyboard.update_tgb")],
+        [i18n.t("keyboard.update_btb")],
+        [i18n.t("keyboard.execute_script")],
+        [i18n.t("keyboard.back")],
     ],
     resize_keyboard=True,
 )

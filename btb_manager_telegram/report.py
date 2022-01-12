@@ -11,8 +11,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import requests
 
+import i18n
 from btb_manager_telegram import logger, scheduler, settings
-from btb_manager_telegram.utils import escape_tg, i18n_format
+from btb_manager_telegram.utils import escape_tg
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -131,7 +132,7 @@ def make_snapshot():
         logger.error(
             f"❌ Unable to take a snapshot of the binance account: {e}", exc_info=True
         )
-        message = f"{i18n_format('snapshot.error')}\n ```\n"
+        message = f"{i18n.t('snapshot.error')}\n ```\n"
         message += "".join(traceback.format_exception(*sys.exc_info()))
         message += "\n```"
         settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
@@ -208,17 +209,17 @@ def get_graph(relative, symbols, days, graph_type, ref_currency):
     plt.setp(plt.xticks()[1], rotation=15)
     if graph_type == "amount":
         if relative:
-            plt.ylabel(i18n_format("graph.relative_amount"))
+            plt.ylabel(i18n.t("graph.relative_amount"))
             plt.legend(bbox_to_anchor=(1, 1), loc="upper left")
         else:
-            label = i18n_format("graph.amount")
+            label = i18n.t("graph.amount")
             label += f" ({symbols[0]})" if len(symbols) == 1 else ""
             plt.ylabel(label)
     elif graph_type == "price":
         if relative:
-            plt.ylabel(i18n_format("graph.relative_price", currency=ref_currency))
+            plt.ylabel(i18n.t("graph.relative_price", currency=ref_currency))
         else:
-            plt.ylabel(i18n_format("graph.price", currency=ref_currency))
+            plt.ylabel(i18n.t("graph.price", currency=ref_currency))
     plt.grid()
     figname = f"data/quantity_{symbol}.png"
     plt.savefig(figname)

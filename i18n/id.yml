@@ -11,7 +11,7 @@ select_option: "Silahkan pilih opsi di bawah ini."
 welcome:
   hello: "Hai *%{name}*!"
   welcome: "Selamat datang di _Telegram Manager_ untuk _Binance Trade Bot_."
-  developed_by: "Telegram Manager ini dikembangkan oleh @lorcalhost."
+  developed_by: "Telegram Manager ini dikembangkan oleh %{contributors}."
   project_link: "Cari tahu tentang project ini [disini](https://github.com/lorcalhost/BTB-manager-telegram)."
   donation: "*Jika kamu menyukai project ini [pertimbangkan untuk mendukung proyek ini dengan memberikan sedikit donasi](https://github.com/sponsors/lorcalhost). ❤*"
   how_to_start: "*Untuk memulai percakapan, klik tombol `/start`*"
