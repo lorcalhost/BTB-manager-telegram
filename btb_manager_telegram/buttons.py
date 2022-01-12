@@ -14,7 +14,6 @@ from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
     format_float,
     get_binance_trade_bot_process,
-    i18n_format,
     is_btb_bot_update_available,
     is_tg_bot_update_available,
     setup_coin_list,
@@ -26,7 +25,7 @@ def current_value():
     logger.info("Current value button pressed.")
 
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
-    message = [i18n_format("database_not_found", path=db_file_path)]
+    message = [i18n.t("database_not_found", path=db_file_path)]
     if os.path.exists(db_file_path):
         try:
             con = sqlite3.connect(db_file_path)
@@ -49,15 +48,15 @@ def current_value():
                     raise Exception()
                 if state == "ORDERED":
                     return [
-                        f"{i18n_format('value.order_placed', order_size=order_size, bridge=bridge, current_coin=current_coin)}\n\n"
-                        f"{i18n_format('value.wait_for_order')}"
+                        f"{i18n.t('value.order_placed', order_size=order_size, bridge=bridge, current_coin=current_coin)}\n\n"
+                        f"{i18n.t('value.wait_for_order')}"
                     ]
             except Exception as e:
                 logger.error(
                     f"❌ Unable to fetch current coin from database: {e}", exc_info=True
                 )
                 con.close()
-                return [i18n_format("value.db_error")]
+                return [i18n.t("value.db_error")]
 
             # Get balance, current coin price in USD, current coin price in BTC
             try:
@@ -70,8 +69,8 @@ def current_value():
                 query = cur.fetchone()
                 if query is None:
                     return [
-                        i18n_format("value.no_information", current_coin=current_coin),
-                        i18n_format("value.no_during_trade"),
+                        i18n.t("value.no_information", current_coin=current_coin),
+                        i18n.t("value.no_during_trade"),
                     ]
 
                 balance, usd_price, btc_price, last_update = query
@@ -122,25 +121,25 @@ def current_value():
                 )
                 con.close()
                 return [
-                    i18n_format("value.db_error"),
-                    i18n_format("value.no_during_trade"),
+                    i18n.t("value.db_error"),
+                    i18n.t("value.no_during_trade"),
                 ]
 
             try:
                 m_list = [
-                    f"\n{i18n_format('value.last_update', update=last_update.strftime('%H:%M:%S %d/%m/%Y'))}\n\n",
-                    f"{i18n_format('value.current_coin', coin=current_coin)}\n",
-                    f"\t{i18n_format('value.balance', balance=balance, coin=current_coin)}\n",
-                    f"\t{i18n_format('value.exchange_rate_purchased', rate=buy_price / alt_amount, bridge=bridge, coin=current_coin)}\n",
-                    f"\t{i18n_format('value.exchange_rate_now', rate=usd_price, coin=current_coin)}\n",
-                    f"\t{i18n_format('value.value_change', change=round((balance * usd_price - buy_price) / buy_price * 100, 2))}\n",
-                    f"\t{i18n_format('value.value_usd', value=round(balance * usd_price, 2))}\n",
-                    f"\t{i18n_format('value.value_btc', value=round(balance * btc_price, 5))}\n\n",
-                    f"{i18n_format('value.bought_for', value=round(buy_price, 2), coin=bridge)}\n",
+                    f"\n{i18n.t('value.last_update', update=last_update.strftime('%H:%M:%S %d/%m/%Y'))}\n\n",
+                    f"{i18n.t('value.current_coin', coin=current_coin)}\n",
+                    f"\t{i18n.t('value.balance', balance=balance, coin=current_coin)}\n",
+                    f"\t{i18n.t('value.exchange_rate_purchased', rate=buy_price / alt_amount, bridge=bridge, coin=current_coin)}\n",
+                    f"\t{i18n.t('value.exchange_rate_now', rate=usd_price, coin=current_coin)}\n",
+                    f"\t{i18n.t('value.value_change', change=round((balance * usd_price - buy_price) / buy_price * 100, 2))}\n",
+                    f"\t{i18n.t('value.value_usd', value=round(balance * usd_price, 2))}\n",
+                    f"\t{i18n.t('value.value_btc', value=round(balance * btc_price, 5))}\n\n",
+                    f"{i18n.t('value.bought_for', value=round(buy_price, 2), coin=bridge)}\n",
                 ]
                 for i_delta, delta in enumerate(days_deltas):
                     m_list.append(
-                        f"{i18n_format('value.change_btc', days=delta, value=return_rates[i_delta])}\n"
+                        f"{i18n.t('value.change_btc', days=delta, value=return_rates[i_delta])}\n"
                     )
 
                 message = telegram_text_truncator(m_list)
@@ -151,12 +150,12 @@ def current_value():
                     exc_info=True,
                 )
                 con.close()
-                return [i18n_format("value.error")]
+                return [i18n.t("value.error")]
         except Exception as e:
             logger.error(
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
-            message = [i18n_format("value.db_error")]
+            message = [i18n.t("value.db_error")]
     return message
 
 
@@ -164,7 +163,7 @@ def check_progress():
     logger.info("Progress button pressed.")
 
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
-    message = [i18n_format("database_not_found", path=db_file_path)]
+    message = [i18n.t("database_not_found", path=db_file_path)]
     if os.path.exists(db_file_path):
         try:
             con = sqlite3.connect(db_file_path)
@@ -178,7 +177,7 @@ def check_progress():
                 query = cur.fetchall()
 
                 # Generate message
-                m_list = [f"{i18n_format('progress.coin')}\n\n"]
+                m_list = [f"{i18n.t('progress.coin')}\n\n"]
                 for coin in query:
                     last_trade_date = datetime.strptime(coin[5], "%Y-%m-%d %H:%M:%S.%f")
                     if coin[4] is None:
@@ -193,7 +192,7 @@ def check_progress():
                     time_passed = last_trade_date - pre_last_trade_date
                     last_trade_date = last_trade_date.strftime("%H:%M:%S %d/%m/%Y")
                     change = (
-                        i18n_format(
+                        i18n.t(
                             "progress.change_over_days",
                             amount=coin[3],
                             coin=coin[0],
@@ -206,10 +205,10 @@ def check_progress():
                     )
                     m_list.append(
                         f"*{coin[0]}*\n"
-                        f"\t{i18n_format('progress.amount', amount=coin[1], coin=coin[0])}\n"
-                        f"\t{i18n_format('progress.price', amount=round(coin[2], 2))}\n"
+                        f"\t{i18n.t('progress.amount', amount=coin[1], coin=coin[0])}\n"
+                        f"\t{i18n.t('progress.price', amount=round(coin[2], 2))}\n"
                         f"\t{change}\n"
-                        f"\t{i18n_format('progress.trade_datetime', date=last_trade_date)}\n\n"
+                        f"\t{i18n.t('progress.trade_datetime', date=last_trade_date)}\n\n"
                     )
 
                 message = telegram_text_truncator(m_list)
@@ -220,12 +219,12 @@ def check_progress():
                     exc_info=True,
                 )
                 con.close()
-                return [i18n_format("progress.db_error")]
+                return [i18n.t("progress.db_error")]
         except Exception as e:
             logger.error(
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
-            message = [i18n_format("progress.db_error")]
+            message = [i18n.t("progress.db_error")]
     return message
 
 
@@ -234,7 +233,7 @@ def current_ratios():
 
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
-    message = [i18n_format("database_not_found", path=db_file_path)]
+    message = [i18n.t("database_not_found", path=db_file_path)]
     if os.path.exists(db_file_path):
         try:
             # Get bridge currency symbol
@@ -273,7 +272,7 @@ def current_ratios():
                     f"❌ Unable to fetch current coin from database: {e}", exc_info=True
                 )
                 con.close()
-                return [i18n_format("ratios.db_error")]
+                return [i18n.t("ratios.db_error")]
 
             # Get prices and ratios of all alt coins
             try:
@@ -299,17 +298,17 @@ def current_ratios():
                 query = sorted(query, key=lambda k: k[-1], reverse=True)
 
                 m_list = [
-                    f"\n{i18n_format('ratios.last_update', update=last_update.strftime('%H:%M:%S %d/%m/%Y'))}\n\n"
-                    f"{i18n_format('ratios.compared_ratios', coin=current_coin)}\n"
+                    f"\n{i18n.t('ratios.last_update', update=last_update.strftime('%H:%M:%S %d/%m/%Y'))}\n\n"
+                    f"{i18n.t('ratios.compared_ratios', coin=current_coin)}\n"
                 ]
                 max_length_ticker = max([len(i[1]) for i in query] + [4])
 
                 m_list.extend(
                     tabularize(
                         [
-                            i18n_format("ratios.coin"),
-                            i18n_format("ratios.price", bridge=bridge),
-                            i18n_format("ratios.ratio"),
+                            i18n.t("ratios.coin"),
+                            i18n.t("ratios.price", bridge=bridge),
+                            i18n.t("ratios.ratio"),
                         ],
                         [[q[1], q[2], q[3]] for q in query],
                         [6, 12, 12],
@@ -327,14 +326,14 @@ def current_ratios():
                 )
                 con.close()
                 return [
-                    i18n_format("ratios.gen_error"),
-                    i18n_format("logging_enabled_error"),
+                    i18n.t("ratios.gen_error"),
+                    i18n.t("logging_enabled_error"),
                 ]
         except Exception as e:
             logger.error(
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
-            message = [i18n_format("ratios.db_error")]
+            message = [i18n.t("ratios.db_error")]
     return message
 
 
@@ -343,7 +342,7 @@ def next_coin():
 
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
-    message = [f"{i18n_format('database_not_found', path=db_file_path)}"]
+    message = [f"{i18n.t('database_not_found', path=db_file_path)}"]
     if os.path.exists(db_file_path):
         try:
             # Get bridge currency symbol
@@ -393,10 +392,10 @@ def next_coin():
                 m_list.extend(
                     tabularize(
                         [
-                            i18n_format("next_coin.coin"),
-                            i18n_format("next_coin.percentage"),
-                            i18n_format("next_coin.current_price"),
-                            i18n_format("next_coin.target_price"),
+                            i18n.t("next_coin.coin"),
+                            i18n.t("next_coin.percentage"),
+                            i18n.t("next_coin.current_price"),
+                            i18n.t("next_coin.target_price"),
                         ],
                         [[q[0], str(round(q[3] * 100, 2)), q[1], q[2]] for q in query],
                         [6, 7, 8, 8],
@@ -414,23 +413,23 @@ def next_coin():
                 )
                 con.close()
                 return [
-                    i18n_format("next_coin.error"),
-                    i18n_format("logging_enabled_error"),
+                    i18n.t("next_coin.error"),
+                    i18n.t("logging_enabled_error"),
                 ]
         except Exception as e:
             logger.error(
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
-            message = [i18n_format("next_coin.db_error")]
+            message = [i18n.t("next_coin.db_error")]
     return message
 
 
 def check_status():
     logger.info("Check status button pressed.")
 
-    message = i18n_format("btb.not_running")
+    message = i18n.t("btb.not_running")
     if get_binance_trade_bot_process():
-        message = i18n_format("btb.running")
+        message = i18n.t("btb.running")
     return message
 
 
@@ -438,7 +437,7 @@ def trade_history():
     logger.info("Trade history button pressed.")
 
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
-    message = [i18n_format("database_not_found", path=db_file_path)]
+    message = [i18n.t("database_not_found", path=db_file_path)]
     if os.path.exists(db_file_path):
         try:
             con = sqlite3.connect(db_file_path)
@@ -452,7 +451,7 @@ def trade_history():
                 query = cur.fetchall()
 
                 m_list = [
-                    f"{i18n_format('history.last_x_trades', trades=10 if len(query) > 10 else len(query))}\n\n"
+                    f"{i18n.t('history.last_x_trades', trades=10 if len(query) > 10 else len(query))}\n\n"
                 ]
                 for trade in query:
                     if trade[4] is None:
@@ -460,11 +459,11 @@ def trade_history():
                     date = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
                     if trade[5] is not None:
 
-                        trade_details = i18n_format(
+                        trade_details = i18n.t(
                             "history.sold_bought",
-                            sold_trade=i18n_format("history.sold")
+                            sold_trade=i18n.t("history.sold")
                             if trade[2]
-                            else i18n_format("history.bought"),
+                            else i18n.t("history.bought"),
                             amount1=trade[4],
                             coin1=trade[0],
                             amount2=trade[5],
@@ -476,7 +475,7 @@ def trade_history():
                     m_list.append(
                         f"`{date.strftime('%H:%M:%S %d/%m/%Y')}`\n"
                         f"{trade_details}\n"
-                        f"{i18n_format('history.status', status=trade[3])}\n\n"
+                        f"{i18n.t('history.status', status=trade[3])}\n\n"
                     )
 
                 message = telegram_text_truncator(m_list)
@@ -487,19 +486,19 @@ def trade_history():
                     exc_info=True,
                 )
                 con.close()
-                return [i18n_format("history.error")]
+                return [i18n.t("history.error")]
 
         except Exception as e:
             logger.error(
                 f"❌ Unable to perform actions on the database: {e}", exc_info=True
             )
-            message = [i18n_format("history.db_error")]
+            message = [i18n.t("history.db_error")]
     return message
 
 
 def bot_stats():
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
-    message = [i18n_format("database_not_found", path=db_file_path)]
+    message = [i18n.t("database_not_found", path=db_file_path)]
     if not os.path.exists(db_file_path):
         return message
     message = ""
@@ -515,21 +514,21 @@ def bot_stats():
         )
         query = cur.fetchall()
         if len(query) == 0:
-            message = [i18n_format("bot_stats.error.date_error")]
+            message = [i18n.t("bot_stats.error.date_error")]
             return message
         bot_start_date = query[0][0]
 
         cur.execute("SELECT datetime FROM scout_history ORDER BY id DESC LIMIT 1")
         query = cur.fetchall()
         if len(query) == 0:
-            message = [i18n_format("bot_stats.error.date_error")]
+            message = [i18n.t("bot_stats.error.date_error")]
             return message
         bot_end_date = query[0][0]
 
         cur.execute("SELECT * FROM trade_history ")
         lenTradeHistory = len(cur.fetchall())
         if not lenTradeHistory > 0:
-            message = [i18n_format("bot_stats.error.empty_trade_history")]
+            message = [i18n.t("bot_stats.error.empty_trade_history")]
             return message
 
         cur.execute("SELECT count(*) FROM trade_history WHERE selling=0")
@@ -548,8 +547,8 @@ def bot_stats():
         )
         query = cur.fetchone()
         if query is None:
-            logger.error(i18n_format("bot_stats.error.first_coin_error"))
-            message = [i18n_format("bot_stats.error.first_coin_error")]
+            logger.error(i18n.t("bot_stats.error.first_coin_error"))
+            message = [i18n.t("bot_stats.error.first_coin_error")]
             return message
         (
             initialCoinID,
@@ -565,8 +564,8 @@ def bot_stats():
             ORDER BY id DESC LIMIT 1;"""
         )
         if query is None:
-            logger.error(i18n_format("bot_stats.error.current_coin_error"))
-            message = [i18n_format("bot_stats.error.current_coin_error")]
+            logger.error(i18n.t("bot_stats.error.current_coin_error"))
+            message = [i18n.t("bot_stats.error.current_coin_error")]
             return message
         currentCoinID, currentCoinAmount = cur.fetchone()
 
@@ -591,22 +590,22 @@ def bot_stats():
 
         currentCoinLiveBridgeValue = currentCoinAmount * currentCoinLiveBridgePrice
 
-        message += f"`{i18n_format('bot_stats.bot_started', date=start_date.strftime('%d/%m/%y'), no_days=numDays)}"
-        message += f"\n{i18n_format('bot_stats.nb_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"
+        message += f"`{i18n.t('bot_stats.bot_started', date=start_date.strftime('%d/%m/%y'), no_days=numDays)}"
+        message += f"\n{i18n.t('bot_stats.nb_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"
 
         if initialCoinID != "":
             message += "\n{} {:.4f} {} / {:.3f} {}".format(
-                i18n_format("bot_stats.start_coin"),
+                i18n.t("bot_stats.start_coin"),
                 initialCoinAmount,
                 initialCoinID,
                 initialCoinFiatValue,
                 displayCurrency,
             )
         else:
-            message += f"\n{i18n_format('bot_stats.start_coin')} -- / --"
+            message += f"\n{i18n.t('bot_stats.start_coin')} -- / --"
 
         message += "\n{} {:.4f} {} / {:.3f} {}".format(
-            i18n_format("bot_stats.current_coin"),
+            i18n.t("bot_stats.current_coin"),
             currentCoinAmount,
             currentCoinID,
             currentCoinLiveBridgeValue,
@@ -632,7 +631,7 @@ def bot_stats():
             )
 
             message += "\n{} {}{:.2f}% {} / {}{:.2f}% {}".format(
-                i18n_format("bot_stats.profit"),
+                i18n.t("bot_stats.profit"),
                 "+" if changeStartCoin >= 0 else "",
                 changeStartCoin,
                 initialCoinID,
@@ -641,7 +640,7 @@ def bot_stats():
                 displayCurrency,
             )
             message += "\n{} {:.4f} {} / {:.3f} {}".format(
-                i18n_format("bot_stats.hodl"),
+                i18n.t("bot_stats.hodl"),
                 initialCoinAmount,
                 initialCoinID,
                 initialCoinLiveBridgeValue,
@@ -649,10 +648,10 @@ def bot_stats():
             )
 
         else:
-            message += f"\n{i18n_format('bot_stats.hodl')} -- / --"
+            message += f"\n{i18n.t('bot_stats.hodl')} -- / --"
 
         if initialCoinID == "":
-            message += f"\n{i18n_format('bot_stats.error.start_coin_not_found')}"
+            message += f"\n{i18n.t('bot_stats.error.start_coin_not_found')}"
 
         max_usd = max(reports, key=lambda a: a["total_usdt"])["total_usdt"]
         min_usd = min(reports, key=lambda a: a["total_usdt"])["total_usdt"]
@@ -660,8 +659,8 @@ def bot_stats():
         max_btc = max(btc_vals)
         min_btc = min(btc_vals)
 
-        message += f"\n{i18n_format('bot_stats.min_max_usd')} {round(min_usd,2)} / {round(max_usd,2)}"
-        message += f"\n{i18n_format('bot_stats.min_max_btc')} {round(min_btc,5)} / {round(max_btc,5)}"
+        message += f"\n{i18n.t('bot_stats.min_max_usd')} {round(min_usd,2)} / {round(max_usd,2)}"
+        message += f"\n{i18n.t('bot_stats.min_max_btc')} {round(min_btc,5)} / {round(max_btc,5)}"
         message += "`"
 
         rows = []
@@ -702,15 +701,15 @@ def bot_stats():
             )
 
         if len(rows) == 0:
-            message += f"\n\n{i18n_format('bot_stats.error.empty_trade_history')}\n"
+            message += f"\n\n{i18n.t('bot_stats.error.empty_trade_history')}\n"
             message = [message]
 
         else:
             table = tabularize(
                 [
-                    i18n_format("bot_stats.table.coin"),
-                    i18n_format("bot_stats.table.from"),
-                    i18n_format("bot_stats.table.to"),
+                    i18n.t("bot_stats.table.coin"),
+                    i18n.t("bot_stats.table.from"),
+                    i18n.t("bot_stats.table.to"),
                     "% ±",
                     "<->",
                 ],
@@ -719,14 +718,14 @@ def bot_stats():
                 add_spaces=False,
                 align=["left", "right", "right", "right", "right"],
             )
-            message += f"\n\n*{i18n_format('bot_stats.coin_progress')}*\n"
+            message += f"\n\n*{i18n.t('bot_stats.coin_progress')}*\n"
             message = [message]
             message += table
 
         message = telegram_text_truncator(message)
     except Exception as e:
         logger.error(f"❌ Unable to perform actions on the database: {e}", exc_info=True)
-        message = [i18n_format("bot_stats.error.db_error")]
+        message = [i18n.t("bot_stats.error.db_error")]
     return message
 
 
@@ -755,16 +754,13 @@ def start_bot():
 def stop_bot():
     logger.info("Stop bot button pressed.")
 
-    message = i18n_format("btb.not_running")
+    message = i18n.t("btb.not_running")
     if get_binance_trade_bot_process():
         find_and_kill_binance_trade_bot_process()
         if not get_binance_trade_bot_process():
-            message = i18n_format("btb.stopped")
+            message = i18n.t("btb.stopped")
         else:
-            message = (
-                f"{i18n_format('btb.stop_error')}\n\n"
-                f"{i18n_format('btb.windows_hint')}"
-            )
+            message = f"{i18n.t('btb.stop_error')}\n\n" f"{i18n.t('btb.windows_hint')}"
     return message
 
 
@@ -772,12 +768,12 @@ def read_log():
     logger.info("Read log button pressed.")
 
     log_file_path = os.path.join(settings.ROOT_PATH, "logs/crypto_trading.log")
-    message = f"{i18n_format('log.error', path=log_file_path)}"
+    message = f"{i18n.t('log.error', path=log_file_path)}"
     if os.path.exists(log_file_path):
         with open(log_file_path) as f:
             file_content = f.read()[-4000:]
             message = (
-                f"{i18n_format('log.last_4000_characters')}\n\n"
+                f"{i18n.t('log.last_4000_characters')}\n\n"
                 f"```\n"
                 f"{file_content}\n"
                 f"```"
@@ -788,111 +784,105 @@ def read_log():
 def delete_db():
     logger.info("Delete database button pressed.")
 
-    message = i18n_format("db.delete.stop_bot")
+    message = i18n.t("db.delete.stop_bot")
     delete = False
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     if not get_binance_trade_bot_process():
         if os.path.exists(db_file_path):
-            message = i18n_format("db.delete.sure")
+            message = i18n.t("db.delete.sure")
             delete = True
         else:
-            message = f"{i18n_format('database_not_found', path=db_file_path)}"
+            message = f"{i18n.t('database_not_found', path=db_file_path)}"
     return [message, delete]
 
 
 def edit_user_cfg():
     logger.info("Edit user configuration button pressed.")
 
-    message = i18n_format("config.stop_bot")
+    message = i18n.t("config.stop_bot")
     edit = False
     user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
     if not get_binance_trade_bot_process():
         if os.path.exists(user_cfg_file_path):
             with open(user_cfg_file_path) as f:
                 message = (
-                    f"{i18n_format('config.is')}\n\n"
+                    f"{i18n.t('config.is')}\n\n"
                     f"```\n"
                     f"{f.read()}\n"
                     f"```\n\n"
-                    f"{i18n_format('config.reply')}\n\n"
-                    f"{i18n_format('stop_to_stop')}"
+                    f"{i18n.t('config.reply')}\n\n"
+                    f"{i18n.t('stop_to_stop')}"
                 )
                 edit = True
         else:
-            message = f"{i18n_format('config.error', path=user_cfg_file_path)}"
+            message = f"{i18n.t('config.error', path=user_cfg_file_path)}"
     return [message, edit]
 
 
 def edit_coin():
     logger.info("Edit coin list button pressed.")
 
-    message = i18n_format("coin_list.stop_bot")
+    message = i18n.t("coin_list.stop_bot")
     edit = False
     coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
     if not get_binance_trade_bot_process():
         if os.path.exists(coin_file_path):
             with open(coin_file_path) as f:
                 message = (
-                    f"{i18n_format('coin_list.is')}\n\n"
+                    f"{i18n.t('coin_list.is')}\n\n"
                     f"```\n{f.read()}\n```\n\n"
-                    f"{i18n_format('coin_list.reply')}\n\n"
-                    f"{i18n_format('stop_to_stop')}"
+                    f"{i18n.t('coin_list.reply')}\n\n"
+                    f"{i18n.t('stop_to_stop')}"
                 )
                 edit = True
         else:
-            message = f"{i18n_format('coin_list.not_found', path=coin_file_path)}"
+            message = f"{i18n.t('coin_list.not_found', path=coin_file_path)}"
     return [message, edit]
 
 
 def export_db():
     logger.info("Export database button pressed.")
 
-    message = i18n_format("db.export.stop_bot")
+    message = i18n.t("db.export.stop_bot")
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     file = None
     if not get_binance_trade_bot_process():
         if os.path.exists(db_file_path):
             with open(db_file_path, "rb") as db:
                 file = db.read()
-            message = i18n_format("db.export.file")
+            message = i18n.t("db.export.file")
         else:
-            message = i18n_format("db.export.error")
+            message = i18n.t("db.export.error")
     return [message, file]
 
 
 def update_tg_bot():
     logger.info("⬆ Update Telegram Bot button pressed.")
 
-    message = i18n_format("update.tgb.up_to_date")
+    message = i18n.t("update.tgb.up_to_date")
     upd = False
     to_update = is_tg_bot_update_available()
     if to_update is not None:
         if to_update:
-            message = (
-                f"{i18n_format('update.tgb.available')}\n"
-                f"{i18n_format('update.now')}"
-            )
+            message = f"{i18n.t('update.tgb.available')}\n" f"{i18n.t('update.now')}"
             upd = True
     else:
-        message = i18n_format("update.tgb.error")
+        message = i18n.t("update.tgb.error")
     return [message, upd]
 
 
 def update_btb():
     logger.info("⬆ Update Binance Trade Bot button pressed.")
 
-    message = i18n_format("update.btb.up_to_date")
+    message = i18n.t("update.btb.up_to_date")
     upd = False
     to_update = is_btb_bot_update_available()
     if to_update is not None:
         if to_update:
             upd = True
-            message = (
-                f"{i18n_format('update.btb.available')}\n"
-                f"{i18n_format('update.now')}"
-            )
+            message = f"{i18n.t('update.btb.available')}\n" f"{i18n.t('update.now')}"
     else:
-        message = i18n_format("update.btb.error")
+        message = i18n.t("update.btb.error")
     return [message, upd]
 
 
@@ -902,11 +892,11 @@ def panic_btn():
     # Check if open orders / not in usd
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
     if not os.path.exists(db_file_path):
-        return [i18n_format("database_not_found"), -1]
+        return [i18n.t("database_not_found"), -1]
 
     user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
     if not os.path.exists(user_cfg_file_path):
-        return [i18n_format("config.not_found"), -1]
+        return [i18n.t("config.not_found"), -1]
 
     try:
         con = sqlite3.connect(db_file_path)
@@ -932,37 +922,37 @@ def panic_btn():
                 if state == "COMPLETE":
                     con.close()
                     return [
-                        f"{i18n_format('panic.holding', amount1=round(alt_trade_amount, 6), coin1=alt_coin_id, amount2=round(crypto_trade_amount, 2), coin2=crypto_coin_id)}\n\n "
-                        f"{i18n_format('panic.rate_when_bought')}\n"
+                        f"{i18n.t('panic.holding', amount1=round(alt_trade_amount, 6), coin1=alt_coin_id, amount2=round(crypto_trade_amount, 2), coin2=crypto_coin_id)}\n\n "
+                        f"{i18n.t('panic.rate_when_bought')}\n"
                         f"`{format_float(round(price_old, 4))}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
-                        f"{i18n_format('panic.current_rate')}\n"
+                        f"{i18n.t('panic.current_rate')}\n"
                         f"`{format_float(round(price_now, 4))}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
-                        f"{i18n_format('panic.current_value')}\n"
+                        f"{i18n.t('panic.current_value')}\n"
                         f"`{format_float(round(price_now * alt_trade_amount, 4))}` *{crypto_coin_id}*\n\n"
-                        f"{i18n_format('panic.change')}\n"
+                        f"{i18n.t('panic.change')}\n"
                         f"`{format_float(round((price_now - price_old) / price_old * 100, 2))}` *%*\n\n"
-                        f"{i18n_format('panic.stop_and_sell')}",
+                        f"{i18n.t('panic.stop_and_sell')}",
                         BOUGHT,
                     ]
                 else:
                     con.close()
                     return [
-                        f"{i18n_format('panic.open_buy_order', amount1=alt_trade_amount, coin1=alt_coin_id, amount2=crypto_trade_amount, coin2=crypto_coin_id)}\n\n"
-                        f"{i18n_format('panic.limit_buy_price')}\n"
+                        f"{i18n.t('panic.open_buy_order', amount1=alt_trade_amount, coin1=alt_coin_id, amount2=crypto_trade_amount, coin2=crypto_coin_id)}\n\n"
+                        f"{i18n.t('panic.limit_buy_price')}\n"
                         f"`{format_float(round(price_old, 4))}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
-                        f"{i18n_format('panic.current_rate')}\n"
+                        f"{i18n.t('panic.current_rate')}\n"
                         f"`{format_float(round(price_now, 4))}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
-                        f"{i18n_format('panic.change')}\n"
+                        f"{i18n.t('panic.change')}\n"
                         f"`{format_float(round((price_now - price_old) / price_old * 100, 2))}` *%*\n\n"
-                        f"{i18n_format('panic.stop_and_cancel')}",
+                        f"{i18n.t('panic.stop_and_cancel')}",
                         BUYING,
                     ]
             else:
                 if state == "COMPLETE":
                     con.close()
                     return [
-                        f"{i18n_format('panic.order_already_complete', coin=crypto_coin_id)}\n\n"
-                        f"{i18n_format('panic.ask_stop_bot')}",
+                        f"{i18n.t('panic.order_already_complete', coin=crypto_coin_id)}\n\n"
+                        f"{i18n.t('panic.ask_stop_bot')}",
                         SOLD,
                     ]
                 else:
@@ -970,14 +960,14 @@ def panic_btn():
                     price_now = get_current_price(alt_coin_id, crypto_coin_id)
                     con.close()
                     return [
-                        f"{i18n_format('panic.open_sell_order', amount1=alt_trade_amount, coin1=alt_coin_id, amount2=crypto_trade_amount, coin2=crypto_coin_id)}\n\n"
-                        f"{i18n_format('panic.limit_sell_price')}\n"
+                        f"{i18n.t('panic.open_sell_order', amount1=alt_trade_amount, coin1=alt_coin_id, amount2=crypto_trade_amount, coin2=crypto_coin_id)}\n\n"
+                        f"{i18n.t('panic.limit_sell_price')}\n"
                         f"`{format_float(round(price_old, 4))}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
-                        f"{i18n_format('panic.current_rate')}\n"
+                        f"{i18n.t('panic.current_rate')}\n"
                         f"`{format_float(round(price_now, 4))}` *{crypto_coin_id}*/*{alt_coin_id}*\n\n"
-                        f"{i18n_format('panic.change')}\n"
+                        f"{i18n.t('panic.change')}\n"
                         f"`{format_float(round((price_now - price_old) / price_old * 100, 2))}` *%*\n\n"
-                        f"{i18n_format('panic.stop_and_cancel')}",
+                        f"{i18n.t('panic.stop_and_cancel')}",
                         SELLING,
                     ]
 
@@ -988,9 +978,9 @@ def panic_btn():
                 exc_info=True,
             )
             return [
-                i18n_format("panic.error"),
+                i18n.t("panic.error"),
                 -1,
             ]
     except Exception as e:
         logger.error(f"❌ Unable to perform actions on the database: {e}", exc_info=True)
-        return [i18n_format("panic.db_error"), -1]
+        return [i18n.t("panic.db_error"), -1]

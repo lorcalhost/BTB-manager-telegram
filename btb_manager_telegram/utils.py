@@ -34,12 +34,12 @@ def i18n_format(key, **kwargs):
             val = format_float(val)
         except:
             pass
-        kwargs[k] = escape_markdown(str(val), version=2)
+        kwargs[k] = str(val)
     return i18n.t(key, **kwargs)
 
 
 def escape_tg(message):
-    escape_char = (".", "-", "?", "!", ">", "{", "}", "(", ")", "=", "+", "|")
+    escape_char = (".", "-", "?", "!", ">", "{", "}", "=", "+", "|")
     escaped_message = ""
     is_escaped = False
     for cur_char in message:

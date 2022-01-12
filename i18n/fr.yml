@@ -11,7 +11,7 @@ select_option: "Sélectionnez une option"
 welcome:
   hello: "Bonjour %{name}!"
   welcome: "Bienvenue sur le manager télégram du _Binance Trade Bot_."
-  developed_by: "Ce bot est développé collaborativement par lorcalhost, NovusEdge, titulebolide, Lisiadito, DmytroLitvinov, sydekumf, bloodf, idkravitz, neuhausj, MasaiasuOse, tntwist, kydrenw, pwnfoo, santiagocarod, stgo-eo and shhhmel."
+  developed_by: "Ce bot est développé par %{contributors}."
   project_link: "Retrouvez le projet [ici](https://github.com/lorcalhost/BTB-manager-telegram)."
   donation: "*Si vous appréciez mon travail, [supportez moi avec un petit don](https://github.com/sponsors/lorcalhost). ❤*"
   how_to_start: "*Pour démarrer la discussion, appuyez sur le bouton `/start`*"
@@ -81,7 +81,7 @@ history:
 
 
 bot_stats:
-  bot_started:  "Démarré le       : %{date} (%{no_days} days ago)"
+  bot_started:  "Démarré le       : %{date} (il y a %{no_days} jours)"
   nb_jumps:     "Nb de sauts      :"
   start_coin:   "Monnaie départ   :"
   current_coin: "Monnaie actuelle :"
