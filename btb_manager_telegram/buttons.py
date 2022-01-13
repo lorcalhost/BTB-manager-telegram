@@ -546,10 +546,6 @@ def bot_stats():
         end_date = datetime.strptime(bot_end_date[2:], "%y-%m-%d %H:%M:%S.%f")
         numDays = (end_date - start_date).days
 
-        reports = [
-            r for r in get_previous_reports() if r["time"] >= start_date.timestamp()
-        ]
-
         # get first trade and its bridge - all stats must be in this bridge
         cur.execute(
             f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount, crypto_trade_amount
@@ -573,11 +569,26 @@ def bot_stats():
             WHERE selling=0 and state='COMPLETE'
             ORDER BY id DESC LIMIT 1;"""
         )
+        query = cur.fetchone()
         if query is None:
             logger.error(i18n.t("bot_stats.error.current_coin_error"))
             message = [i18n.t("bot_stats.error.current_coin_error")]
             return message
-        currentCoinID, currentCoinAmount = cur.fetchone()
+        currentCoinID, currentCoinAmount = query
+
+        cur.execute(
+            """
+        SELECT min(usd_values), max(usd_values), min(btc_values), max(btc_values) FROM (
+            SELECT (balance * usd_price) usd_values, (balance * btc_price) btc_values FROM coin_value WHERE usd_values > 5
+        )
+        """
+        )
+        query = cur.fetchone()
+        if query is None:
+            max_usd = min_usd = max_btc = min_btc = 0
+            logger.error("Exception : Unable to calculate min/max USD, BTC values.")
+        else:
+            min_usd, max_usd, min_btc, max_btc = query
 
         displayCurrency = (
             "$" if initialCoinbridgeID in stableCoins else initialCoinbridgeID
@@ -603,16 +614,13 @@ def bot_stats():
         message += f"`{i18n.t('bot_stats.bot_started', date=start_date.strftime('%d/%m/%y'), no_days=numDays)}"
         message += f"\n{i18n.t('bot_stats.nb_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"
 
-        if initialCoinID != "":
-            message += "\n{} {} {} / {} {}".format(
-                i18n.t("bot_stats.start_coin"),
-                float_strip(initialCoinAmount, 8),
-                initialCoinID,
-                round(initialCoinFiatValue, 2),
-                displayCurrency,
-            )
-        else:
-            message += f"\n{i18n.t('bot_stats.start_coin')} -- / --"
+        message += "\n{} {} {} / {} {}".format(
+            i18n.t("bot_stats.start_coin"),
+            float_strip(initialCoinAmount, 8),
+            initialCoinID,
+            round(initialCoinFiatValue, 2),
+            displayCurrency,
+        )
 
         message += "\n{} {} {} / {} {}".format(
             i18n.t("bot_stats.current_coin"),
@@ -622,72 +630,37 @@ def bot_stats():
             displayCurrency,
         )
 
-        if initialCoinID != "":
-            convertibleStartCoinAmount = (
-                currentCoinLiveBridgeValue / initialCoinLiveBridgePrice
-            )
+        convertibleStartCoinAmount = (
+            currentCoinLiveBridgeValue / initialCoinLiveBridgePrice
+        )
 
-            # always show profit in bot start coin's Bridge
-            changeFiat = (
-                (currentCoinLiveBridgeValue - initialCoinFiatValue)
-                / initialCoinFiatValue
-                * 100
-            )
+        # always show profit in bot start coin's Bridge
+        changeFiat = (
+            (currentCoinLiveBridgeValue - initialCoinFiatValue)
+            / initialCoinFiatValue
+            * 100
+        )
 
-            changeStartCoin = (
-                (convertibleStartCoinAmount - initialCoinAmount)
-                / initialCoinAmount
-                * 100
-            )
+        changeStartCoin = (
+            (convertibleStartCoinAmount - initialCoinAmount) / initialCoinAmount * 100
+        )
 
-            message += "\n{} {}{}% {} / {}{}% {}".format(
-                i18n.t("bot_stats.profit"),
-                "+" if changeStartCoin >= 0 else "",
-                round(changeStartCoin, 2),
-                initialCoinID,
-                "+" if changeFiat >= 0 else "",
-                round(changeFiat, 2),
-                displayCurrency,
-            )
-            message += "\n{} {} {} / {} {}".format(
-                i18n.t("bot_stats.hodl"),
-                float_strip(initialCoinAmount, 8),
-                initialCoinID,
-                round(initialCoinLiveBridgeValue, 2),
-                displayCurrency,
-            )
-
-        else:
-            message += f"\n{i18n.t('bot_stats.hodl')} -- / --"
-
-        if initialCoinID == "":
-            message += f"\n{i18n.t('bot_stats.error.start_coin_not_found')}"
-
-        try:
-            cur.execute(f"""SELECT (balance * usd_price) FROM coin_value """)
-            usd_values = cur.fetchall()
-            usd_values_filtered = []
-            for val in usd_values:
-                if val[0] != None:
-                    if val[0] > 5:
-                        usd_values_filtered.append(val[0])
-
-            cur.execute(f"""SELECT (balance * btc_price) FROM coin_value """)
-            btc_values = cur.fetchall()
-            btc_values_filtered = []
-            for value in btc_values:
-                if value[0] != None:
-                    if value[0] > (5.0 / [a["tickers"]["BTC"] for a in reports][-1]):
-                        btc_values_filtered.append(value[0])
-
-            max_usd = max(usd_values_filtered)
-            min_usd = min(usd_values_filtered)
-
-            max_btc = max(btc_values_filtered)
-            min_btc = min(btc_values_filtered)
-        except:
-            max_usd = min_usd = max_btc = min_btc = 0
-            logger.error("Exception : Unable to calculate min/max USD, BTC values.")
+        message += "\n{} {}{}% {} / {}{}% {}".format(
+            i18n.t("bot_stats.profit"),
+            "+" if changeStartCoin >= 0 else "",
+            round(changeStartCoin, 2),
+            initialCoinID,
+            "+" if changeFiat >= 0 else "",
+            round(changeFiat, 2),
+            displayCurrency,
+        )
+        message += "\n{} {} {} / {} {}".format(
+            i18n.t("bot_stats.hodl"),
+            float_strip(initialCoinAmount, 8),
+            initialCoinID,
+            round(initialCoinLiveBridgeValue, 2),
+            displayCurrency,
+        )
 
         message += f"\n{i18n.t('bot_stats.min_max_usd')} {round(min_usd,2)} / {round(max_usd,2)}"
         message += f"\n{i18n.t('bot_stats.min_max_btc')} {float_strip(min_btc,8)} / {float_strip(max_btc,8)}"
