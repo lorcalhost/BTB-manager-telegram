@@ -32,13 +32,13 @@ value:
   error: "❌ Er ging iets mis, niet in staat om op dit moment waarde te genereren."
   last_update: "Laatste update: `%{update}`"
   current_coin: "*Huidige munt %{coin}:*"
-  balance: "- Balans: `%{balance}` *%{coin}*"
-  exchange_rate_purchased: "- Gekocht op wisselkoers: `%{rate}` *%{coin}*/*%{bridge}*"
-  exchange_rate_now: "- Wisselkoers nu:           `%{rate}` *%{coin}*/*USD*"
-  value_change: "- *Waardeverandering*: `%{change}` *%*"
-  value_usd: "- Waarde in *USD*: `%{value}` *USD*"
-  value_btc: "- Waarde in *BTC*: `%{value}` *BTC*"
-  bought_for: "_Gekocht voor_ `%{value}` *%{coin}*"
+  balance:                 "Balans                : %{balance} %{coin}"
+  exchange_rate_purchased: "Gekocht op wisselkoers: %{rate} %{coin}/%{bridge}"
+  exchange_rate_now:       "Wisselkoers nu        : %{rate} %{coin}/USD"
+  value_change:            "Waardeverandering     : %{change} %"
+  value_usd:               "Waarde in USD         : %{value} USD"
+  value_btc:               "Waarde in BTC         : %{value} BTC"
+  bought_for:              "Gekocht voor          : %{value} %{coin}"
 
 
 progress:

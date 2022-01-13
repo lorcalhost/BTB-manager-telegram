@@ -9,7 +9,7 @@ import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
 from btb_manager_telegram.report import get_previous_reports
-from btb_manager_telegram.table import tabularize
+from btb_manager_telegram.table import float_strip, tabularize
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
     format_float,
@@ -129,18 +129,26 @@ def current_value():
                 m_list = [
                     f"\n{i18n.t('value.last_update', update=last_update.strftime('%H:%M:%S %d/%m/%Y'))}\n\n",
                     f"{i18n.t('value.current_coin', coin=current_coin)}\n",
-                    f"\t{i18n.t('value.balance', balance=balance, coin=current_coin)}\n",
-                    f"\t{i18n.t('value.exchange_rate_purchased', rate=buy_price / alt_amount, bridge=bridge, coin=current_coin)}\n",
-                    f"\t{i18n.t('value.exchange_rate_now', rate=usd_price, coin=current_coin)}\n",
-                    f"\t{i18n.t('value.value_change', change=round((balance * usd_price - buy_price) / buy_price * 100, 2))}\n",
-                    f"\t{i18n.t('value.value_usd', value=round(balance * usd_price, 2))}\n",
-                    f"\t{i18n.t('value.value_btc', value=round(balance * btc_price, 5))}\n\n",
+                    "`",
+                    f"{i18n.t('value.balance', balance=balance, coin=current_coin)}\n",
+                    f"{i18n.t('value.exchange_rate_purchased', rate=float_strip(buy_price / alt_amount, 8), bridge=bridge, coin=current_coin)}\n",
+                    f"{i18n.t('value.exchange_rate_now', rate=float_strip(usd_price, 8), coin=current_coin)}\n",
+                    f"{i18n.t('value.value_change', change=round((balance * usd_price - buy_price) / buy_price * 100, 2))}\n",
+                    f"{i18n.t('value.value_usd', value=round(balance * usd_price, 2))}\n",
+                    f"{i18n.t('value.value_btc', value=float_strip(balance * btc_price, 8))}\n",
                     f"{i18n.t('value.bought_for', value=round(buy_price, 2), coin=bridge)}\n",
                 ]
                 for i_delta, delta in enumerate(days_deltas):
                     m_list.append(
-                        f"{i18n.t('value.change_btc', days=delta, value=return_rates[i_delta])}\n"
+                        i18n.t(
+                            "value.change_btc",
+                            days=delta,
+                            spaces=" " * max(0, 2 - len(str(delta))),
+                            value=return_rates[i_delta],
+                        )
+                        + "\n"
                     )
+                m_list[-1] += "`"
 
                 message = telegram_text_truncator(m_list)
                 con.close()
@@ -596,21 +604,21 @@ def bot_stats():
         message += f"\n{i18n.t('bot_stats.nb_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"
 
         if initialCoinID != "":
-            message += "\n{} {:.4f} {} / {:.3f} {}".format(
+            message += "\n{} {} {} / {} {}".format(
                 i18n.t("bot_stats.start_coin"),
-                initialCoinAmount,
+                float_strip(initialCoinAmount, 8),
                 initialCoinID,
-                initialCoinFiatValue,
+                round(initialCoinFiatValue, 2),
                 displayCurrency,
             )
         else:
             message += f"\n{i18n.t('bot_stats.start_coin')} -- / --"
 
-        message += "\n{} {:.4f} {} / {:.3f} {}".format(
+        message += "\n{} {} {} / {} {}".format(
             i18n.t("bot_stats.current_coin"),
-            currentCoinAmount,
+            float_strip(currentCoinAmount, 8),
             currentCoinID,
-            currentCoinLiveBridgeValue,
+            round(currentCoinLiveBridgeValue, 2),
             displayCurrency,
         )
 
@@ -632,20 +640,20 @@ def bot_stats():
                 * 100
             )
 
-            message += "\n{} {}{:.2f}% {} / {}{:.2f}% {}".format(
+            message += "\n{} {}{}% {} / {}{}% {}".format(
                 i18n.t("bot_stats.profit"),
                 "+" if changeStartCoin >= 0 else "",
-                changeStartCoin,
+                round(changeStartCoin, 2),
                 initialCoinID,
                 "+" if changeFiat >= 0 else "",
-                changeFiat,
+                round(changeFiat, 2),
                 displayCurrency,
             )
-            message += "\n{} {:.4f} {} / {:.3f} {}".format(
+            message += "\n{} {} {} / {} {}".format(
                 i18n.t("bot_stats.hodl"),
-                initialCoinAmount,
+                float_strip(initialCoinAmount, 8),
                 initialCoinID,
-                initialCoinLiveBridgeValue,
+                round(initialCoinLiveBridgeValue, 2),
                 displayCurrency,
             )
 
@@ -662,7 +670,7 @@ def bot_stats():
         min_btc = min(btc_vals)
 
         message += f"\n{i18n.t('bot_stats.min_max_usd')} {round(min_usd,2)} / {round(max_usd,2)}"
-        message += f"\n{i18n.t('bot_stats.min_max_btc')} {round(min_btc,5)} / {round(max_btc,5)}"
+        message += f"\n{i18n.t('bot_stats.min_max_btc')} {float_strip(min_btc,8)} / {float_strip(max_btc,8)}"
         message += "`"
 
         rows = []
