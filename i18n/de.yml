@@ -32,13 +32,13 @@ value:
   error: "❌ Etwas ist schief gelaufen, derzeit kann kein Wert generiert werden."
   last_update: "Letztes Update: `%{update}`"
   current_coin: "*Aktueller Coin %{coin}:*"
-  balance: "- Bilanz: `%{balance}` *%{coin}*"
-  exchange_rate_purchased: "- Wechselkurs beim Kauf:  `%{rate}` *%{coin}*/*%{bridge}*"
-  exchange_rate_now: "- Aktueller Wechselkurs : `%{rate}` *%{coin}*/*USD*"
-  value_change: "- *Wertänderung*: `%{change}` *%*"
-  value_usd: "- Wert in *USD*: `%{value}` *USD*"
-  value_btc: "- Wert in *BTC*: `%{value}` *BTC*"
-  bought_for: "_Gekauft für_ `%{value}` *%{coin}*"
+  balance:                 "Bilanz               : %{balance} %{coin}"
+  exchange_rate_purchased: "Wechselkurs beim Kauf: %{rate} %{coin}/%{bridge}"
+  exchange_rate_now:       "Aktueller Wechselkurs: %{rate} %{coin}/USD"
+  value_change:            "Wertänderung         : %{change} %"
+  value_usd:               "Wert in USD          : %{value} USD"
+  value_btc:               "Wert in BTC          : %{value} BTC"
+  bought_for:              "Gekauft für          : %{value} %{coin}"
 
 
 progress:

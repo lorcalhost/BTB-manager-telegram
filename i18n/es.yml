@@ -32,13 +32,13 @@ value:
   error: "❌ Algo salió mal. Imposible mostrar el valor en este momento."
   last_update: "Última actualización: `%{update}`"
   current_coin: "*Moneda actual %{coin}:*"
-  balance: "- Balance: `%{balance}` *%{coin}*"
-  exchange_rate_purchased: "- Tipo de cambio en la compra: `%{rate}` *%{coin}*/*%{bridge}*"
-  exchange_rate_now: "- Tipo de cambio actual: `%{rate}` *%{coin}*/*USD*"
-  value_change: "- *Cambio en valor*: `%{change}` *%*"
-  value_usd: "- Valor en *USD*: `%{value}` *USD*"
-  value_btc: "- Valor en *BTC*: `%{value}` *BTC*"
-  bought_for: "_Comprado por_ `%{value}` *%{coin}*"
+  balance:                 "Balance              : %{balance} %{coin}"
+  exchange_rate_purchased: "Tipo de cambio en la compra: %{rate} %{coin}/%{bridge}"
+  exchange_rate_now:       "Tipo de cambio actual: %{rate} %{coin}/USD"
+  value_change:            "Cambio en valor      : %{change} %"
+  value_usd:               "Valor en USD         : %{value} USD"
+  value_btc:               "Valor en BTC         : %{value} BTC"
+  bought_for:              "Comprado por         : %{value} %{coin}"
 
 
 progress:
