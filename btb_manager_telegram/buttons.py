@@ -664,7 +664,6 @@ def bot_stats():
                     if val[0] > 5:
                         usd_values_filtered.append(val[0])
 
-
             cur.execute(f"""SELECT (balance * btc_price) FROM coin_value """)
             btc_values = cur.fetchall()
             btc_values_filtered = []
@@ -673,7 +672,6 @@ def bot_stats():
                     if value[0] > (5.0 / [a["tickers"]["BTC"] for a in reports][-1]):
                         btc_values_filtered.append(value[0])
 
-            # import ipdb; ipdb.set_trace()
             max_usd = max(usd_values_filtered)
             min_usd = min(usd_values_filtered)
 
