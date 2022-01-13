@@ -39,7 +39,7 @@ value:
   value_usd:               "Wert in USD          : %{value} USD"
   value_btc:               "Wert in BTC          : %{value} BTC"
   bought_for:              "Gekauft für          : %{value} %{coin}"
-
+  change_btc:              "%{days} Tagesänderung BTC %{spaces}    : %{value}"
 
 progress:
   coin: "Aktueller Coin-Mengenfortschritt:"
