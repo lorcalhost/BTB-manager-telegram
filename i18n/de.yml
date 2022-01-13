@@ -80,22 +80,27 @@ history:
 
 
 bot_stats:
-  bot_started: "Bot startete  :"
-  no_days: "Nr von Tagen   :"
-  no_jumps: "Nr von Sprüngen  :"
-  start_coin: "Start-Coin   :"
-  current_coin: "Aktueller Coin :"
-  hodl: "HODL¹        :"
-  profit: "Profit       :"
-  start_coin_not_found_in_supported_list: "Bot-Start-Coin ist %{firstTradeCoin} wird aber derzeit nicht in der Coin-Liste gefunden."
-  start_coin_not_found: "Bot-Start-Coin kann nicht in der Coin-Liste gefunden werden."
-  coin_progress: "Coin Fortschritt:"
+  bot_started:  "Bot startete     :"
+  nb_jumps:     "Nr. von Sprüngen :"
+  start_coin:   "Start-Coin       :"
+  current_coin: "Aktueller Coin   :"
+  hodl:         "Kaufen & Halten  :"
+  profit:       "Bot-Profit       :"
+  min_max_usd:  "Min/Max USD      :"
+  min_max_btc:  "Min/Max BTC      :"
+  coin_progress: "Coinentwicklung:"
   table:
     coin: "Coin"
     from: "Von"
     to: "Bis"
-  HODL_explanation: "Stellt dar, was du derzeit hättest, wenn du einfach deine Startmünze halten würdest"
-  db_error: "❌ Statistik kann nicht aus der Datenbank abgerufen werden"
+  error:
+    db_error: "❌ Statistiken können nicht aus der Datenbank geholt werden."
+    date_error: "❌ Die Datumsinformationen können nicht abgerufen werden."
+    empty_trade_history: "❌ Die Handelshistorie ist leer, warte, bis du Statistiken über den Handel erhältst."
+    first_coin_error: "❌ Die Informationen über den Start-Coin des Bots konnten nicht aus der Datenbank abgerufen werden."
+    current_coin_error: "❌ Die aktuellen Coin-Daten des Bots konnten nicht aus der Datenbank abgerufen werden."
+    value_error: "❌ Fehler beim Holen von Informationen aus der Datenbank. Fehlercode = `%{error_code}`"
+    start_coin_not_found: "❌ Start-Coin nicht in Coin-Liste gefunden."
 
 btb:
   not_running: "⚠ Binance Trade Bot läuft nicht."
