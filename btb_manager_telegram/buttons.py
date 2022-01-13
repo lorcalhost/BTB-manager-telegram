@@ -534,11 +534,13 @@ def bot_stats():
         cur.execute("SELECT count(*) FROM trade_history WHERE selling=0")
         numCoinJumps = cur.fetchall()[0][0]
 
-        reports = get_previous_reports()
-
         start_date = datetime.strptime(bot_start_date[2:], "%y-%m-%d %H:%M:%S.%f")
         end_date = datetime.strptime(bot_end_date[2:], "%y-%m-%d %H:%M:%S.%f")
         numDays = (end_date - start_date).days
+
+        reports = [
+            r for r in get_previous_reports() if r["time"] >= start_date.timestamp()
+        ]
 
         # get first trade and its bridge - all stats must be in this bridge
         cur.execute(
