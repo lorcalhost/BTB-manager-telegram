@@ -27,7 +27,7 @@ from btb_manager_telegram import (
     settings,
 )
 from btb_manager_telegram.buttons import start_bot
-from btb_manager_telegram.report import make_snapshot
+from btb_manager_telegram.report import make_snapshot, migrate_reports
 from btb_manager_telegram.utils import (
     escape_tg,
     retreive_btb_constants,
@@ -129,12 +129,12 @@ def pre_run_main() -> None:
     setup_root_path_constant()
     retreive_btb_constants()
     setup_coin_list()
-
     if settings.TOKEN is None or settings.CHAT_ID is None:
         setup_telegram_constants()
-
     settings.BOT = Bot(settings.TOKEN)
     settings.CHAT = settings.BOT.getChat(settings.CHAT_ID)
+
+    migrate_reports()
 
     scheduler.enter(1, 1, update_checker)
     scheduler.enter(1, 1, make_snapshot)
