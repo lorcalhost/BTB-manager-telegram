@@ -32,14 +32,14 @@ value:
   error: "❌ Terjadi kesalahan, tidak dapat menampilkan nilai saat ini."
   last_update: "Pembaruan terakhir: `%{update}`"
   current_coin: "*Koin saat ini adalah %{coin}:*"
-  balance: "- Saldo            : `%{balance}` *%{coin}*"
-  exchange_rate_purchased: "- Harga pembelian  : `%{rate}` *%{coin}*/*%{bridge}*"
-  exchange_rate_now: "- Harga saat ini   : `%{rate}` *%{coin}*/*USD*"
-  value_change: "- Perubahan harga  : `%{change}` *%*"
-  value_usd: "- Nilai dalam *USD*: `%{value}` *USD*"
-  value_btc: "- Nilai dalam *BTC*: `%{value}` *BTC*"
-  bought_for: "_Pembelian sejumlah_ `%{value}` *%{coin}*"
-  change_btc: "%{days} hari perubahan nilai BTC: `%{value}`"
+  balance:                 "Saldo              : %{balance} %{coin}"
+  exchange_rate_purchased: "Harga pembelian    : %{rate} %{coin}/%{bridge}"
+  exchange_rate_now:       "Harga saat ini     : %{rate} %{coin}/USD"
+  value_change:            "Perubahan harga    : %{change} %"
+  value_usd:               "Nilai dalam USD    : %{value} USD"
+  value_btc:               "Nilai dalam BTC    : %{value} BTC"
+  bought_for:              "Pembelian sejumlah : %{value} %{coin}"
+  change_btc:              "%{days} hari perubahan nilai BTC%{spaces}: %{value}"
 
 
 progress:

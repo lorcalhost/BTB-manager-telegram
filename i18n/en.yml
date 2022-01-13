@@ -32,14 +32,14 @@ value:
   error: "❌ Something went wrong, unable to generate value at this time."
   last_update: "Last update: `%{update}`"
   current_coin: "*Current coin %{coin}:*"
-  balance: "- Balance                : `%{balance}` *%{coin}*"
-  exchange_rate_purchased: "- Exchange rate purchased: `%{rate}` *%{coin}*/*%{bridge}*"
-  exchange_rate_now: "- Exchange rate now      : `%{rate}` *%{coin}*/*USD*"
-  value_change: "- *Change in value*      : `%{change}` *%*"
-  value_usd: "- Value in *USD*         : `%{value}` *USD*"
-  value_btc: "- Value in *BTC*         : `%{value}` *BTC*"
-  bought_for: "_Bought for_ `%{value}` *%{coin}*"
-  change_btc: "%{days} day change BTC: `%{value}`"
+  balance:                 "Balance               : %{balance} %{coin}"
+  exchange_rate_purchased: "Exchg. rate purchased : %{rate} %{coin}/%{bridge}"
+  exchange_rate_now:       "Exchange rate now     : %{rate} %{coin}/USD"
+  value_change:            "Change in value       : %{change} %"
+  value_usd:               "Value in USD          : %{value} USD"
+  value_btc:               "Value in BTC          : %{value} BTC"
+  bought_for:              "Bought for            : %{value} %{coin}"
+  change_btc:              "%{days} day change BTC %{spaces}    : %{value}"
 
 
 progress:

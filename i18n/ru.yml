@@ -32,13 +32,13 @@ value:
   error: "❌ Что-то пошло не так, не могу сгенерировать стоимость сейчас."
   last_update: "Обновлено: `%{update}`"
   current_coin: "*Текущая монета %{coin}:*"
-  balance: "- Баланс: `%{balance}` *%{coin}*"
-  exchange_rate_purchased: "- Курс покупки: `%{rate}` *%{coin}*/*%{bridge}*"
-  exchange_rate_now: "- Курс сейчас: `%{rate}` *%{coin}*/*USD*"
-  value_change: "- *Изменение стоимости*: `%{change}` *%*"
-  value_usd: "- Стоимость в *USDT*: `%{value}`"
-  value_btc: "- Стоимость в *BTC*: `%{value}`"
-  bought_for: "_Куплен за_ `%{value}` *%{coin}*"
+  balance:                 "Баланс              : %{balance} %{coin}"
+  exchange_rate_purchased: "Курс покупки        : %{rate} %{coin}/%{bridge}"
+  exchange_rate_now:       "Курс сейчас         : %{rate} %{coin}/USD"
+  value_change:            "Изменение стоимости : %{change} %"
+  value_usd:               "Стоимость в USDT    : %{value}"
+  value_btc:               "Стоимость в BTC     : %{value}"
+  bought_for:              "Куплен за           : %{value} %{coin}"
 
 
 progress:
