@@ -1,5 +1,6 @@
 import datetime as dt
 import os
+import shutil
 import sys
 import time
 import traceback
@@ -19,6 +20,19 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 additional_coins = ["BTC"]
 include_only_coinlist = True
+
+
+def reports_path():
+    return os.path.join(settings.ROOT_PATH, "data", "btbmt_reports.npy")
+
+
+def migrate_reports():
+    """
+    Used to migrate report placement from v1.1.1 to v1.2
+    """
+
+    if os.path.isfile("data/crypto.npy"):
+        shutil.move("data/crypto.npy", reports_path())
 
 
 def build_ticker(all_symbols, tickers_raw):
@@ -108,8 +122,8 @@ def get_report():
 
 
 def get_previous_reports():
-    if os.path.exists("data/crypto.npy"):
-        reports = np.load("data/crypto.npy", allow_pickle=True).tolist()
+    if os.path.exists(reports_path()):
+        reports = np.load(reports_path(), allow_pickle=True).tolist()
         return reports
     else:
         return []
@@ -118,7 +132,7 @@ def get_previous_reports():
 def save_report(report, old_reports):
     report["time"] = int(time.time())
     old_reports.append(report)
-    np.save("data/crypto.npy", old_reports, allow_pickle=True)
+    np.save(reports_path(), old_reports, allow_pickle=True)
     return old_reports
 
 
