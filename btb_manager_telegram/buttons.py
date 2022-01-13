@@ -626,23 +626,6 @@ def bot_stats():
             (convertibleStartCoinAmount - initialCoinAmount) / initialCoinAmount * 100
         )
 
-        message += "\n{} {}{}% {} / {}{}% {}".format(
-            i18n.t("bot_stats.profit"),
-            "+" if changeStartCoin >= 0 else "",
-            round(changeStartCoin, 2),
-            initialCoinID,
-            "+" if changeFiat >= 0 else "",
-            round(changeFiat, 2),
-            displayCurrency,
-        )
-        message += "\n{} {} {} / {} {}".format(
-            i18n.t("bot_stats.hodl"),
-            float_strip(initialCoinAmount, 8),
-            initialCoinID,
-            round(initialCoinLiveBridgeValue, 2),
-            displayCurrency,
-        )
-
         message += (
             "`"
             f"{i18n.t('bot_stats.bot_started', date=start_date.strftime('%d/%m/%y'), no_days=numDays)}"
