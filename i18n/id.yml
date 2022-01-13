@@ -82,7 +82,7 @@ history:
 
 bot_stats:
   bot_started: "Tanggal Mulai   : %{date} (%{no_days} days ago)"
-  no_jumps: "Jumlah Lompatan :"
+  nb_jumps: "Jumlah Lompatan :"
   start_coin: "Koin Permulaan  :"
   current_coin: "Koin Saat Ini   :"
   hodl: "HODL¹           :"
