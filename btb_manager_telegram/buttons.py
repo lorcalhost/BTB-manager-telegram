@@ -778,11 +778,33 @@ def bot_stats():
         if initialCoinID == "":
             message += f"\n{i18n.t('bot_stats.error.start_coin_not_found')}"
 
-        max_usd = max(reports, key=lambda a: a["total_usdt"])["total_usdt"]
-        min_usd = min(reports, key=lambda a: a["total_usdt"])["total_usdt"]
-        btc_vals = [a["total_usdt"] / a["tickers"]["BTC"] for a in reports]
-        max_btc = max(btc_vals)
-        min_btc = min(btc_vals)
+        try:
+            cur.execute(f"""SELECT (balance * usd_price) FROM coin_value """)
+            usd_values = cur.fetchall()
+            usd_values_filtered = []
+            for val in usd_values:
+                if val[0] != None:
+                    if val[0] > 5:
+                        usd_values_filtered.append(val[0])
+
+
+            cur.execute(f"""SELECT (balance * btc_price) FROM coin_value """)
+            btc_values = cur.fetchall()
+            btc_values_filtered = []
+            for value in btc_values:
+                if value[0] != None:
+                    if value[0] > (5.0 / [a["tickers"]["BTC"] for a in reports][-1]):
+                        btc_values_filtered.append(value[0])
+
+            # import ipdb; ipdb.set_trace()
+            max_usd = max(usd_values_filtered)
+            min_usd = min(usd_values_filtered)
+
+            max_btc = max(btc_values_filtered)
+            min_btc = min(btc_values_filtered)
+        except:
+            max_usd = min_usd = max_btc = min_btc = 0
+            logger.error("Exception : Unable to calculate min/max USD, BTC values.")
 
         message += f"\n{i18n.t('bot_stats.min_max_usd')} {round(min_usd,2)} / {round(max_usd,2)}"
         message += f"\n{i18n.t('bot_stats.min_max_btc')} {float_strip(min_btc,8)} / {float_strip(max_btc,8)}"
