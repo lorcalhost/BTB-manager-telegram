@@ -621,9 +621,9 @@ def retrieve_value_db(dbFetch):
 
 def bot_stats():
     db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
-    message = [i18n.t("database_not_found", path=db_file_path)]
     if not os.path.exists(db_file_path):
-        return message
+        return [i18n.t("database_not_found", path=db_file_path)]
+
     message = ""
 
     stableCoins = ["USDT", "USD", "BUSD", "USDC", "DAI"]
@@ -688,11 +688,12 @@ def bot_stats():
             WHERE selling=0 and state='COMPLETE'
             ORDER BY id DESC LIMIT 1;"""
         )
+        query = cur.fetchone()
         if query is None:
             logger.error(i18n.t("bot_stats.error.current_coin_error"))
             message = [i18n.t("bot_stats.error.current_coin_error")]
             return message
-        currentCoinID, currentCoinAmount = cur.fetchone()
+        currentCoinID, currentCoinAmount = query
 
         displayCurrency = (
             "$" if initialCoinbridgeID in stableCoins else initialCoinbridgeID
@@ -715,68 +716,20 @@ def bot_stats():
 
         currentCoinLiveBridgeValue = currentCoinAmount * currentCoinLiveBridgePrice
 
-        message += f"`{i18n.t('bot_stats.bot_started', date=start_date.strftime('%d/%m/%y'), no_days=numDays)}"
-        message += f"\n{i18n.t('bot_stats.nb_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"
-
-        if initialCoinID != "":
-            message += "\n{} {} {} / {} {}".format(
-                i18n.t("bot_stats.start_coin"),
-                float_strip(initialCoinAmount, 8),
-                initialCoinID,
-                round(initialCoinFiatValue, 2),
-                displayCurrency,
-            )
-        else:
-            message += f"\n{i18n.t('bot_stats.start_coin')} -- / --"
-
-        message += "\n{} {} {} / {} {}".format(
-            i18n.t("bot_stats.current_coin"),
-            float_strip(currentCoinAmount, 8),
-            currentCoinID,
-            round(currentCoinLiveBridgeValue, 2),
-            displayCurrency,
+        convertibleStartCoinAmount = (
+            currentCoinLiveBridgeValue / initialCoinLiveBridgePrice
         )
 
-        if initialCoinID != "":
-            convertibleStartCoinAmount = (
-                currentCoinLiveBridgeValue / initialCoinLiveBridgePrice
-            )
+        # always show profit in bot start coin's Bridge
+        changeFiat = (
+            (currentCoinLiveBridgeValue - initialCoinFiatValue)
+            / initialCoinFiatValue
+            * 100
+        )
 
-            # always show profit in bot start coin's Bridge
-            changeFiat = (
-                (currentCoinLiveBridgeValue - initialCoinFiatValue)
-                / initialCoinFiatValue
-                * 100
-            )
-
-            changeStartCoin = (
-                (convertibleStartCoinAmount - initialCoinAmount)
-                / initialCoinAmount
-                * 100
-            )
-
-            message += "\n{} {}{}% {} / {}{}% {}".format(
-                i18n.t("bot_stats.profit"),
-                "+" if changeStartCoin >= 0 else "",
-                round(changeStartCoin, 2),
-                initialCoinID,
-                "+" if changeFiat >= 0 else "",
-                round(changeFiat, 2),
-                displayCurrency,
-            )
-            message += "\n{} {} {} / {} {}".format(
-                i18n.t("bot_stats.hodl"),
-                float_strip(initialCoinAmount, 8),
-                initialCoinID,
-                round(initialCoinLiveBridgeValue, 2),
-                displayCurrency,
-            )
-
-        else:
-            message += f"\n{i18n.t('bot_stats.hodl')} -- / --"
-
-        if initialCoinID == "":
-            message += f"\n{i18n.t('bot_stats.error.start_coin_not_found')}"
+        changeStartCoin = (
+            (convertibleStartCoinAmount - initialCoinAmount) / initialCoinAmount * 100
+        )
 
         try:
             cur.execute(f"""SELECT (balance * usd_price) FROM coin_value """)
@@ -804,9 +757,18 @@ def bot_stats():
             max_usd = min_usd = max_btc = min_btc = 0
             logger.error("Exception : Unable to calculate min/max USD, BTC values.")
 
-        message += f"\n{i18n.t('bot_stats.min_max_usd')} {round(min_usd,2)} / {round(max_usd,2)}"
-        message += f"\n{i18n.t('bot_stats.min_max_btc')} {float_strip(min_btc,8)} / {float_strip(max_btc,8)}"
-        message += "`"
+        message += (
+            "`"
+            f"{i18n.t('bot_stats.bot_started', date=start_date.strftime('%d/%m/%y'), no_days=numDays)}"
+            f"\n{i18n.t('bot_stats.nb_jumps')} {numCoinJumps} ({round(numCoinJumps / max(numDays,1),1)} jumps/day)"
+            f"\n{i18n.t('bot_stats.start_coin')} {float_strip(initialCoinAmount, 8)} {initialCoinID} / {round(initialCoinFiatValue, 2)} {displayCurrency}"
+            f"\n{i18n.t('bot_stats.current_coin')} {float_strip(currentCoinAmount, 8)} {currentCoinID} / {round(currentCoinLiveBridgeValue, 2)} {displayCurrency}"
+            f"\n{i18n.t('bot_stats.profit')} {'+' if changeStartCoin >= 0 else ''}{round(changeStartCoin, 2)}% {initialCoinID} / {'+' if changeFiat >= 0 else ''}{round(changeFiat, 2)}% {displayCurrency}"
+            f"\n{i18n.t('bot_stats.hodl')} {float_strip(initialCoinAmount, 8)} {initialCoinID} / {round(initialCoinLiveBridgeValue, 2)} {displayCurrency}"
+            f"\n{i18n.t('bot_stats.min_max_usd')} {round(min_usd,2)} / {round(max_usd,2)}"
+            f"\n{i18n.t('bot_stats.min_max_btc')} {float_strip(min_btc,8)} / {float_strip(max_btc,8)}"
+            "`"
+        )
 
         rows = []
         for coin in settings.COIN_LIST:
