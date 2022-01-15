@@ -1,0 +1,270 @@
+exited_no_change: "👌 未修改退出"
+stop_to_stop: "输入 /stop 指令来不保存修改退出"
+bye: "再见! 希望哪天我们有缘相见。"
+killed_bot: "终止 _Binance Trade Bot_!"
+logging_enabled_error: "⚠ 请确认 _Binance Trade Bot_ 日志功能打开。"
+database_not_found: "❌ 在`%{path}`未能找到数据库。"
+conversation_started: "对话开始!"
+select_option: "请从选项中选出一个。"
+
+
+welcome:
+  hello: "你好 *%{name}*!"
+  welcome: "欢迎来到 _Binance Trade Bot Manager Telegram_."
+  developed_by: "这个机器人由这些贡献者打造 %{contributors}."
+  project_link: "关于这个的 [更多信息](https://github.com/lorcalhost/BTB-manager-telegram)."
+  donation: "*如果你觉得我做的不错的话请考虑 [通过赞助来支持我](https://github.com/sponsors/lorcalhost). ❤*"
+  how_to_start: "*通过`/start`开始对话*"
+  bot_started: "目前已经有一个机器人在运行，不需要运行多个"
+  bot_not_started:
+    base: "尝试开始机器人但是失败了"
+    bot_error: "看起来机器人启动的时候发生了错误"
+    no_python: "没有找到python"
+    bad_path: "没有找到机器人"
+
+
+value:
+  order_placed: "购单： `%{order_size}` *%{bridge}* 现在已经在*%{current_coin}*上下单 ."
+  wait_for_order: "_等待购单完成_."
+  db_error: "❌ 无法从数据库中拿到当前币种"
+  no_information: "❌ 数据库中没有关于 *%{current_coin}* 的有效信息"
+  no_during_trade: "⚠ 若果你正在交易中并尝试使用 `当前价值` 按钮，请等待交易完成后使用"
+  error: "❌ 出错了，暂时不能生成价值"
+  last_update: "上次更新: `%{update}`"
+  current_coin: "*当前币 %{coin}:*"
+  balance:                 "余额　　                : %{balance} %{coin}"
+  exchange_rate_purchased: "购买汇率                : %{rate} %{coin}/%{bridge}"
+  exchange_rate_now:       "当前汇率                : %{rate} %{coin}/USD"
+  value_change:            "价值变化                : %{change} %"
+  value_usd:               "USD价值　 　            : %{value} USD"
+  value_btc:               "BTC价值　 　            : %{value} BTC"
+  bought_for:              "购入成本                : %{value} %{coin}"
+  change_btc:              "%{days} 日变化 BTC %{spaces}    : %{value}"
+
+
+progress:
+  coin: "当前币种数量进度:"
+  amount: "- 数量: `%{amount}` *%{coin}*"
+  price: "- 价格: `%{amount}` *USD*"
+  change_over_days: "- 变化: `%{amount}` *%{coin}* `%{percent}` *%* 在 %{days} 天, %{hours} 小时"
+  trade_datetime: "- 交易时间: `%{date}`"
+  db_error: "❌ 无法从数据库中找到数量进展"
+
+
+ratios:
+  last_update: "上次更新: `%{update}`"
+  compared_ratios: "*对于 %{coin} 的比率降序:*"
+  price: "价格 %{bridge}"
+  ratio: "比率"
+  coin: "币"
+  gen_error: "❌ 出错了, 暂时不能生成比率"
+  db_error: "❌ 无法从数据库中找到比率"
+
+
+next_coin:
+  current_price: "目前价格"
+  target_price: "目标价格"
+  percentage: "%"
+  coin: "币"
+  error: "❌ 出错了, 暂时不能生成下一个币"
+  db_error: "❌ 无法从数据库中找到下一个币"
+
+
+history:
+  last_x_trades: "上 **%{trades}** 次交易:"
+  sold_bought: "*%{sold_trade}* `%{amount1}` *%{coin1}* 卖了 `%{amount2}` *%{coin2}*"
+  sold: "卖出"
+  bought: "买入"
+  status: "状态: _*%{status}*_"
+  error: "❌ 出错了, 暂时不能生成交易历史"
+  db_error: "❌ 无法从数据库中找到交易历史"
+
+
+bot_stats:
+  bot_started:  "机器人启动于　  : %{date} (%{no_days} days ago)"
+  nb_jumps:     "跳跃次数       　 :"
+  start_coin:   "起始币　       　 :"
+  current_coin: "当前币　       　 :"
+  hodl:         "购买并持有　 　　  :"
+  profit:       "机器人获利　　  　 :"
+  min_max_usd:  "最低最高 USD  　  :"
+  min_max_btc:  "最低最高 BTC  　  :"
+  coin_progress: "币种进度:"
+  table:
+    coin: "币种"
+    from: "从"
+    to: "到"
+  error:
+    db_error: "❌ 无法从数据库中找到统计数据"
+    date_error: "❌ 无法从数据库中找到日期信息"
+    empty_trade_history: "❌ 交易历史是空的, 等待交易后获得统计数据"
+    first_coin_error: "❌ 无法从数据库中取到机器人起始币种信息"
+    current_coin_error: "❌ 无法从数据库中取到机器人当前币种信息"
+    value_error: "❌ 无法从数据库中取道信息， Error Code = `%{error_code}`."
+    start_coin_not_found: "❌ 机器人起始币不在支持列表内"
+
+btb:
+  not_running: "⚠ Binance Trade Bot 没有在运行"
+  running: "✔ Binance Trade Bot 正在运行"
+  already_running: "⚠ Binance Trade Bot 已经运行"
+  starting: "交易机器人正在启动, 请等待..."
+  started: "✔ 交易机器人成功启动"
+  start_error: "❌ 无法启动 Binance Trade Bot."
+  installation_path_error: "❌ 无法找到 _Binance Trade Bot_ 在此安装路径： `%{path}`."
+  directory_hint: "确认 `binance-trade-bot` 和 `BTB-manager-telegram` 在同一母文件夹下"
+  stopped: "✔ 成功停止机器人"
+  stop_error: "❌ 无法停止 Binance Trade Bot."
+  lib_error: "❌ 无法在此路径找到python： `%{path}`."
+  windows_hint: "如果你使用windows运行机器人，请确保在管理员权限运行"
+
+
+log:
+  error: "❌ 无法在次找到日志：`%{path}`."
+  last_4000_characters: "最后 *4000* 字符在日志文件:"
+
+
+panic:
+  holding: "你现在拥有 `%{amount1}` *%{coin1}* 通过 `%{amount2}` *%{coin2}* 交易"
+  rate_when_bought: "购买时汇率:"
+  current_rate: "当前汇率:"
+  current_value: "当前价值:"
+  change: "变化:"
+  stop_and_sell: "你想要停止 _Binance Trade Bot_ 并且按市价售出?"
+  open_buy_order: "你有一个购单 `%{amount1}` *%{coin1}* 以 `%{amount2}` *%{coin2}* 价格"
+  limit_buy_price: "限价购入单在:"
+  stop_and_cancel: "你想要停止 _Binance Trade Bot_ 并取消目前购单?"
+  order_already_complete: "你的余额已经是 *%{coin}*."
+  ask_stop_bot: "你想要停止 _Binance Trade Bot_?"
+  open_sell_order: "你有一个卖单 `%{amount1}` *%{coin1}* 以 `%{amount2}` *%{coin2}* 价格"
+  limit_sell_price: "限价卖出单在:"
+  error: "❌ 出错了，紧急错误按钮目前不生效"
+  db_error: "❌ 无法对数据库执行所需的操作"
+
+
+coin_list:
+  success: "✔ 成功编辑币种列表文件到:"
+  error: "❌ 无法编辑币种列表文件"
+  not_found: "❌ 无法在 `%{path}` 找到币种列表文件."
+  not_modified: "你的 `supported_coin_list` 文件还*没有*更改"
+  is: "当前币种列表是:"
+  reply: "_*请回复包含更新币种列表的消息*_"
+  stop_bot: "⚠ 请在编辑币种列表之前停止 Binance Trade Bot"
+
+
+config:
+  success: "✔ 成功编辑用户配置文件到:"
+  error: "❌ 无法编辑用户配置文件"
+  not_found: "❌ 无法在 `%{path}` 找到用户配置文件"
+  not_modified: "您的 `user.cfg` 文件*未*修改。"
+  is: "当前配置文件是:"
+  reply: "_*请回复包含更新配置的消息*_."
+  stop_bot: "⚠ 请在编辑用户配置文件前停止Binance Trade Bot"
+
+
+db:
+  delete:
+    success: "✔ 成功删除数据库文件"
+    error: "❌ 无法删除数据库文件"
+    clear_log_error: "❌ 无法清除日志文件"
+    not_deleted: "您的数据库*未*删除"
+    stop_bot: "⚠ 请在删除数据库文件之前停止 Binance Trade Bot"
+    sure: "您确定要删除数据库文件并清除日志吗?"
+
+  export:
+    stop_bot: "⚠ 请在导出数据库文件之前停止 Binance Trade Bot"
+    file: "这是您的数据库文件:"
+    error: "❌ 无法导出数据库文件"
+
+
+update:
+  now: "你想现在更新吗?"
+  tgb:
+    updating: "机器人正在更新。请等待重新启动"
+    version_error: "尝试获取 BTB Manager Telegram 版本信息时出错"
+    error: "无法更新 BTB Manager Telegram"
+    not_updated: "BTB Manager Telegram *没有* 更新."
+    up_to_date: "你的 BTB Manager Telegram 已经更新"
+    available: "新的 BTB Manager Telegram 已经可以更新"
+    instruction: "请前往 *🛠 维修维护* 然后按下*⬆ 更新 Telegram Bot* 按钮."
+
+  btb:
+    updating: "机器人已经停止并开始更新"
+    version_error: "尝试获取 Binance Trade Bot 版本信息时出错"
+    error: "无法更新 Binance Trade Bot"
+    not_updated: "Binance Trade Bot was *没有* 更新."
+    up_to_date: "你的 Binance Trade Bot 已经更新"
+    available: "新的 Binance Trade Bot 已经可以更新"
+    instruction: "请前往 *🛠 维修维护* 然后按下*更新 Binance Trade Bot* 按钮."
+    start_manually: "稍等一会, 然后手动重启"
+
+
+script:
+  not_found: "无法在 custom_scripts.json 文件中找到名为 %{name} 的脚本"
+  error: "脚本执行期间出错"
+  no_script: "在 *BTB-manager-telegram* 的 `/config/custom_scripts.json` 文件中找不到自定义脚本"
+  no_config: "无法在 *BTB-manager-telegram* 的 `config/` 目录中找到 `custom_scripts.json` 文件"
+  select: "选择您的自定义脚本以执行"
+
+
+snapshot:
+  error: "❌ 暂时无法拍摄币安帐户的快照。错误消息:"
+
+
+graph:
+  msg_existing_graphs: "选择一个图表或创建一个新图表。提示：语法为 'COIN1,COIN2,COIN3 NumberOfDays"
+  msg_no_graphs: "使用“新建图表”按钮创建一个新图表"
+  error: "生成图表时发生错误。请报告。错误消息 :"
+  relative_amount: "相对数量变化 (%)"
+  amount: "数量"
+  relative_price: "以 %{currency} 表示的价格相对变化 (%)"
+  price: "以%{currency}表示的价格"
+  exit: "👌 已退出"
+  not_enough_points: "用于生成绘图的信息不足。因此，无法生成图表。请等待一小时以生成新报告"
+  bad_graph: "您输入的命令格式错误，正在退出"
+  new_graph:
+    a: "输入您要创建的新图表"
+    b: "语法如下：`COIN1,COIN2,... NumberOfDays`"
+    c: "如果 NumberOfDays 设置为 0，则将绘制所有历史记录的图表"
+    d: "如果 币种列表 替换为为 *，则将绘制所有记录下的币种的图表"
+    e: "示例："
+    f: "`USD 7` 将绘制您在过去 7 天中以USD价值表示的持有量"
+    g: "`USD,BTC 0` 将在绘制以 USD 和 BTC 表示所有记录的数据的持有量"
+    h: "`* 14` 将绘制你在过去 14 天内所有记录的币种的持有量"
+    i: "输入 `/stop` 指令以退出"
+
+
+keyboard:
+  current_value: "💵 当前价值"
+  progress: "📈 进度"
+  current_ratios: "➗ 当前比率"
+  trade_history: "⌛ 交易理智"
+  panic: "🚨 紧急错误按钮"
+  check_status: "🔍 查看机器人状态"
+  bot_stats: "🚀 机器人数据"
+  maintenance: "🛠 维修维护"
+  configurations: "⚙️ 设置"
+  start: "▶ 开始交易机器人"
+  stop: "⏹ 错误交易机器人"
+  read_logs: "📜 查看最后的日志"
+  delete_db: "❌ 删除数据库"
+  edit_cfg: "⚙ 编就 user.cfg"
+  edit_coin_list: "👛 编辑币种列表"
+  export_db: "📤 导出数据库"
+  back: "⬅️ 返回"
+  go_back: "返回"
+  update_tgb: "⬆ 更新 Telegram Bot"
+  update_btb: "⬆ 更新 Binance Trade Bot"
+  execute_script: "🤖 执行自定义脚本"
+  stop_sell: "⚠ 停止并按市价售出"
+  stop_cancel: "⚠ 停止并取消订单"
+  ok_s: "OK 👌"
+  ok: "OK"
+  great: "太棒了 👌"
+  cancel: "取消"
+  update: "更新"
+  cancel_update: "取消更新"
+  confirm: "⚠ 确认"
+  stop_bot: "⚠ 停止机器人"
+  next_coin: "🔀 下一个币"
+  graph: "📊 图表"
+  new_graph: "➕ 新图表"
