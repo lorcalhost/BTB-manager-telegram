@@ -50,7 +50,7 @@ However, you can run the bot with options :
 # (Otherwise you will have to manually start the Binance Trade Bot from telegram)
 python3 -m btb_manager_telegram -s
 
-# Use the french translation. Available translation : en, ru, fr, de, nl, es, id
+# Use the french translation. Available translation : en, ru, fr, de, nl, es, id, cn
 python3 -m btb_manager_telegram -l fr
 
 # Make possible to plot the bot's performance in EUR instead of USD
