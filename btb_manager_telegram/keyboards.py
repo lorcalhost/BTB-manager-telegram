@@ -8,7 +8,7 @@ menu = ReplyKeyboardMarkup(
         [i18n.t("keyboard.current_ratios"), i18n.t("keyboard.next_coin")],
         [i18n.t("keyboard.trade_history"), i18n.t("keyboard.progress")],
         [i18n.t("keyboard.graph"), i18n.t("keyboard.configurations")],
-        [i18n.t("keyboard.coin_forecast")]
+        [i18n.t("keyboard.coin_forecast")],
         [i18n.t("keyboard.check_status"), i18n.t("keyboard.maintenance")],
     ],
     resize_keyboard=True,
