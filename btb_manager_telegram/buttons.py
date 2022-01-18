@@ -547,47 +547,47 @@ def coin_forecast():
         for pair in coinPairs:
             pairID = pair[0]
             coin = pair[2]
-
-            liveCoinPrice = 1
-            try:
-                cur.execute(
-                    f"SELECT other_coin_price FROM scout_history WHERE pair_id='{pairID}' order by id DESC limit 1"
-                )
-                liveCoinPrice = retrieve_value_db(cur.fetchall())
-            except:
-                liveCoinPrice = get_current_price(coin, "USDT")
-
-            forecastAmount = currentCoinLiveUSDTValue / liveCoinPrice
-
-            try:
-                cur.execute(
-                    f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' \
-                    and selling=0 and state='COMPLETE' order by id DESC limit 1"
-                )
-
-                previousAmount = retrieve_value_db(cur.fetchall())
-                if previousAmount != None:
-                    changePercentage = (
-                        (forecastAmount - previousAmount) / previousAmount * 100
+            if coin in settings.COIN_LIST:
+                liveCoinPrice = 1
+                try:
+                    cur.execute(
+                        f"SELECT other_coin_price FROM scout_history WHERE pair_id='{pairID}' order by id DESC limit 1"
                     )
-                    rows.append(
-                        [
-                            coin,
-                            float(forecastAmount),
-                            float(previousAmount),
-                            str(round(changePercentage, 2))
-                            if changePercentage != 0
-                            else "0",
-                        ]
+                    liveCoinPrice = retrieve_value_db(cur.fetchall())
+                except:
+                    liveCoinPrice = get_current_price(coin, "USDT")
+
+                forecastAmount = currentCoinLiveUSDTValue / liveCoinPrice
+
+                try:
+                    cur.execute(
+                        f"SELECT alt_trade_amount FROM trade_history WHERE alt_coin_id='{coin}' \
+                        and selling=0 and state='COMPLETE' order by id DESC limit 1"
                     )
-                else:
+
+                    previousAmount = retrieve_value_db(cur.fetchall())
+                    if previousAmount != None:
+                        changePercentage = (
+                            (forecastAmount - previousAmount) / previousAmount * 100
+                        )
+                        rows.append(
+                            [
+                                coin,
+                                float(forecastAmount),
+                                float(previousAmount),
+                                str(round(changePercentage, 2))
+                                if changePercentage != 0
+                                else "0",
+                            ]
+                        )
+                    else:
+                        rows.append(
+                            [coin, float(forecastAmount), "--", "--",]
+                        )
+                except:
                     rows.append(
                         [coin, float(forecastAmount), "--", "--",]
                     )
-            except:
-                rows.append(
-                    [coin, float(forecastAmount), "--", "--",]
-                )
 
         table = tabularize(
             [
