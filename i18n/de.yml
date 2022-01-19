@@ -11,7 +11,7 @@ select_option: "Bitte wähle eine der Optionen aus."
 welcome:
   hello: "Hallo *%{name}*!"
   welcome: "Willkommen beim _Binance Trade Bot Manager Telegramm_."
-  developed_by: "Dieser Telegram Bot wurder von @lorcalhost entwickelt."
+  developed_by: "Dieser Telegram Bot wurder von %{contributors} entwickelt."
   project_link: "Finde [hier](https://github.com/lorcalhost/BTB-manager-telegram) mehr über das Projekt heraus."
   donation: "*Wenn du meine Arbeit magst, [überlege bitte das Projekt mit einer kleinen Spende zu unterstützen](https://github.com/sponsors/lorcalhost). ❤*"
   how_to_start: "*Zum Starten der Unterhaltung, klicke auf die Schaltfläche `/start`*"
@@ -32,16 +32,14 @@ value:
   error: "❌ Etwas ist schief gelaufen, derzeit kann kein Wert generiert werden."
   last_update: "Letztes Update: `%{update}`"
   current_coin: "*Aktueller Coin %{coin}:*"
-  balance: "- Bilanz: `%{balance}` *%{coin}*"
-  exchange_rate_purchased: "- Wechselkurs beim Kauf:  `%{rate}` *%{coin}*/*%{bridge}*"
-  exchange_rate_now: "- Aktueller Wechselkurs : `%{rate}` *%{coin}*/*USD*"
-  value_change: "- *Wertänderung*: `%{change}` *%*"
-  value_usd: "- Wert in *USD*: `%{value}` *USD*"
-  value_btc: "- Wert in *BTC*: `%{value}` *BTC*"
-  bought_for: "_Gekauft für_ `%{value}` *%{coin}*"
-  one_day_change_btc: "1 Tag Änderung BTC: `%{value}` %"
-  seven_day_change_btc: "7 Tage Änderung BTC: `%{value}` %"
-
+  balance:                 "Bilanz               : %{balance} %{coin}"
+  exchange_rate_purchased: "Wechselkurs beim Kauf: %{rate} %{coin}/%{bridge}"
+  exchange_rate_now:       "Aktueller Wechselkurs: %{rate} %{coin}/USD"
+  value_change:            "Wertänderung         : %{change} %"
+  value_usd:               "Wert in USD          : %{value} USD"
+  value_btc:               "Wert in BTC          : %{value} BTC"
+  bought_for:              "Gekauft für          : %{value} %{coin}"
+  change_btc:              "%{days} Tagesänderung BTC %{spaces}    : %{value}"
 
 progress:
   coin: "Aktueller Coin-Mengenfortschritt:"
@@ -55,15 +53,18 @@ progress:
 ratios:
   last_update: "Letztes Update: `%{update}`"
   compared_ratios: "*Coinverhältnisse im Vergleich zu %{coin} in absteigender Reihenfolge:*"
-  bridge_value: "- Preis: `%{value}` %{bridge}"
-  ratio: "- Verhältnis: `%{ratio}`"
+  price: "Preis %{bridge}"
+  ratio: "Verhältnis"
+  coin: "Coin"
   gen_error: "❌ Etwas ist schief gelaufen, derzeit können keine Verhältnisse erstellt werden."
   db_error: "❌ Verhältnisse können nicht aus der Datenbank abgerufen werden."
 
 
 next_coin:
-  current_price: "- Aktueller Preis: `%{price}` %{coin}"
-  target_price: "- Zielpreis: `%{price}` %{coin}"
+  current_price: "Aktueller Preis"
+  target_price: "Zielpreis"
+  percentage: "%"
+  coin: "Coin"
   error: "❌ Etwas ist schief gelaufen, derzeit kann der nächste Coin nicht ermittelt werden."
   db_error: "❌ Nächster Coin kann nicht aus der Datenbank ermittelt werden."
 
@@ -77,6 +78,29 @@ history:
   error: "❌ Etwas ist schief gelaufen, Handelshistorie kann derzeit nicht erstellt werden."
   db_error: "❌ Handelshistorie kann nicht aus der Datenbank abgerufen werden."
 
+
+bot_stats:
+  bot_started:  "Bot startete     :"
+  nb_jumps:     "Nr. von Sprüngen :"
+  start_coin:   "Start-Coin       :"
+  current_coin: "Aktueller Coin   :"
+  hodl:         "Kaufen & Halten  :"
+  profit:       "Bot-Profit       :"
+  min_max_usd:  "Min/Max USD      :"
+  min_max_btc:  "Min/Max BTC      :"
+  coin_progress: "Coinentwicklung:"
+  table:
+    coin: "Coin"
+    from: "Von"
+    to: "Bis"
+  error:
+    db_error: "❌ Statistiken können nicht aus der Datenbank geholt werden."
+    date_error: "❌ Die Datumsinformationen können nicht abgerufen werden."
+    empty_trade_history: "❌ Die Handelshistorie ist leer, warte, bis du Statistiken über den Handel erhältst."
+    first_coin_error: "❌ Die Informationen über den Start-Coin des Bots konnten nicht aus der Datenbank abgerufen werden."
+    current_coin_error: "❌ Die aktuellen Coin-Daten des Bots konnten nicht aus der Datenbank abgerufen werden."
+    value_error: "❌ Fehler beim Holen von Informationen aus der Datenbank. Fehlercode = `%{error_code}`"
+    start_coin_not_found: "❌ Start-Coin nicht in Coin-Liste gefunden."
 
 btb:
   not_running: "⚠ Binance Trade Bot läuft nicht."
@@ -181,17 +205,22 @@ script:
   no_config: "Die Datei `custom_scripts.json` kann im `config/`-Verzeichnis von *BTB-manager-telegram* nicht gefunden werden."
   select: "Wähle eines deiner benutzerdefinierten Skripts aus, um es auszuführen."
 
+snapshot:
+  error: "❌ Momentan kann kein Snapshot des Binance-Kontos erstellt werden. Fehlermeldung:"
+
 graph:
-  msg_existing_graphs: "Wähle ein Diagramm oder erstelle ein neues. Hinweis : Hinweis: Das Syntax ist 'COIN1,COIN2,COIN3 AnzahlTage'"
-  msg_no_graphs: "Benutze die 'Neues Diagramm' Schaltfläche zum Erstellen eines neuen Diagramm."
-  error: "Ein Fehler ist beim Erstellen  des Diagramms aufgetreten. Bitte melde es. Fehlermeldung :"
+  msg_existing_graphs: "Wähle ein Graph oder erstelle ein neuen. Hinweis : Hinweis: Das Syntax ist 'COIN1,COIN2,COIN3 AnzahlTage'"
+  msg_no_graphs: "Benutze die 'Neuer Graph' Schaltfläche zum Erstellen eines neuen Graph."
+  error: "Ein Fehler ist beim Erstellen  des Graph aufgetreten. Bitte melde es. Fehlermeldung :"
   relative_amount: "Relative Entwicklung der Menge (%)"
   amount: "Anzahl"
   relative_price: "Relative Preisentwicklung in %{currency} (%)"
   price: "Preis in %{currency}"
   exit: "👌 Beendet"
+  not_enough_points: "Es wurde weniger als ein Punkt verwendet, um den Graph zu erstellen. Als Ergebnis kann kein Graph erzeugt werden. Bitte warte eine Stunde, bis ein neuer Punkt erstellt wird.."
+  bad_graph: "Der von dir eingegebene Befehl ist falsch formatiert und wird beendet."
   new_graph:
-    a: "Gebe das neue Diagramm ein, das du erstellen möchtest."
+    a: "Gebe den neuen Graph ein, den du erstellen möchtest."
     b: "Das Syntax ist folgendes'COIN1,COIN2,... AnzahlTage'"
     c: "Wenn AnzahlTage auf 0 gesetzt ist, wird der Graph über die komplett aufgezeichnete Zeit erstellt"
     d: "Wenn die Liste an Coins durch `*` ersetzt wird, werden alle aufgezeichneten Coins gezeichnet"
@@ -208,6 +237,7 @@ keyboard:
   trade_history: "⌛ Handelshistorie"
   panic: "🚨 Panikknopf"
   check_status: "🔍 Bot-Status prüfen"
+  bot_stats: "🚀 Bot Statistiken"
   maintenance: "🛠 Wartung"
   configurations: "⚙️ Konfiguration"
   start: "▶ Starte Handelsbot"
@@ -233,5 +263,5 @@ keyboard:
   confirm: "⚠ Bestätige"
   stop_bot: "⚠ Stoppe den Bot"
   next_coin: "🔀 Nächster Coin"
-  graph: "📊 Diagramm"
-  new_graph: "➕ Neues Diagramm"
+  graph: "📊 Graph"
+  new_graph: "➕ Neuer Graph"

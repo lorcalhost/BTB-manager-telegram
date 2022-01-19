@@ -50,7 +50,7 @@ However, you can run the bot with options :
 # (Otherwise you will have to manually start the Binance Trade Bot from telegram)
 python3 -m btb_manager_telegram -s
 
-# Use the french translation. Available translation : en, ru, fr, de, nl, es, id
+# Use the french translation. Available translation : en, ru, fr, de, nl, es, id, cn
 python3 -m btb_manager_telegram -l fr
 
 # Make possible to plot the bot's performance in EUR instead of USD
@@ -70,6 +70,13 @@ nohup python3 -m btb_manager_telegram -s -l fr -u EUR &
 # See all available options
 python3 -m btb_manager_telegram --help
 ```
+
+## Stopping the bot
+If the trade bot has been launched with the telegram bot, stopping the telegram bot will stop the trade bot.
+
+- If the telegram bot has been launched **without** `nohup`, closing the terminal or pressing `CTRL + C` will stop the bot.
+
+- If the telegram bot has been launched **with** `nohup`, the bot can be stopped with the command `kill $(cat btbmt.pid)` (no animal will be hurt in this operation). If this command respond the file `btbmt.pid`, it his very likely the telegram bot is no longer running.
 
 ## Manual upgrade
 First of, stop the telegram bot.
@@ -190,6 +197,14 @@ This project follows the [all-contributors] specification.
     <td align="center"><a href="https://github.com/shhhmel"><img src="https://avatars.githubusercontent.com/u/17930913?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ivan Myronov</b></sub></a><br /><a href="#translation-shhhmel" title="Translation">🌍</a></td>
     <td align="center"><a href="https://github.com/hieu0nguyen"><img src="https://avatars.githubusercontent.com/u/4257715?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Hieu Nguyen</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Ahieu0nguyen" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/SunBooster"><img src="https://avatars.githubusercontent.com/u/79193009?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Riza Abdul Aziz</b></sub></a><br /><a href="#translation-SunBooster" title="Translation">🌍</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://webdriver.agency/"><img src="https://avatars.githubusercontent.com/u/33579804?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kelecheck</b></sub></a><br /><a href="#translation-kelecheck" title="Translation">🌍</a></td>
+    <td align="center"><a href="http://quentinluppo.fr"><img src="https://avatars.githubusercontent.com/u/34373024?v=4?s=100" width="100px;" alt=""/><br /><sub><b>kentuki</b></sub></a><br /><a href="#translation-QuentinLuppo" title="Translation">🌍</a></td>
+    <td align="center"><a href="https://github.com/maromalo"><img src="https://avatars.githubusercontent.com/u/54760464?v=4?s=100" width="100px;" alt=""/><br /><sub><b>maromalo</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Amaromalo" title="Bug reports">🐛</a> <a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=maromalo" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/ullasbharadwaj"><img src="https://avatars.githubusercontent.com/u/34948688?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ulllas Bharadwaj</b></sub></a><br /><a href="#ideas-ullasbharadwaj" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=ullasbharadwaj" title="Code">💻</a> <a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Aullasbharadwaj" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/renkasiyas"><img src="https://avatars.githubusercontent.com/u/7783256?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ren Kasiyas</b></sub></a><br /><a href="#translation-renkasiyas" title="Translation">🌍</a></td>
+    <td align="center"><a href="https://github.com/KevinTroyT"><img src="https://avatars.githubusercontent.com/u/35399999?v=4?s=100" width="100px;" alt=""/><br /><sub><b>KevinTroyT</b></sub></a><br /><a href="#translation-KevinTroyT" title="Translation">🌍</a></td>
   </tr>
 </table>
 

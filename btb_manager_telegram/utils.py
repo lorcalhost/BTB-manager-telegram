@@ -27,19 +27,8 @@ def format_float(num):
     return f"{num:0.8f}".rstrip("0").rstrip(".")
 
 
-def i18n_format(key, **kwargs):
-    for k, val in kwargs.items():
-        try:
-            float(val)
-            val = format_float(val)
-        except:
-            pass
-        kwargs[k] = escape_markdown(str(val), version=2)
-    return i18n.t(key, **kwargs)
-
-
 def escape_tg(message):
-    escape_char = (".", "-", "?", "!", ">", "{", "}")
+    escape_char = (".", "-", "?", "!", ">", "{", "}", "=", "+", "|")
     escaped_message = ""
     is_escaped = False
     for cur_char in message:
@@ -185,7 +174,7 @@ def kill_btb_manager_telegram_process():
 def is_tg_bot_update_available():
     try:
         proc = subprocess.Popen(
-            ["bash", "-c", "git remote update && git status -uno"],
+            ["bash", "-c", "git remote update origin && git status -uno"],
             stdout=subprocess.PIPE,
         )
         output, _ = proc.communicate()
@@ -198,16 +187,28 @@ def is_tg_bot_update_available():
 
 def is_btb_bot_update_available():
     try:
-        proc = subprocess.Popen(
-            [
-                "bash",
-                "-c",
-                f"cd {settings.ROOT_PATH} && git remote update && git status -uno",
-            ],
-            stdout=subprocess.PIPE,
+        subprocess.run(["git", "remote", "update", "origin"])
+        branch = (
+            subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+            .decode()
+            .rstrip("\n")
         )
-        output, _ = proc.communicate()
-        re = "Your branch is behind" in str(output)
+        try:
+            current_version = (
+                subprocess.check_output(["git", "describe", "--tags", branch])
+                .decode()
+                .rstrip("\n")
+            )
+        except subprocess.CalledProcessError:
+            return True
+        remote_version = (
+            subprocess.check_output(["git", "describe", "--tags", f"origin/{branch}"])
+            .decode()
+            .rstrip("\n")
+        )
+        current_version = current_version.split("-")[0]
+        remote_version = remote_version.split("-")[0]
+        re = current_version != remote_version
     except Exception as e:
         logger.error(e, exc_info=True)
         re = None
@@ -222,8 +223,8 @@ def update_checker():
             logger.info("BTB Manager Telegram update found.")
 
             message = (
-                f"{i18n_format('update.tgb.available')}\n\n"
-                f"{i18n_format('update.tgb.instruction')}"
+                f"{i18n.t('update.tgb.available')}\n\n"
+                f"{i18n.t('update.tgb.instruction')}"
             )
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
@@ -239,8 +240,8 @@ def update_checker():
             logger.info("Binance Trade Bot update found.")
 
             message = (
-                f"{i18n_format('update.btb.available')}\n\n"
-                f"{i18n_format('update.btb.instruction')}"
+                f"{i18n.t('update.btb.available')}\n\n"
+                f"{i18n.t('update.btb.instruction')}"
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
@@ -278,7 +279,7 @@ def get_custom_scripts_keyboard():
     custom_scripts_path = "./config/custom_scripts.json"
     keyboard = []
     custom_script_exist = False
-    message = i18n_format("script.no_script")
+    message = i18n.t("script.no_script")
 
     if os.path.exists(custom_scripts_path):
         with open(custom_scripts_path) as f:
@@ -288,12 +289,12 @@ def get_custom_scripts_keyboard():
 
         if len(keyboard) >= 1:
             custom_script_exist = True
-            message = i18n_format("script.select")
+            message = i18n.t("script.select")
     else:
         logger.warning(
             "Unable to find custom_scripts.json file inside BTB-manager-telegram's config/ directory."
         )
-        message = i18n_format("script.no_config")
+        message = i18n.t("script.no_config")
 
-    keyboard.append([i18n_format("keyboard.cancel")])
+    keyboard.append([i18n.t("keyboard.cancel")])
     return keyboard, custom_script_exist, message

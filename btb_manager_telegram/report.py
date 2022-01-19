@@ -1,6 +1,9 @@
 import datetime as dt
 import os
+import shutil
+import sys
 import time
+import traceback
 import warnings
 
 import binance
@@ -9,10 +12,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 import requests
 
+import i18n
 from btb_manager_telegram import logger, scheduler, settings
-from btb_manager_telegram.utils import i18n_format
+from btb_manager_telegram.utils import escape_tg
 
 warnings.filterwarnings("ignore", category=UserWarning)
+
+additional_coins = ["BTC"]
+include_only_coinlist = True
+
+
+def reports_path():
+    return os.path.join(settings.ROOT_PATH, "data", "btbmt_reports.npy")
+
+
+def migrate_reports():
+    """
+    Used to migrate report placement from v1.1.1 to v1.2
+    """
+
+    if os.path.isfile("data/crypto.npy"):
+        shutil.move("data/crypto.npy", reports_path())
 
 
 def build_ticker(all_symbols, tickers_raw):
@@ -62,12 +82,15 @@ def get_report():
             # (see https://github.com/titulebolide/binance-report-bot/issues/5)
             continue
 
+        if include_only_coinlist and symbol not in settings.COIN_LIST:
+            continue
+
         qty = float(balance["free"]) + float(balance["locked"])
         if qty != 0:
             account_symbols.append(symbol)
             balances[symbol] = qty
 
-    all_symbols = list(set(settings.COIN_LIST + account_symbols))
+    all_symbols = list(set(settings.COIN_LIST + account_symbols + additional_coins))
     if settings.CURRENCY == "EUR":
         all_symbols.append("EUR")
     tickers_raw = api.get_symbol_ticker()
@@ -99,8 +122,8 @@ def get_report():
 
 
 def get_previous_reports():
-    if os.path.exists("data/crypto.npy"):
-        reports = np.load("data/crypto.npy", allow_pickle=True).tolist()
+    if os.path.exists(reports_path()):
+        reports = np.load(reports_path(), allow_pickle=True).tolist()
         return reports
     else:
         return []
@@ -109,15 +132,24 @@ def get_previous_reports():
 def save_report(report, old_reports):
     report["time"] = int(time.time())
     old_reports.append(report)
-    np.save("data/crypto.npy", old_reports, allow_pickle=True)
+    np.save(reports_path(), old_reports, allow_pickle=True)
     return old_reports
 
 
 def make_snapshot():
     logger.info("Retreive balance information from binance")
-    crypto_report = get_report()
-    crypto_reports = save_report(crypto_report, get_previous_reports())
-    logger.info("Snapshot saved")
+    try:
+        crypto_report = get_report()
+        crypto_reports = save_report(crypto_report, get_previous_reports())
+        logger.info("Snapshot saved")
+    except Exception as e:
+        logger.error(
+            f"❌ Unable to take a snapshot of the binance account: {e}", exc_info=True
+        )
+        message = f"{i18n.t('snapshot.error')}\n ```\n"
+        message += "".join(traceback.format_exception(*sys.exc_info()))
+        message += "\n```"
+        settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
     scheduler.enter(3600, 2, make_snapshot)
 
 
@@ -126,7 +158,7 @@ def get_graph(relative, symbols, days, graph_type, ref_currency):
         symbols = settings.COIN_LIST
     else:
         for s in symbols:
-            assert s in settings.COIN_LIST + [settings.CURRENCY]
+            assert s in settings.COIN_LIST + [settings.CURRENCY] + additional_coins
     if len(symbols) > 1:
         relative = True
     reports = get_previous_reports()
@@ -191,17 +223,17 @@ def get_graph(relative, symbols, days, graph_type, ref_currency):
     plt.setp(plt.xticks()[1], rotation=15)
     if graph_type == "amount":
         if relative:
-            plt.ylabel(i18n_format("graph.relative_amount"))
+            plt.ylabel(i18n.t("graph.relative_amount"))
             plt.legend(bbox_to_anchor=(1, 1), loc="upper left")
         else:
-            label = i18n_format("graph.amount")
+            label = i18n.t("graph.amount")
             label += f" ({symbols[0]})" if len(symbols) == 1 else ""
             plt.ylabel(label)
     elif graph_type == "price":
         if relative:
-            plt.ylabel(i18n_format("graph.relative_price", currency=ref_currency))
+            plt.ylabel(i18n.t("graph.relative_price", currency=ref_currency))
         else:
-            plt.ylabel(i18n_format("graph.price", currency=ref_currency))
+            plt.ylabel(i18n.t("graph.price", currency=ref_currency))
     plt.grid()
     figname = f"data/quantity_{symbol}.png"
     plt.savefig(figname)

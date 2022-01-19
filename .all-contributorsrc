@@ -215,6 +215,63 @@
       "contributions": [
         "translation"
       ]
+    },
+    {
+      "login": "kelecheck",
+      "name": "Kelecheck",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33579804?v=4",
+      "profile": "https://webdriver.agency/",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "QuentinLuppo",
+      "name": "kentuki",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34373024?v=4",
+      "profile": "http://quentinluppo.fr",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "maromalo",
+      "name": "maromalo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/54760464?v=4",
+      "profile": "https://github.com/maromalo",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "ullasbharadwaj",
+      "name": "Ulllas Bharadwaj",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34948688?v=4",
+      "profile": "https://github.com/ullasbharadwaj",
+      "contributions": [
+        "ideas",
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "renkasiyas",
+      "name": "Ren Kasiyas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7783256?v=4",
+      "profile": "https://github.com/renkasiyas",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "KevinTroyT",
+      "name": "KevinTroyT",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35399999?v=4",
+      "profile": "https://github.com/KevinTroyT",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,

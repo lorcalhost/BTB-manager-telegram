@@ -1,4 +1,6 @@
 import argparse
+import json
+import os
 import sys
 import time
 from subprocess import PIPE, run
@@ -7,6 +9,7 @@ import colorama
 from telegram import Bot, ReplyKeyboardMarkup
 from telegram.ext import ConversationHandler, Updater
 
+import i18n
 from btb_manager_telegram import (
     CREATE_GRAPH,
     CUSTOM_SCRIPT,
@@ -24,10 +27,9 @@ from btb_manager_telegram import (
     settings,
 )
 from btb_manager_telegram.buttons import start_bot
-from btb_manager_telegram.report import make_snapshot
+from btb_manager_telegram.report import make_snapshot, migrate_reports
 from btb_manager_telegram.utils import (
     escape_tg,
-    i18n_format,
     retreive_btb_constants,
     setup_coin_list,
     setup_i18n,
@@ -63,7 +65,7 @@ def pre_run_main() -> None:
         "-l",
         "--language",
         type=str,
-        help="(optional) Select a language. Available: en, ru, fr, de, nl, es",
+        help="(optional) Select a language. Available: en, ru, fr, de, nl, es, id",
         default="en",
     )
     parser.add_argument(
@@ -120,16 +122,19 @@ def pre_run_main() -> None:
             "If using another currency than USD or EUR, and openexchangerates API key is needed"
         )
 
+    with open("btbmt.pid", "w") as f:
+        f.write(str(os.getpid()))
+
     setup_i18n(settings.LANG)
     setup_root_path_constant()
     retreive_btb_constants()
     setup_coin_list()
-
     if settings.TOKEN is None or settings.CHAT_ID is None:
         setup_telegram_constants()
-
     settings.BOT = Bot(settings.TOKEN)
     settings.CHAT = settings.BOT.getChat(settings.CHAT_ID)
+
+    migrate_reports()
 
     scheduler.enter(1, 1, update_checker)
     scheduler.enter(1, 1, make_snapshot)
@@ -150,15 +155,15 @@ def main() -> None:
         trade_bot_status = start_bot()
 
         if trade_bot_status in (0, 1):
-            message_trade_bot += i18n_format("welcome.bot_started")
+            message_trade_bot += i18n.t("welcome.bot_started")
         else:
-            message_trade_bot += i18n_format("welcome.bot_not_started.base") + " "
+            message_trade_bot += i18n.t("welcome.bot_not_started.base") + " "
             if trade_bot_status == 2:
-                message_trade_bot += i18n_format("welcome.bot_not_started.bot_error")
+                message_trade_bot += i18n.t("welcome.bot_not_started.bot_error")
             if trade_bot_status == 3:
-                message_trade_bot += i18n_format("welcome.bot_not_started.bad_path")
+                message_trade_bot += i18n.t("welcome.bot_not_started.bad_path")
             if trade_bot_status == 4:
-                message_trade_bot += i18n_format("welcome.bot_not_started.no_python")
+                message_trade_bot += i18n.t("welcome.bot_not_started.no_python")
         message_trade_bot += "\n\n"
 
     # Create the Updater and pass it your token
@@ -185,6 +190,7 @@ def main() -> None:
         },
         fallbacks=[handlers.FALLBACK_HANDLER],
         per_user=True,
+        allow_reentry=True,
     )
     dispatcher.add_handler(conv_handler)
 
@@ -192,15 +198,23 @@ def main() -> None:
     updater.start_polling()
 
     # Welcome mat
-    message = (
-        f"{i18n_format('welcome.hello', name=settings.CHAT.first_name)}\n"
-        f"{i18n_format('welcome.welcome')}\n\n"
-        f"{i18n_format('welcome.developed_by')}\n"
-        f"{i18n_format('welcome.project_link')}\n\n"
-        f"{i18n_format('welcome.donation')}\n\n"
-        f"{message_trade_bot}"
-        f"{i18n_format('welcome.how_to_start')}"
+
+    with open(".all-contributorsrc", "r") as f:
+        contributors_data = json.load(f)
+    contributors = ", ".join(
+        [f"[{i['login']}]({i['profile']})" for i in contributors_data["contributors"]]
     )
+
+    message = (
+        f"{i18n.t('welcome.hello', name=settings.CHAT.first_name)}\n"
+        f"{i18n.t('welcome.welcome')}\n\n"
+        f"{i18n.t('welcome.developed_by', contributors=contributors)}\n"
+        f"{i18n.t('welcome.project_link')}\n\n"
+        f"{i18n.t('welcome.donation')}\n\n"
+        f"{message_trade_bot}"
+        f"{i18n.t('welcome.how_to_start')}"
+    )
+
     keyboard = [["/start"]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     settings.CHAT.send_message(
@@ -217,6 +231,11 @@ def main() -> None:
 
     scheduler_thread.stop()
     scheduler_thread.join()
+
+    try:
+        os.remove("btbmt.pid")
+    except FileNotFoundError:
+        pass
 
     logger.info("The telegram bot has stopped")
 
