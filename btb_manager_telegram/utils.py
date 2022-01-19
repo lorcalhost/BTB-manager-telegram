@@ -186,28 +186,18 @@ def is_tg_bot_update_available():
 def is_btb_bot_update_available():
     try:
         subprocess.run(["git", "remote", "update", "origin"])
-        branch = (
-            subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+        current_version = (
+            subprocess.check_output(["git", "describe", "--abbrev=0", "--tags"])
             .decode()
             .rstrip("\n")
         )
-        try:
-            current_version = (
-                subprocess.check_output(["git", "describe", "--tags", branch])
-                .decode()
-                .rstrip("\n")
-            )
-        except subprocess.CalledProcessError:
-            return True
         remote_version = (
-            subprocess.check_output(["git", "describe", "--tags", f"origin/{branch}"])
+            subprocess.check_output(
+                ["git", "describe", "--abbrev=0", "--tags", "origin/main"]
+            )
             .decode()
             .rstrip("\n")
         )
-        print(current_version, remote_version)
-
-        current_version = "-".join(current_version.split("-")[:-2])
-        remote_version = "-".join(remote_version.split("-")[:-2])
         re = current_version != remote_version
     except Exception as e:
         logger.error(e, exc_info=True)
