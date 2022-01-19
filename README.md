@@ -50,7 +50,7 @@ However, you can run the bot with options :
 # (Otherwise you will have to manually start the Binance Trade Bot from telegram)
 python3 -m btb_manager_telegram -s
 
-# Use the french translation. Available translation : en, ru, fr, de, nl, es, id
+# Use the french translation. Available translation : en, ru, fr, de, nl, es, id, cn
 python3 -m btb_manager_telegram -l fr
 
 # Make possible to plot the bot's performance in EUR instead of USD
@@ -204,6 +204,7 @@ This project follows the [all-contributors] specification.
     <td align="center"><a href="https://github.com/maromalo"><img src="https://avatars.githubusercontent.com/u/54760464?v=4?s=100" width="100px;" alt=""/><br /><sub><b>maromalo</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Amaromalo" title="Bug reports">🐛</a> <a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=maromalo" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/ullasbharadwaj"><img src="https://avatars.githubusercontent.com/u/34948688?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ulllas Bharadwaj</b></sub></a><br /><a href="#ideas-ullasbharadwaj" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=ullasbharadwaj" title="Code">💻</a> <a href="https://github.com/lorcalhost/BTB-manager-telegram/issues?q=author%3Aullasbharadwaj" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/renkasiyas"><img src="https://avatars.githubusercontent.com/u/7783256?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ren Kasiyas</b></sub></a><br /><a href="#translation-renkasiyas" title="Translation">🌍</a></td>
+    <td align="center"><a href="https://github.com/KevinTroyT"><img src="https://avatars.githubusercontent.com/u/35399999?v=4?s=100" width="100px;" alt=""/><br /><sub><b>KevinTroyT</b></sub></a><br /><a href="#translation-KevinTroyT" title="Translation">🌍</a></td>
   </tr>
 </table>
 
