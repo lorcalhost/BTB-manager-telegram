@@ -150,7 +150,11 @@ def make_snapshot():
         message += "".join(traceback.format_exception(*sys.exc_info()))
         message += "\n```"
         settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
-    scheduler.enter(3600, 2, make_snapshot)
+    scheduler.enter(
+        dt.timedelta(hours=1).total_seconds(),
+        2, 
+        make_snapshot
+    )
 
 
 def get_graph(relative, symbols, days, graph_type, ref_currency):
