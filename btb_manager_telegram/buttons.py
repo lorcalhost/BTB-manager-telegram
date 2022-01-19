@@ -462,10 +462,6 @@ def bot_stats():
         end_date = dt.datetime.strptime(bot_end_date[2:], "%y-%m-%d %H:%M:%S.%f")
         numDays = (end_date - start_date).days
 
-        reports = [
-            r for r in get_previous_reports() if r["time"] >= start_date.timestamp()
-        ]
-
         # get first trade and its bridge - all stats must be in this bridge
         cur.execute(
             f"""SELECT alt_coin_id, crypto_coin_id, alt_trade_amount, crypto_trade_amount
@@ -495,6 +491,20 @@ def bot_stats():
             message = [i18n.t("bot_stats.error.current_coin_error")]
             return message
         currentCoinID, currentCoinAmount = query
+
+        cur.execute(
+            """
+        SELECT min(usd_values), max(usd_values), min(btc_values), max(btc_values) FROM (
+            SELECT (balance * usd_price) usd_values, (balance * btc_price) btc_values FROM coin_value WHERE usd_values > 5
+        )
+        """
+        )
+        query = cur.fetchone()
+        if query is None:
+            max_usd = min_usd = max_btc = min_btc = 0
+            logger.error("Exception : Unable to calculate min/max USD, BTC values.")
+        else:
+            min_usd, max_usd, min_btc, max_btc = query
 
         displayCurrency = (
             "$" if initialCoinbridgeID in stableCoins else initialCoinbridgeID
@@ -531,12 +541,6 @@ def bot_stats():
         changeStartCoin = (
             (convertibleStartCoinAmount - initialCoinAmount) / initialCoinAmount * 100
         )
-
-        max_usd = max(reports, key=lambda a: a["total_usdt"])["total_usdt"]
-        min_usd = min(reports, key=lambda a: a["total_usdt"])["total_usdt"]
-        btc_vals = [a["total_usdt"] / a["tickers"]["BTC"] for a in reports]
-        max_btc = max(btc_vals)
-        min_btc = min(btc_vals)
 
         message += (
             "`"
