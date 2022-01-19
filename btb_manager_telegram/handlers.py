@@ -175,18 +175,24 @@ def menu(update: Update, _: CallbackContext) -> int:
             )
 
     elif update.message.text == i18n.t("keyboard.graph"):
+        keyboard = []
         if os.path.isfile("data/favourite_graphs.npy"):
             favourite_graphs = np.load(
                 "data/favourite_graphs.npy", allow_pickle=True
             ).tolist()
             favourite_graphs.sort(key=lambda x: -int(x[1]))
-            kb = [[i[0]] for i in favourite_graphs[:4]]
-            kb.append([i18n.t("keyboard.new_graph"), i18n.t("keyboard.go_back")])
+            favourite_graphs = [i[0] for i in favourite_graphs]
+            keyboard.extend(
+                [
+                    favourite_graphs[3 * i : 3 * i + 3]
+                    for i in range(min(3, (len(favourite_graphs) - 1) // 3 + 1))
+                ]
+            )
             message = i18n.t("graph.msg_existing_graphs")
         else:
             message = i18n.t("graph.msg_no_graphs")
-            kb = [[i18n.t("keyboard.new_graph"), i18n.t("keyboard.go_back")]]
-        reply_markup_graph = ReplyKeyboardMarkup(kb, resize_keyboard=True)
+        keyboard.append([i18n.t("keyboard.new_graph"), i18n.t("keyboard.go_back")])
+        reply_markup_graph = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         reply_text_escape_fun(
             message, reply_markup=reply_markup_graph, parse_mode="MarkdownV2"
         )
