@@ -1,3 +1,4 @@
+import configparser
 import json
 import os
 import shutil
@@ -5,7 +6,6 @@ import sqlite3
 import subprocess
 import sys
 import traceback
-from configparser import ConfigParser
 
 import numpy as np
 from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
@@ -551,7 +551,7 @@ def panic(update: Update, _: CallbackContext) -> int:
         # Get Binance api keys and tld
         user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
         with open(user_cfg_file_path) as cfg:
-            config = ConfigParser()
+            config = configparser.ConfigParser()
             config.read_file(cfg)
             api_key = config.get("binance_user_config", "api_key")
             api_secret_key = config.get("binance_user_config", "api_secret_key")

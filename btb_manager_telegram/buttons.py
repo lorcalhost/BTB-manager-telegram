@@ -1,9 +1,9 @@
+import configparser
+import datetime as dt
 import os
 import sqlite3
 import subprocess
 import time
-from configparser import ConfigParser
-from datetime import datetime, timedelta
 
 import i18n
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, logger, settings
@@ -80,7 +80,7 @@ def current_value():
                     usd_price = 0
                 if btc_price is None:
                     btc_price = 0
-                last_update = datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
+                last_update = dt.datetime.strptime(last_update, "%Y-%m-%d %H:%M:%S.%f")
 
                 reports = get_previous_reports()
                 reports.reverse()
@@ -91,12 +91,15 @@ def current_value():
                 ts_now = int(last_update.timestamp())
                 delta = days_deltas[0]
                 for report in reports:
-                    if ts_now - report["time"] > timedelta(days=delta).total_seconds():
+                    if (
+                        ts_now - report["time"]
+                        > dt.timedelta(days=delta).total_seconds()
+                    ):
                         if (
                             ts_now
                             - report["time"]
-                            - timedelta(days=delta).total_seconds()
-                            < timedelta(hours=2).total_seconds()
+                            - dt.timedelta(days=delta).total_seconds()
+                            < dt.timedelta(hours=2).total_seconds()
                             and report["total_usdt"] > 0
                         ):
                             amount_btc_old = (
@@ -187,13 +190,15 @@ def check_progress():
                 # Generate message
                 m_list = [f"{i18n.t('progress.coin')}\n\n"]
                 for coin in query:
-                    last_trade_date = datetime.strptime(coin[5], "%Y-%m-%d %H:%M:%S.%f")
+                    last_trade_date = dt.datetime.strptime(
+                        coin[5], "%Y-%m-%d %H:%M:%S.%f"
+                    )
                     if coin[4] is None:
-                        pre_last_trade_date = datetime.strptime(
+                        pre_last_trade_date = dt.datetime.strptime(
                             coin[5], "%Y-%m-%d %H:%M:%S.%f"
                         )
                     else:
-                        pre_last_trade_date = datetime.strptime(
+                        pre_last_trade_date = dt.datetime.strptime(
                             coin[4], "%Y-%m-%d %H:%M:%S.%f"
                         )
 
@@ -246,7 +251,7 @@ def current_ratios():
         try:
             # Get bridge currency symbol
             with open(user_cfg_file_path) as cfg:
-                config = ConfigParser()
+                config = configparser.ConfigParser()
                 config.read_file(cfg)
                 bridge = config.get("binance_user_config", "bridge")
                 scout_multiplier = config.get("binance_user_config", "scout_multiplier")
@@ -302,7 +307,7 @@ def current_ratios():
                 query = cur.fetchall()
 
                 # Generate message
-                last_update = datetime.strptime(query[0][0], "%Y-%m-%d %H:%M:%S.%f")
+                last_update = dt.datetime.strptime(query[0][0], "%Y-%m-%d %H:%M:%S.%f")
                 query = sorted(query, key=lambda k: k[-1], reverse=True)
 
                 m_list = [
@@ -355,7 +360,7 @@ def next_coin():
         try:
             # Get bridge currency symbol
             with open(user_cfg_file_path) as cfg:
-                config = ConfigParser()
+                config = configparser.ConfigParser()
                 config.read_file(cfg)
                 bridge = config.get("binance_user_config", "bridge")
                 scout_multiplier = config.get("binance_user_config", "scout_multiplier")
@@ -464,7 +469,7 @@ def trade_history():
                 for trade in query:
                     if trade[4] is None:
                         continue
-                    date = datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
+                    date = dt.datetime.strptime(trade[6], "%Y-%m-%d %H:%M:%S.%f")
                     if trade[5] is not None:
 
                         trade_details = i18n.t(
@@ -542,8 +547,8 @@ def bot_stats():
         cur.execute("SELECT count(*) FROM trade_history WHERE selling=0")
         numCoinJumps = cur.fetchall()[0][0]
 
-        start_date = datetime.strptime(bot_start_date[2:], "%y-%m-%d %H:%M:%S.%f")
-        end_date = datetime.strptime(bot_end_date[2:], "%y-%m-%d %H:%M:%S.%f")
+        start_date = dt.datetime.strptime(bot_start_date[2:], "%y-%m-%d %H:%M:%S.%f")
+        end_date = dt.datetime.strptime(bot_end_date[2:], "%y-%m-%d %H:%M:%S.%f")
         numDays = (end_date - start_date).days
 
         reports = [

@@ -1,9 +1,8 @@
 import argparse
 import json
 import os
+import subprocess
 import sys
-import time
-from subprocess import PIPE, run
 
 import colorama
 from telegram import Bot, ReplyKeyboardMarkup
@@ -242,8 +241,10 @@ def main() -> None:
 
 def run_on_docker() -> None:
     try:
-        run("docker image inspect btbmt", shell=True, check=True, stdout=PIPE)
-        run("docker run --rm -it btbmt", shell=True)
+        subprocess.run(
+            "docker image inspect btbmt", shell=True, check=True, stdout=subprocess.PIPE
+        )
+        subprocess.run("docker run --rm -it btbmt", shell=True)
 
     except Exception as e:
         print(
