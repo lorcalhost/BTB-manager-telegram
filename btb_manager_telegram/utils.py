@@ -204,8 +204,10 @@ def is_btb_bot_update_available():
             .decode()
             .rstrip("\n")
         )
-        current_version = current_version.split("-")[0]
-        remote_version = remote_version.split("-")[0]
+        print(current_version, remote_version)
+
+        current_version = "-".join(current_version.split("-")[:-2])
+        remote_version = "-".join(remote_version.split("-")[:-2])
         re = current_version != remote_version
     except Exception as e:
         logger.error(e, exc_info=True)
