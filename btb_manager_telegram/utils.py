@@ -11,6 +11,13 @@ import yaml
 
 import i18n
 from btb_manager_telegram import logger, scheduler, settings
+from btb_manager_telegram.error import (
+    BTBConfigNotFound,
+    NoChatID,
+    NoRootPath,
+    NoTgConfig,
+    TgConfigNotFound,
+)
 
 
 def setup_i18n(lang):
@@ -46,8 +53,7 @@ def reply_text_escape(reply_text_fun):
 
 def setup_root_path_constant():
     if settings.ROOT_PATH is None:
-        logger.info("No root_path was specified. Aborting.")
-        exit(-1)
+        raise NoRootPath
     else:
         settings.ROOT_PATH = os.path.join(settings.ROOT_PATH, "")
 
@@ -60,41 +66,35 @@ def setup_telegram_constants():
         with open(yaml_file_path) as f:
             try:
                 parsed_urls = yaml.load(f, Loader=yaml.FullLoader)["urls"]
-            except Exception:
+            except Exception as e:
                 logger.error(
-                    "Unable to correctly read apprise.yml file. Make sure it is correctly set up. Aborting."
+                    "Unable to correctly read apprise.yml file. Make sure it is correctly set up."
                 )
-                exit(-1)
+                raise e
             for url in parsed_urls:
                 if url.startswith("tgram"):
                     telegram_url = url.split("//")[1]
         if not telegram_url:
-            logger.error(
-                "No telegram configuration was found in your apprise.yml file. Aborting."
-            )
-            exit(-1)
+            raise NoTgConfig
     else:
-        logger.error(
-            f'Unable to find apprise.yml file at "{yaml_file_path}". Aborting.'
-        )
-        exit(-1)
-    try:
-        settings.TOKEN = telegram_url.split("/")[0]
-        settings.CHAT_ID = telegram_url.split("/")[1]
-        logger.info(
-            f"Successfully retrieved Telegram configuration. "
-            f"The bot will only respond to user in the chat with chat_id {settings.CHAT_ID}"
-        )
-    except Exception:
-        logger.error(
-            "No chat_id has been set in the yaml configuration, anyone would be able to control your bot. Aborting."
-        )
-        exit(-1)
+        raise TgConfigNotFound
+
+    telegram_url = telegram_url.split("/")
+    if len(telegram_url) != 2:
+        raise NoChatID
+
+    settings.TOKEN, settings.CHAT_ID = telegram_url
+    logger.info(
+        f"Successfully retrieved Telegram configuration. "
+        f"The bot will only respond to user in the chat with chat_id {settings.CHAT_ID}"
+    )
 
 
 def retreive_btb_constants():
     logger.info("Retreiving binance tokens")
     btb_config_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    if not os.path.isfile(btb_config_path):
+        raise BTBConfigNotFound(btb_config_path)
     btb_config = configparser.ConfigParser()
     btb_config.read(btb_config_path)
     settings.BINANCE_API_KEY = btb_config.get("binance_user_config", "api_key")
