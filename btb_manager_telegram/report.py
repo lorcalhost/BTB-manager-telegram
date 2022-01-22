@@ -7,12 +7,12 @@ import traceback
 import warnings
 
 import binance
+import i18n
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numpy as np
 import requests
 
-import i18n
 from btb_manager_telegram import scheduler, settings
 from btb_manager_telegram.formating import escape_tg
 from btb_manager_telegram.logging import logger

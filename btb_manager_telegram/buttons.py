@@ -6,6 +6,7 @@ import subprocess
 import time
 
 import i18n
+
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
 from btb_manager_telegram.formating import format_float, telegram_text_truncator

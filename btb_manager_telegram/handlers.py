@@ -7,18 +7,11 @@ import subprocess
 import sys
 import traceback
 
-import numpy as np
-from telegram import Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
-from telegram.ext import (
-    CallbackContext,
-    CommandHandler,
-    ConversationHandler,
-    Filters,
-    MessageHandler,
-)
-from telegram.utils.helpers import escape_markdown
-
 import i18n
+import numpy as np
+import telegram
+import telegram.ext
+
 from btb_manager_telegram import (
     BOUGHT,
     BUYING,
@@ -53,7 +46,7 @@ from btb_manager_telegram.utils import (
 )
 
 
-def menu(update: Update, _: CallbackContext) -> int:
+def menu(update, _):
     logger.info(f"Menu selector. ({update.message.text})")
 
     # Panic button disabled until PR #74 is complete
@@ -131,7 +124,7 @@ def menu(update: Update, _: CallbackContext) -> int:
 
             reply_text_escape_fun(
                 message,
-                reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                reply_markup=telegram.ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return PANIC_BUTTON
@@ -188,7 +181,9 @@ def menu(update: Update, _: CallbackContext) -> int:
         else:
             message = i18n.t("graph.msg_no_graphs")
         keyboard.append([i18n.t("keyboard.new_graph"), i18n.t("keyboard.go_back")])
-        reply_markup_graph = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+        reply_markup_graph = telegram.ReplyKeyboardMarkup(
+            keyboard, resize_keyboard=True
+        )
         reply_text_escape_fun(
             message, reply_markup=reply_markup_graph, parse_mode="MarkdownV2"
         )
@@ -236,7 +231,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             kb = [[i18n.t("keyboard.confirm"), i18n.t("keyboard.go_back")]]
             reply_text_escape_fun(
                 message,
-                reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                reply_markup=telegram.ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return DELETE_DB
@@ -249,7 +244,9 @@ def menu(update: Update, _: CallbackContext) -> int:
         message, status = buttons.edit_user_cfg()
         if status:
             reply_text_escape_fun(
-                message, reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
+                message,
+                reply_markup=telegram.ReplyKeyboardRemove(),
+                parse_mode="MarkdownV2",
             )
             return EDIT_USER_CONFIG
         else:
@@ -261,7 +258,9 @@ def menu(update: Update, _: CallbackContext) -> int:
         message, status = buttons.edit_coin()
         if status:
             reply_text_escape_fun(
-                message, reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
+                message,
+                reply_markup=telegram.ReplyKeyboardRemove(),
+                parse_mode="MarkdownV2",
             )
             return EDIT_COIN_LIST
         else:
@@ -286,7 +285,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             kb = [[i18n.t("keyboard.update"), i18n.t("keyboard.cancel_update")]]
             reply_text_escape_fun(
                 message,
-                reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                reply_markup=telegram.ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return UPDATE_TG
@@ -303,7 +302,7 @@ def menu(update: Update, _: CallbackContext) -> int:
             kb = [[i18n.t("keyboard.update"), i18n.t("keyboard.cancel_update")]]
             reply_text_escape_fun(
                 message,
-                reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                reply_markup=telegram.ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return UPDATE_BTB
@@ -319,7 +318,7 @@ def menu(update: Update, _: CallbackContext) -> int:
         if status:
             reply_text_escape_fun(
                 message,
-                reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                reply_markup=telegram.ReplyKeyboardMarkup(kb, resize_keyboard=True),
                 parse_mode="MarkdownV2",
             )
             return CUSTOM_SCRIPT
@@ -333,7 +332,7 @@ def menu(update: Update, _: CallbackContext) -> int:
     return MENU
 
 
-def edit_coin(update: Update, _: CallbackContext) -> int:
+def edit_coin(update, _):
     logger.info(f"Editing coin list. ({update.message.text})")
 
     # modify reply_text function to have it escaping characters
@@ -360,13 +359,13 @@ def edit_coin(update: Update, _: CallbackContext) -> int:
         )
 
     keyboard = [[i18n.t("keyboard.go_back")]]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
 
     return MENU
 
 
-def edit_user_config(update: Update, _: CallbackContext) -> int:
+def edit_user_config(update, _):
     logger.info(f"Editing user configuration. ({update.message.text})")
 
     # modify reply_text function to have it escaping characters
@@ -394,13 +393,13 @@ def edit_user_config(update: Update, _: CallbackContext) -> int:
         message = f"{i18n.t('exited_no_change')}\n" f"{i18n.t('config.not_modified')}"
 
     keyboard = [[i18n.t("keyboard.go_back")]]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
 
     return MENU
 
 
-def delete_db(update: Update, _: CallbackContext) -> int:
+def delete_db(update, _):
     logger.info(
         f"Asking if the user really wants to delete the db. ({update.message.text})"
     )
@@ -433,13 +432,13 @@ def delete_db(update: Update, _: CallbackContext) -> int:
         message = f"{i18n.t('exited_no_change')}\n" f"{i18n.t('db.delete.not_deleted')}"
 
     keyboard = [[i18n.t("keyboard.ok")]]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
 
     return MENU
 
 
-def update_tg_bot(update: Update, _: CallbackContext) -> int:
+def update_tg_bot(update, _):
     logger.info(f"Updating BTB Manager Telegram. ({update.message.text})")
 
     # modify reply_text function to have it escaping characters
@@ -448,7 +447,7 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
     if update.message.text != i18n.t("keyboard.cancel_update"):
         message = i18n.t("update.tgb.updating")
         keyboard = [["/start"]]
-        reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+        reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
@@ -471,7 +470,7 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
             f"{i18n.t('exited_no_change')}\n" f"{i18n.t('update.tgb.not_updated')}"
         )
         keyboard = [[i18n.t("keyboard.ok_s")]]
-        reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+        reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
         reply_text_escape_fun(
             message, reply_markup=reply_markup, parse_mode="MarkdownV2"
         )
@@ -479,14 +478,14 @@ def update_tg_bot(update: Update, _: CallbackContext) -> int:
     return MENU
 
 
-def update_btb(update: Update, _: CallbackContext) -> int:
+def update_btb(update, _):
     logger.info(f"Updating Binance Trade Bot. ({update.message.text})")
 
     # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     keyboard = [[i18n.t("keyboard.ok_s")]]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
     if update.message.text != i18n.t("keyboard.cancel_update"):
         message = (
@@ -522,14 +521,14 @@ def update_btb(update: Update, _: CallbackContext) -> int:
     return MENU
 
 
-def panic(update: Update, _: CallbackContext) -> int:
+def panic(update, _):
     logger.info(f"Panic Button is doing its job. ({update.message.text})")
 
     # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     keyboard = [[i18n.t("keyboard.great")]]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     if update.message.text != i18n.t("keyboard.go_back"):
         find_and_kill_binance_trade_bot_process()
 
@@ -590,14 +589,14 @@ def panic(update: Update, _: CallbackContext) -> int:
     return MENU
 
 
-def execute_custom_script(update: Update, _: CallbackContext) -> int:
+def execute_custom_script(update, _):
     logger.info(f"Going to 🤖 execute custom script. ({update.message.text})")
 
     # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     keyboard = [[i18n.t("keyboard.ok_s")]]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
     custom_scripts_path = "./config/custom_scripts.json"
     if update.message.text != i18n.t("keyboard.cancel"):
@@ -623,7 +622,7 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
                 )
                 output, _ = proc.communicate()
                 message_list = telegram_text_truncator(
-                    escape_markdown(output.decode("utf-8"), version=2),
+                    output.decode("utf-8"),
                     padding_chars_head="```\n",
                     padding_chars_tail="```",
                 )
@@ -641,7 +640,7 @@ def execute_custom_script(update: Update, _: CallbackContext) -> int:
     return MENU
 
 
-def graph_menu(update: Update, _: CallbackContext) -> int:
+def graph_menu(update, _):
     if update.message.text == i18n.t("keyboard.go_back"):
         message = i18n.t("graph.exit")
         update.message.reply_text(
@@ -660,7 +659,7 @@ def graph_menu(update: Update, _: CallbackContext) -> int:
 {i18n.t("graph.new_graph.i")}"""
         update.message.reply_text(
             escape_tg(message),
-            reply_markup=ReplyKeyboardRemove(),
+            reply_markup=telegram.ReplyKeyboardRemove(),
             parse_mode="MarkdownV2",
         )
         return CREATE_GRAPH
@@ -668,7 +667,7 @@ def graph_menu(update: Update, _: CallbackContext) -> int:
         return create_graph(update=update, _=_)
 
 
-def create_graph(update: Update, _: CallbackContext) -> int:
+def create_graph(update, _):
     text = update.message.text
 
     if text == "/stop":
@@ -734,20 +733,22 @@ def create_graph(update: Update, _: CallbackContext) -> int:
     return MENU
 
 
-def cancel(update: Update, _: CallbackContext) -> int:
+def cancel(update, _):
     logger.info("Conversation canceled.")
 
     # modify reply_text function to have it escaping characters
     reply_text_escape_fun = reply_text_escape(update.message.reply_text)
 
     reply_text_escape_fun(
-        i18n.t("bye"), reply_markup=ReplyKeyboardRemove(), parse_mode="MarkdownV2"
+        i18n.t("bye"),
+        reply_markup=telegram.ReplyKeyboardRemove(),
+        parse_mode="MarkdownV2",
     )
-    return ConversationHandler.END
+    return telegram.ext.ConversationHandler.END
 
 
-MENU_HANDLER = MessageHandler(
-    Filters.regex(
+MENU_HANDLER = telegram.ext.MessageHandler(
+    telegram.ext.Filters.regex(
         f"^({i18n.t('keyboard.current_value')}|{i18n.t('keyboard.panic')}|{i18n.t('keyboard.progress')}|{i18n.t('keyboard.next_coin')}|{i18n.t('keyboard.check_status')}|{i18n.t('keyboard.bot_stats')}|{i18n.t('keyboard.trade_history')}|{i18n.t('keyboard.graph')}|{i18n.t('keyboard.maintenance')}|"
         f"{i18n.t('keyboard.configurations')}|{i18n.t('keyboard.start')}|{i18n.t('keyboard.stop')}|{i18n.t('keyboard.read_logs')}|{i18n.t('keyboard.delete_db')}|"
         f"{i18n.t('keyboard.edit_cfg')}|{i18n.t('keyboard.edit_coin_list')}|{i18n.t('keyboard.export_db')}|{i18n.t('keyboard.update_tgb')}|{i18n.t('keyboard.update_btb')}|"
@@ -756,45 +757,57 @@ MENU_HANDLER = MessageHandler(
     menu,
 )
 
-ENTRY_POINT_HANDLER = CommandHandler(
-    "start", menu, Filters.chat(chat_id=eval(settings.CHAT_ID))
+ENTRY_POINT_HANDLER = telegram.ext.CommandHandler(
+    "start", menu, telegram.ext.Filters.chat(chat_id=eval(settings.CHAT_ID))
 )
 
-EDIT_COIN_LIST_HANDLER = MessageHandler(Filters.regex("(.*?)"), edit_coin)
+EDIT_COIN_LIST_HANDLER = telegram.ext.MessageHandler(
+    telegram.ext.Filters.regex("(.*?)"), edit_coin
+)
 
-EDIT_USER_CONFIG_HANDLER = MessageHandler(Filters.regex("(.*?)"), edit_user_config)
+EDIT_USER_CONFIG_HANDLER = telegram.ext.MessageHandler(
+    telegram.ext.Filters.regex("(.*?)"), edit_user_config
+)
 
-DELETE_DB_HANDLER = MessageHandler(
-    Filters.regex(f"^({i18n.t('keyboard.confirm')}|{i18n.t('keyboard.go_back')})$"),
+DELETE_DB_HANDLER = telegram.ext.MessageHandler(
+    telegram.ext.Filters.regex(
+        f"^({i18n.t('keyboard.confirm')}|{i18n.t('keyboard.go_back')})$"
+    ),
     delete_db,
 )
 
-UPDATE_TG_HANDLER = MessageHandler(
-    Filters.regex(
+UPDATE_TG_HANDLER = telegram.ext.MessageHandler(
+    telegram.ext.Filters.regex(
         f"^({i18n.t('keyboard.update')}|{i18n.t('keyboard.cancel_update')})$"
     ),
     update_tg_bot,
 )
 
-UPDATE_BTB_HANDLER = MessageHandler(
-    Filters.regex(
+UPDATE_BTB_HANDLER = telegram.ext.MessageHandler(
+    telegram.ext.Filters.regex(
         f"^({i18n.t('keyboard.update')}|{i18n.t('keyboard.cancel_update')})$"
     ),
     update_btb,
 )
 
-PANIC_BUTTON_HANDLER = MessageHandler(
-    Filters.regex(
+PANIC_BUTTON_HANDLER = telegram.ext.MessageHandler(
+    telegram.ext.Filters.regex(
         f"^({i18n.t('keyboard.stop_sell')}|{i18n.t('keyboard.stop_cancel')}|{i18n.t('keyboard.stop_bot')}|{i18n.t('keyboard.go_back')})$"
     ),
     panic,
 )
 
-CUSTOM_SCRIPT_HANDLER = MessageHandler(Filters.regex("(.*?)"), execute_custom_script)
+CUSTOM_SCRIPT_HANDLER = telegram.ext.MessageHandler(
+    telegram.ext.Filters.regex("(.*?)"), execute_custom_script
+)
 
-GRAPH_MENU_HANDLER = MessageHandler(Filters.regex("(.*)"), graph_menu)
+GRAPH_MENU_HANDLER = telegram.ext.MessageHandler(
+    telegram.ext.Filters.regex("(.*)"), graph_menu
+)
 
-CREATE_GRAPH_HANDLER = MessageHandler(Filters.regex("(.*)"), create_graph)
+CREATE_GRAPH_HANDLER = telegram.ext.MessageHandler(
+    telegram.ext.Filters.regex("(.*)"), create_graph
+)
 
 
-FALLBACK_HANDLER = CommandHandler("cancel", cancel)
+FALLBACK_HANDLER = telegram.ext.CommandHandler("cancel", cancel)

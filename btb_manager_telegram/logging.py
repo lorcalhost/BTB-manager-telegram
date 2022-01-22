@@ -34,7 +34,7 @@ def if_exception_log(message=None, level=logging.ERROR, raise_error=True):
     """
 
     def _f_if_exception_log(fun):
-        def _exec_f_exception_fun(*args, **kwargs):
+        def _exec_if_exception_fun(*args, **kwargs):
             result = None
             try:
                 result = fun(*args, **kwargs)
@@ -51,7 +51,7 @@ def if_exception_log(message=None, level=logging.ERROR, raise_error=True):
                 raise e
             return result
 
-        return _exec_f_exception_fun
+        return _exec_if_exception_fun
 
     return _f_if_exception_log
 

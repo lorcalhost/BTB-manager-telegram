@@ -5,10 +5,10 @@ import subprocess
 import sys
 
 import colorama
-from telegram import Bot, ReplyKeyboardMarkup
-from telegram.ext import ConversationHandler, Updater
-
 import i18n
+import telegram
+import telegram.ext
+
 from btb_manager_telegram import (
     CREATE_GRAPH,
     CUSTOM_SCRIPT,
@@ -39,7 +39,7 @@ from btb_manager_telegram.utils import (
 
 def pre_run_main() -> None:
     parser = argparse.ArgumentParser(
-        description="Thanks for using Binance Trade Bot Manager Telegram. "
+        description="Thanks for using Binance Trade telegram.Bot Manager Telegram. "
         'By default the program will use "../binance-trade-bot/" as binance-trade-bot installation path.'
     )
     parser.add_argument(
@@ -128,7 +128,7 @@ def pre_run_main() -> None:
     setup_coin_list()
     if settings.TOKEN is None or settings.CHAT_ID is None:
         setup_telegram_constants()
-    settings.BOT = Bot(settings.TOKEN)
+    settings.BOT = telegram.Bot(settings.TOKEN)
     settings.CHAT = settings.BOT.getChat(settings.CHAT_ID)
 
     migrate_reports()
@@ -163,15 +163,15 @@ def main() -> None:
                 message_trade_bot += i18n.t("welcome.bot_not_started.no_python")
         message_trade_bot += "\n\n"
 
-    # Create the Updater and pass it your token
-    updater = Updater(settings.TOKEN)
+    # Create the telegram.ext.Updater and pass it your token
+    updater = telegram.ext.Updater(settings.TOKEN)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
 
     dispatcher.add_error_handler(tg_error_handler)
 
-    conv_handler = ConversationHandler(
+    conv_handler = telegram.ext.ConversationHandler(
         entry_points=[
             handlers.ENTRY_POINT_HANDLER,
         ],
@@ -193,7 +193,7 @@ def main() -> None:
     )
     dispatcher.add_handler(conv_handler)
 
-    # Start the Bot
+    # Start the telegram.Bot
     updater.start_polling()
 
     # Welcome mat
@@ -215,7 +215,7 @@ def main() -> None:
     )
 
     keyboard = [["/start"]]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     settings.CHAT.send_message(
         escape_tg(message),
         reply_markup=reply_markup,

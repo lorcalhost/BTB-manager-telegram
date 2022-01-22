@@ -92,10 +92,10 @@ You can now reboot the telegram bot.
 This bot supports custom scripts in a plugin manner. An extensive documentation on customs scripts is available [here](./docs/custom-scripts.md).
 
 ### Create a new translation
-Copy the `i18n/en.yml` file and rename it to e.g. `i18n/it.yml` and translate all the included values.
+Copy the `locales/en.yml` file and rename it to e.g. `locales/it.yml` and translate all the included values.
 Check the translation is complete :
 ```bash
-cd i18n
+cd locales
 pip3 install click
 python3 check_translation_file.py it.yml
 ```

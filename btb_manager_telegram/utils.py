@@ -4,20 +4,12 @@ import json
 import os
 import sqlite3
 import subprocess
-from typing import List, Optional
 
+import i18n
 import psutil
 import yaml
 
-import i18n
 from btb_manager_telegram import scheduler, settings
-from btb_manager_telegram.error import (
-    BTBConfigNotFound,
-    NoChatID,
-    NoRootPath,
-    NoTgConfig,
-    TgConfigNotFound,
-)
 from btb_manager_telegram.formating import escape_tg
 from btb_manager_telegram.logging import logger
 
@@ -27,7 +19,7 @@ def setup_i18n(lang):
     i18n.set("fallback", "en")
     i18n.set("skip_locale_root_data", True)
     i18n.set("filename_format", "{locale}.{format}")
-    i18n.load_path.append("./i18n")
+    i18n.load_path.append("./locales")
 
 
 def get_db_cursor(fun):
@@ -138,7 +130,7 @@ def setup_coin_list():
     settings.COIN_LIST = [i for i in coin_list if i != ""]
 
 
-def get_binance_trade_bot_process() -> Optional[psutil.Process]:
+def get_binance_trade_bot_process():
     name = "binance_trade_bot"
     is_root_path_absolute = os.path.isabs(settings.ROOT_PATH)
     bot_path = os.path.normpath(settings.ROOT_PATH)
