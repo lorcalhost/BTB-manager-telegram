@@ -15,6 +15,8 @@ from btb_manager_telegram import (
     CUSTOM_SCRIPT,
     DELETE_DB,
     EDIT_COIN_LIST,
+    EDIT_INVESTMENTS,
+    DELETE_INVESTMENTS,
     EDIT_USER_CONFIG,
     GRAPH_MENU,
     MENU,
@@ -179,6 +181,8 @@ def main() -> None:
         states={
             MENU: [handlers.MENU_HANDLER],
             EDIT_COIN_LIST: [handlers.EDIT_COIN_LIST_HANDLER],
+            EDIT_INVESTMENTS: [handlers.EDIT_INVESTMENTS_HANDLER],
+            DELETE_INVESTMENTS: [handlers.DELETE_INVESTMENTS_HANDLER],
             EDIT_USER_CONFIG: [handlers.EDIT_USER_CONFIG_HANDLER],
             DELETE_DB: [handlers.DELETE_DB_HANDLER],
             UPDATE_TG: [handlers.UPDATE_TG_HANDLER],
