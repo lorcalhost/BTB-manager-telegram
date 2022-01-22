@@ -20,19 +20,18 @@ from btb_manager_telegram import (
     PANIC_BUTTON,
     UPDATE_BTB,
     UPDATE_TG,
-    logger,
     scheduler,
     scheduler_thread,
     settings,
 )
 from btb_manager_telegram.buttons import start_bot
+from btb_manager_telegram.formating import escape_tg
+from btb_manager_telegram.logging import logger, tg_error_handler
 from btb_manager_telegram.report import make_snapshot, migrate_reports
 from btb_manager_telegram.utils import (
-    escape_tg,
     retreive_btb_constants,
     setup_coin_list,
     setup_i18n,
-    setup_root_path_constant,
     setup_telegram_constants,
     update_checker,
 )
@@ -104,7 +103,7 @@ def pre_run_main() -> None:
         run_on_docker()
         exit(1)
 
-    settings.ROOT_PATH = args.path
+    settings.ROOT_PATH = os.path.join(args.path, "")
     settings.PYTHON_PATH = args.python_path
     settings.TOKEN = args.token
     settings.CHAT_ID = args.chat_id
@@ -125,7 +124,6 @@ def pre_run_main() -> None:
         f.write(str(os.getpid()))
 
     setup_i18n(settings.LANG)
-    setup_root_path_constant()
     retreive_btb_constants()
     setup_coin_list()
     if settings.TOKEN is None or settings.CHAT_ID is None:
@@ -170,6 +168,8 @@ def main() -> None:
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
+
+    dispatcher.add_error_handler(tg_error_handler)
 
     conv_handler = ConversationHandler(
         entry_points=[

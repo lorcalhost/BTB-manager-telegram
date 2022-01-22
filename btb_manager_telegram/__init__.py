@@ -1,7 +1,8 @@
-import logging
 import sched
 import threading
 import time
+
+from btb_manager_telegram.logging import logger, logger_handler
 
 (
     MENU,
@@ -17,13 +18,6 @@ import time
 ) = range(10)
 
 BOUGHT, BUYING, SOLD, SELLING = range(4)
-
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
-logger = logging.getLogger("btb_manager_telegram_logger")
-
-scheduler = sched.scheduler(time.time, time.sleep)
 
 
 class SchedulerRunner(threading.Thread):
@@ -43,4 +37,5 @@ class SchedulerRunner(threading.Thread):
         self.running = False
 
 
+scheduler = sched.scheduler(time.time, time.sleep)
 scheduler_thread = SchedulerRunner(scheduler)

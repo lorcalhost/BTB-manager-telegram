@@ -13,8 +13,9 @@ import numpy as np
 import requests
 
 import i18n
-from btb_manager_telegram import logger, scheduler, settings
-from btb_manager_telegram.utils import escape_tg
+from btb_manager_telegram import scheduler, settings
+from btb_manager_telegram.formating import escape_tg
+from btb_manager_telegram.logging import logger
 
 warnings.filterwarnings("ignore", category=UserWarning)
 

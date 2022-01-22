@@ -36,18 +36,20 @@ from btb_manager_telegram import (
     UPDATE_TG,
     buttons,
     keyboards,
-    logger,
     settings,
 )
 from btb_manager_telegram.binance_api_utils import send_signed_request
+from btb_manager_telegram.formating import (
+    escape_tg,
+    reply_text_escape,
+    telegram_text_truncator,
+)
+from btb_manager_telegram.logging import logger
 from btb_manager_telegram.report import get_graph
 from btb_manager_telegram.utils import (
-    escape_tg,
     find_and_kill_binance_trade_bot_process,
     get_custom_scripts_keyboard,
     kill_btb_manager_telegram_process,
-    reply_text_escape,
-    telegram_text_truncator,
 )
 
 
