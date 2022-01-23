@@ -20,6 +20,8 @@ from btb_manager_telegram import (
     DELETE_DB,
     EDIT_COIN_LIST,
     EDIT_USER_CONFIG,
+    EDIT_INVESTMENTS,
+    DELETE_INVESTMENTS,
     GRAPH_MENU,
     MENU,
     PANIC_BUTTON,
@@ -263,6 +265,33 @@ def menu(update, _):
                 parse_mode="MarkdownV2",
             )
             return EDIT_COIN_LIST
+        else:
+            reply_text_escape_fun(
+                message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
+            )
+
+    elif update.message.text == i18n.t("keyboard.edit_investments"):
+        message, status = buttons.edit_investments()
+        if status:
+            reply_text_escape_fun(
+                message, reply_markup=telegram.ReplyKeyboardRemove(), parse_mode="MarkdownV2"
+            )
+            return EDIT_INVESTMENTS
+        else:
+            reply_text_escape_fun(
+                message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
+            )
+
+    elif update.message.text == i18n.t("keyboard.delete_investments"):
+        message, status = buttons.delete_investments()
+        if status:
+            kb = [[i18n.t("keyboard.confirm"), i18n.t("keyboard.go_back")]]
+            reply_text_escape_fun(
+                message,
+                reply_markup=telegram.ReplyKeyboardMarkup(kb, resize_keyboard=True),
+                parse_mode="MarkdownV2",
+            )
+            return DELETE_INVESTMENTS
         else:
             reply_text_escape_fun(
                 message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
@@ -746,12 +775,72 @@ def cancel(update, _):
     )
     return telegram.ext.ConversationHandler.END
 
+def delete_investments(update, _):
+    logger.info(
+        f"Asking if the user really wants to delete the investments record. ({update.message.text})"
+    )
+
+    # modify reply_text function to have it escaping characters
+    reply_text_escape_fun = reply_text_escape(update.message.reply_text)
+
+    if update.message.text != i18n.t("keyboard.go_back"):
+        message = i18n.t("investment.delete.success")
+        investments_path = os.path.join(settings.ROOT_PATH, "data", "investments.txt")
+        try:
+            shutil.copyfile(investments_path, f"{investments_path}.backup")
+            os.remove(investments_path)
+        except Exception as e:
+            logger.error(f"❌ Unable to delete investments record: {e}", exc_info=True)
+            message = i18n.t("investment.delete.error")
+
+
+    else:
+        message = f"{i18n.t('exited_no_change')}\n" f"{i18n.t('investment.delete.not_deleted')}"
+
+    keyboard = [[i18n.t("keyboard.ok")]]
+    reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
+
+    return MENU
+
+def edit_investments(update, _):
+    logger.info(f"Editing Investments. ({update.message.text})")
+    # modify reply_text function to have it escaping characters
+    reply_text_escape_fun = reply_text_escape(update.message.reply_text)
+    investments_path = os.path.join(settings.ROOT_PATH, "data", "investments.txt")
+    if update.message.text != "/stop":
+        message = (
+            f"{i18n.t('investment.success')}\n\n" f"```\n" f"{update.message.text}\n" f"```"
+        )
+
+        try:
+            if os.path.isfile(investments_path):
+                shutil.copyfile(investments_path, f"{investments_path}.backup")
+            with open(investments_path, "w+") as f:
+                f.write(update.message.text + "\n")
+        except Exception as e:
+            logger.error(
+                f"❌ Unable to edit user configuration file: {e}", exc_info=True
+            )
+            message = i18n.t("investment.error")
+        try:
+            shutil.copymode(investments_path, f"{investments_path}.backup")
+        except:
+            pass
+    else:
+        message = f"{i18n.t('exited_no_change')}\n" f"{i18n.t('investment.not_modified')}"
+
+    keyboard = [[i18n.t("keyboard.go_back")]]
+    reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
+
+    return MENU
 
 MENU_HANDLER = telegram.ext.MessageHandler(
     telegram.ext.Filters.regex(
         f"^({i18n.t('keyboard.current_value')}|{i18n.t('keyboard.panic')}|{i18n.t('keyboard.progress')}|{i18n.t('keyboard.next_coin')}|{i18n.t('keyboard.check_status')}|{i18n.t('keyboard.bot_stats')}|{i18n.t('keyboard.trade_history')}|{i18n.t('keyboard.graph')}|{i18n.t('keyboard.maintenance')}|"
         f"{i18n.t('keyboard.configurations')}|{i18n.t('keyboard.start')}|{i18n.t('keyboard.stop')}|{i18n.t('keyboard.read_logs')}|{i18n.t('keyboard.delete_db')}|"
-        f"{i18n.t('keyboard.edit_cfg')}|{i18n.t('keyboard.edit_coin_list')}|{i18n.t('keyboard.export_db')}|{i18n.t('keyboard.update_tgb')}|{i18n.t('keyboard.update_btb')}|"
+        f"{i18n.t('keyboard.edit_cfg')}|{i18n.t('keyboard.edit_investments')}|{i18n.t('keyboard.delete_investments')}|{i18n.t('keyboard.edit_coin_list')}|{i18n.t('keyboard.export_db')}|{i18n.t('keyboard.update_tgb')}|{i18n.t('keyboard.update_btb')}|"
         f"{i18n.t('keyboard.execute_script')}|{i18n.t('keyboard.back')}|{i18n.t('keyboard.go_back')}|{i18n.t('keyboard.ok')}|{i18n.t('keyboard.cancel_update')}|{i18n.t('keyboard.cancel')}|{i18n.t('keyboard.ok_s')}|{i18n.t('keyboard.great')})$"
     ),
     menu,
@@ -767,6 +856,13 @@ EDIT_COIN_LIST_HANDLER = telegram.ext.MessageHandler(
 
 EDIT_USER_CONFIG_HANDLER = telegram.ext.MessageHandler(
     telegram.ext.Filters.regex("(.*?)"), edit_user_config
+)
+
+EDIT_INVESTMENTS_HANDLER = telegram.ext.MessageHandler(telegram.ext.Filters.regex("(.*?)"), edit_investments)
+
+DELETE_INVESTMENTS_HANDLER = telegram.ext.MessageHandler(
+    telegram.ext.Filters.regex(f"^({i18n.t('keyboard.confirm')}|{i18n.t('keyboard.go_back')})$"),
+    delete_investments,
 )
 
 DELETE_DB_HANDLER = telegram.ext.MessageHandler(

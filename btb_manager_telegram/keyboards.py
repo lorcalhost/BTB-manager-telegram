@@ -17,6 +17,7 @@ config = telegram.ReplyKeyboardMarkup(
         [i18n.t("keyboard.start"), i18n.t("keyboard.stop")],
         [i18n.t("keyboard.read_logs"), i18n.t("keyboard.delete_db")],
         [i18n.t("keyboard.edit_cfg"), i18n.t("keyboard.edit_coin_list")],
+        [i18n.t("keyboard.edit_investments"), i18n.t("keyboard.delete_investments")],
         [i18n.t("keyboard.export_db"), i18n.t("keyboard.back")],
     ],
     resize_keyboard=True,

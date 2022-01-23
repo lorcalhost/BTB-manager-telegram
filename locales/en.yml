@@ -117,6 +117,23 @@ btb:
   lib_error: "❌ Unable to find python binary at `%{path}`."
   windows_hint: "If you are running the telegram bot on Windows make sure to run with administrator privileges."
 
+investment:
+  success: "✔ Successfully edited additional investments record to:"
+  error: "❌ Unable to edit the investment records."
+  not_found: "❌ Unable to find investments record at `%{path}`."
+  not_modified: "Your investments record was *not* modified."
+  is: "Current investment record is:"
+  reply: "_*Please reply with a message containing the updated investments. Note, \
+          investments must be in same currency as bridge used when the bot \
+          started. Ex: If the bot started with USD as bridge, just add \
+          additional investment as 45.0, 25.1 etc. To delete all investments make it 0.0. *_."
+
+  delete:
+    success: "✔ Successfully deleted investments record."
+    error: "❌ Unable to delete investments record."
+    clear_log_error: "❌ Unable to clear log file."
+    not_deleted: "Your investments record was *not* deleted."
+    sure: "Are you sure you want to delete the investments record?"
 
 log:
   error: "❌ Unable to find log file at `%{path}`."
@@ -249,6 +266,8 @@ keyboard:
   delete_db: "❌ Delete database"
   edit_cfg: "⚙ Edit user.cfg"
   edit_coin_list: "👛 Edit coin list"
+  edit_investments: "💲️Add Investments"
+  delete_investments: "❗️ Delete Investments"
   export_db: "📤 Export database"
   back: "⬅️ Back"
   go_back: "Go back"

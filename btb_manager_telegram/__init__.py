@@ -7,6 +7,8 @@ from btb_manager_telegram.logging import logger, logger_handler
 (
     MENU,
     EDIT_COIN_LIST,
+    EDIT_INVESTMENTS,
+    DELETE_INVESTMENTS,
     EDIT_USER_CONFIG,
     DELETE_DB,
     UPDATE_TG,
@@ -15,7 +17,7 @@ from btb_manager_telegram.logging import logger, logger_handler
     CUSTOM_SCRIPT,
     GRAPH_MENU,
     CREATE_GRAPH,
-) = range(10)
+) = range(12)
 
 BOUGHT, BUYING, SOLD, SELLING = range(4)
 

@@ -4,6 +4,7 @@ import os
 import sqlite3
 import subprocess
 import time
+import numpy as np
 
 import i18n
 
@@ -214,13 +215,13 @@ SELECT
     target_price,
     target_price / current_price * 100 AS percentage
 FROM (
-    SELECT 
-        p.to_coin_id AS coin, 
-        sh.other_coin_price AS current_price, 
+    SELECT
+        p.to_coin_id AS coin,
+        sh.other_coin_price AS current_price,
         {target_price_calculation} AS target_price,
     MAX(sh.datetime)
-    FROM scout_history sh 
-    JOIN pairs p ON p.id = sh.pair_id 
+    FROM scout_history sh
+    JOIN pairs p ON p.id = sh.pair_id
     WHERE p.from_coin_id = (
         SELECT alt_coin_id FROM trade_history ORDER BY datetime DESC LIMIT 1
     )
@@ -302,6 +303,56 @@ def trade_history(cur):
     message = telegram_text_truncator(m_list)
     return message
 
+def investments_path():
+    return os.path.join(settings.ROOT_PATH, "data", "investments.txt")
+
+def delete_investments():
+    logger.info("Delete investments button pressed.")
+
+    message = i18n.t("investment.delete.stop_bot")
+    delete = False
+    if os.path.exists(investments_path()):
+        message = i18n.t("investment.delete.sure")
+        delete = True
+    else:
+        message = f"{i18n.t('investment.not_found', path=investments_path())}"
+    return [message, delete]
+
+def edit_investments():
+    logger.info("Add Additional Investments.")
+
+    edit = False
+    investment_file_path = investments_path()
+    if not get_binance_trade_bot_process():
+        if os.path.exists(investment_file_path):
+            with open(investment_file_path) as f:
+                message = (
+                    f"{i18n.t('investment.is')}\n\n"
+                    f"```\n{f.read()}\n```\n\n"
+                    f"{i18n.t('investment.reply')}\n\n"
+                    f"{i18n.t('stop_to_stop')}"
+                )
+                edit = True
+        else:
+            message = "``` No additional investments record found. Add only investments other than the starting investment. \
+                  Note, investments must be in same currency as bridge used when the bot started. Ex: If the bot started with USD as bridge, just add additional investment of any coin in terms of its birdge value. Ex:\n45.0\n24.5\nTo delete all investments make it 0.0.```"
+            edit = True
+    return [message, edit]
+
+# save investments as numbers same as bridge USDT of the StartCoin
+def read_user_investments():
+
+    investment_file_path = investments_path()
+    if os.path.isfile(investment_file_path):
+        with open(investment_file_path, "r") as f:
+            investments = []
+            for val in f.read().split('\n'):
+                if val != '':
+                    investments.append(float(val))
+
+            return np.sum(investments)
+    else:
+        return None
 
 @get_db_cursor
 @if_exception_log("Cannot retreive bot statistics data.")
@@ -391,6 +442,10 @@ def bot_stats(cur):
 
     convertibleStartCoinAmount = currentCoinLiveBridgeValue / initialCoinLiveBridgePrice
 
+    addition_investment = read_user_investments()
+    if addition_investment != None:
+        initialCoinFiatValue += addition_investment
+
     # always show profit in bot start coin's Bridge
     changeFiat = (
         (currentCoinLiveBridgeValue - initialCoinFiatValue) / initialCoinFiatValue * 100
@@ -478,6 +533,9 @@ def bot_stats(cur):
         message = [message]
         message += table
 
+        if addition_investment != None:
+            message += "\n_Additional Investments is reflected in bot profit. \
+                        You can Manage Investments record from Configuration menu._"
     message = telegram_text_truncator(message)
     return message
 
