@@ -1,8 +1,8 @@
 # Binance Trade Bot Manager Telegram
 
-A Telegram bot for remotely managing [Binance Trade Bot].
+A Telegram bot for remotely managing Edendg23's [Binance Trade Bot](https://github.com/edeng23/binance-trade-bot) and its forks.
 
-I wanted to develop an easy way of managing [Binance Trade Bot] so that I wouldn't have to constantly ssh into my VPS, and my non-techy friends could enjoy the benefits of automated trading.
+This program aims to be an easy way of managing Binance Trade Bot] so that I wouldn't have to constantly ssh into my VPS, and my non-techy friends could enjoy the benefits of automated trading.
 
 The program's default behavior fetches Telegram `token` and `chat_id` from [Binance Trade Bot]'s `apprise.yml` file. For a quick Telegram bot setup guide [click here](./docs/telegram-setup.md).
 
@@ -21,11 +21,11 @@ PARENT_DIR
 ```
 
 To begin with, open a terminal and place yourself in the directory where the binance-trade-bot is already present, e.g. if the binance_trade_bot directory is located in `/home/user/trading_bot` run:
-```bash
+```console
 cd /home/user/trading_bot
 ```
 Then, run the following lines:
-```bash
+```console
 git clone https://github.com/lorcalhost/BTB-manager-telegram.git
 cd BTB-manager-telegram
 python3 -m pip install -r requirements.txt
@@ -35,17 +35,17 @@ python3 -m pip install -r requirements.txt
 
 As the telegram bot is launching itself the **Binance Trade Bot**, you only have to start the **BTB Manager Telegram** like so:
 
-```bash
+```console
 python3 -m btb_manager_telegram
 ```
 
 If the bot is running on a server you may want to keep it running even after ssh connection is closed by using nohup. Note the trailing "&" :
-```bash
+```console
 nohup python3 -m btb_manager_telegram &
 ```
 
 However, you can run the bot with options :
-```bash
+```console
 # Autostart the Binance Trade Bot when the BTB Manager starts
 # (Otherwise you will have to manually start the Binance Trade Bot from telegram)
 python3 -m btb_manager_telegram -s
@@ -80,7 +80,7 @@ If the trade bot has been launched with the telegram bot, stopping the telegram 
 
 ## Manual upgrade
 First of, stop the telegram bot.
-```
+```console
 git pull
 python3 -m pip install --upgrade -r requirements.txt
 ```
@@ -91,36 +91,28 @@ You can now reboot the telegram bot.
 ### Custom scripts
 This bot supports custom scripts in a plugin manner. An extensive documentation on customs scripts is available [here](./docs/custom-scripts.md).
 
-### Create a new translation
-Copy the `locales/en.yml` file and rename it to e.g. `locales/it.yml` and translate all the included values.
-Check the translation is complete :
-```bash
-cd locales
-pip3 install click
-python3 check_translation_file.py it.yml
-```
-Please submit your translation in a PR for it to profit everybody!
-
 ### Telegram token and chat_id
-Make sure [Binance Trade Bot]'s `apprise.yml` file is correctly setup before running, the telegram manager retreives this file to connect the bot.
+Make sure that **Binance Trade Bot**'s `config/apprise.yml` file is correctly setup before running, the telegram manager retreives this file to connect the bot.
 
 If **Binance Trade Bot** and **BTB-Manager-Telegram** were **not** installed in the same parent directory or if `apprise.yml` is not setup or you want to use different `token` and `chat_id` from the ones in the `apprise.yml` file, you can set these two keys with the options `--token` and `--chat_id`
 
 ### Virtualenvs
 If the Binance Trade Bot has its own python environment, that is not shared with the telegram manager, you have to specify the path of the python binary used by the trade bot with the option `--python_path`. For example, if you created a virtualenv specific to the binance trade bot in the folder `/home/user/trading_bot/binance-trade-bot/venv`, you have to run the telegram bot like so:
-```bash
+```console
 python3 -m btb_manager_telegram --python_path /home/user/trading_bot/binance-trade-bot/venv/bin/python
 ```
 
 ### Multiple bots
-If you would like to run several _Binance Trade Bot_ instances at the same time [click here](./docs/multiple-bots.md).
+If you would like to run several **Binance Trade Bot** instances at the same time [click here](./docs/multiple-bots.md).
 
 ### Compatibility
-The program is fully compatible with **Linux** and **Windows** through **[WSL]**.  
-`RWX` permission problems are present on **native Windows** and **MacOS**.
+This program is fully compatible with **Linux** and **Windows** through **WSL** (*Windows Subsystem for Linux*).  
+
+Severa known problems are present on **native Windows** and will not be asserted.
+
+**MacOS** compatibility is unknown, but supposed to be good ad this system is close to **Linux**.
 
 ## Screenshots
-
 <details><summary>Click here</summary>
 
 <p align="center">
@@ -131,8 +123,7 @@ The program is fully compatible with **Linux** and **Windows** through **[WSL]**
 </details>
 
 ## Support the project
-
-If you like `BTB-manager-telegram` and use it on a daily basis consider supporting the project through a small donation. :smile:
+If you like the **BTB manager telegram** and use it on a daily basis consider supporting the project through a small donation. :smile:
 
 [:heart: Sponsor on GitHub](https://github.com/sponsors/lorcalhost)
 
