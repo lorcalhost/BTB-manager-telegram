@@ -69,10 +69,7 @@ def menu(update, _):
             escape_tg(message), reply_markup=keyboards.menu, parse_mode="MarkdownV2"
         )
 
-    if update.message.text in [
-        i18n.t("keyboard.back"),
-        i18n.t("keyboard.great"),
-    ]:
+    if update.message.text in [i18n.t("keyboard.back"), i18n.t("keyboard.great")]:
         reply_text_escape_fun(
             i18n.t("select_option"),
             reply_markup=keyboards.menu,
@@ -112,15 +109,9 @@ def menu(update, _):
         message, status = buttons.panic_btn()
         if status in [BOUGHT, BUYING, SOLD, SELLING]:
             if status == BOUGHT:
-                kb = [
-                    [i18n.t("keyboard.stop_sell")],
-                    [i18n.t("keyboard.go_back")],
-                ]
+                kb = [[i18n.t("keyboard.stop_sell")], [i18n.t("keyboard.go_back")]]
             elif status in [BUYING, SELLING]:
-                kb = [
-                    [i18n.t("keyboard.stop_cancel")],
-                    [i18n.t("keyboard.go_back")],
-                ]
+                kb = [[i18n.t("keyboard.stop_cancel")], [i18n.t("keyboard.go_back")]]
             elif status == SOLD:
                 kb = [[i18n.t("keyboard.stop")], [i18n.t("keyboard.go_back")]]
 
@@ -208,23 +199,17 @@ def menu(update, _):
             f"{i18n.t('btb.lib_error', path=settings.PYTHON_PATH)}\n",
         ][status]
         reply_text_escape_fun(
-            message,
-            reply_markup=keyboards.config,
-            parse_mode="MarkdownV2",
+            message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
         )
 
     elif update.message.text == i18n.t("keyboard.stop"):
         reply_text_escape_fun(
-            buttons.stop_bot(),
-            reply_markup=keyboards.config,
-            parse_mode="MarkdownV2",
+            buttons.stop_bot(), reply_markup=keyboards.config, parse_mode="MarkdownV2"
         )
 
     elif update.message.text == i18n.t("keyboard.read_logs"):
         reply_text_escape_fun(
-            buttons.read_log(),
-            reply_markup=keyboards.config,
-            parse_mode="MarkdownV2",
+            buttons.read_log(), reply_markup=keyboards.config, parse_mode="MarkdownV2"
         )
 
     elif update.message.text == i18n.t("keyboard.delete_db"):
@@ -274,7 +259,9 @@ def menu(update, _):
         message, status = buttons.edit_investments()
         if status:
             reply_text_escape_fun(
-                message, reply_markup=telegram.ReplyKeyboardRemove(), parse_mode="MarkdownV2"
+                message,
+                reply_markup=telegram.ReplyKeyboardRemove(),
+                parse_mode="MarkdownV2",
             )
             return EDIT_INVESTMENTS
         else:
@@ -303,10 +290,7 @@ def menu(update, _):
             message, reply_markup=keyboards.config, parse_mode="MarkdownV2"
         )
         if document is not None:
-            settings.CHAT.send_document(
-                document=document,
-                filename="crypto_trading.db",
-            )
+            settings.CHAT.send_document(document=document, filename="crypto_trading.db")
 
     elif update.message.text == i18n.t("keyboard.update_tgb"):
         message, status = buttons.update_tg_bot()
@@ -320,9 +304,7 @@ def menu(update, _):
             return UPDATE_TG
         else:
             reply_text_escape_fun(
-                message,
-                reply_markup=keyboards.maintenance,
-                parse_mode="MarkdownV2",
+                message, reply_markup=keyboards.maintenance, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n.t("keyboard.update_btb"):
@@ -337,9 +319,7 @@ def menu(update, _):
             return UPDATE_BTB
         else:
             reply_text_escape_fun(
-                message,
-                reply_markup=keyboards.maintenance,
-                parse_mode="MarkdownV2",
+                message, reply_markup=keyboards.maintenance, parse_mode="MarkdownV2"
             )
 
     elif update.message.text == i18n.t("keyboard.execute_script"):
@@ -353,9 +333,7 @@ def menu(update, _):
             return CUSTOM_SCRIPT
         else:
             reply_text_escape_fun(
-                message,
-                reply_markup=keyboards.maintenance,
-                parse_mode="MarkdownV2",
+                message, reply_markup=keyboards.maintenance, parse_mode="MarkdownV2"
             )
 
     return MENU
@@ -645,10 +623,7 @@ def execute_custom_script(update, _):
                 )
 
             try:
-                proc = subprocess.Popen(
-                    command,
-                    stdout=subprocess.PIPE,
-                )
+                proc = subprocess.Popen(command, stdout=subprocess.PIPE)
                 output, _ = proc.communicate()
                 message_list = telegram_text_truncator(
                     output.decode("utf-8"),
@@ -775,6 +750,7 @@ def cancel(update, _):
     )
     return telegram.ext.ConversationHandler.END
 
+
 def delete_investments(update, _):
     logger.info(
         f"Asking if the user really wants to delete the investments record. ({update.message.text})"
@@ -793,15 +769,18 @@ def delete_investments(update, _):
             logger.error(f"❌ Unable to delete investments record: {e}", exc_info=True)
             message = i18n.t("investment.delete.error")
 
-
     else:
-        message = f"{i18n.t('exited_no_change')}\n" f"{i18n.t('investment.delete.not_deleted')}"
+        message = (
+            f"{i18n.t('exited_no_change')}\n"
+            f"{i18n.t('investment.delete.not_deleted')}"
+        )
 
     keyboard = [[i18n.t("keyboard.ok")]]
     reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
 
     return MENU
+
 
 def edit_investments(update, _):
     logger.info(f"Editing Investments. ({update.message.text})")
@@ -810,7 +789,10 @@ def edit_investments(update, _):
     investments_path = os.path.join(settings.ROOT_PATH, "data", "investments.txt")
     if update.message.text != "/stop":
         message = (
-            f"{i18n.t('investment.success')}\n\n" f"```\n" f"{update.message.text}\n" f"```"
+            f"{i18n.t('investment.success')}\n\n"
+            f"```\n"
+            f"{update.message.text}\n"
+            f"```"
         )
 
         try:
@@ -828,13 +810,16 @@ def edit_investments(update, _):
         except:
             pass
     else:
-        message = f"{i18n.t('exited_no_change')}\n" f"{i18n.t('investment.not_modified')}"
+        message = (
+            f"{i18n.t('exited_no_change')}\n" f"{i18n.t('investment.not_modified')}"
+        )
 
     keyboard = [[i18n.t("keyboard.go_back")]]
     reply_markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     reply_text_escape_fun(message, reply_markup=reply_markup, parse_mode="MarkdownV2")
 
     return MENU
+
 
 MENU_HANDLER = telegram.ext.MessageHandler(
     telegram.ext.Filters.regex(
@@ -858,10 +843,14 @@ EDIT_USER_CONFIG_HANDLER = telegram.ext.MessageHandler(
     telegram.ext.Filters.regex("(.*?)"), edit_user_config
 )
 
-EDIT_INVESTMENTS_HANDLER = telegram.ext.MessageHandler(telegram.ext.Filters.regex("(.*?)"), edit_investments)
+EDIT_INVESTMENTS_HANDLER = telegram.ext.MessageHandler(
+    telegram.ext.Filters.regex("(.*?)"), edit_investments
+)
 
 DELETE_INVESTMENTS_HANDLER = telegram.ext.MessageHandler(
-    telegram.ext.Filters.regex(f"^({i18n.t('keyboard.confirm')}|{i18n.t('keyboard.go_back')})$"),
+    telegram.ext.Filters.regex(
+        f"^({i18n.t('keyboard.confirm')}|{i18n.t('keyboard.go_back')})$"
+    ),
     delete_investments,
 )
 

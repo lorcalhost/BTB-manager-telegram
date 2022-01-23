@@ -174,9 +174,7 @@ def main() -> None:
     dispatcher.add_error_handler(tg_error_handler)
 
     conv_handler = telegram.ext.ConversationHandler(
-        entry_points=[
-            handlers.ENTRY_POINT_HANDLER,
-        ],
+        entry_points=[handlers.ENTRY_POINT_HANDLER],
         states={
             MENU: [handlers.MENU_HANDLER],
             EDIT_COIN_LIST: [handlers.EDIT_COIN_LIST_HANDLER],

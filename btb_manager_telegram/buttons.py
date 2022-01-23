@@ -4,25 +4,23 @@ import os
 import sqlite3
 import subprocess
 import time
-import numpy as np
 
 import i18n
+import numpy as np
 
 from btb_manager_telegram import BOUGHT, BUYING, SELLING, SOLD, settings
 from btb_manager_telegram.binance_api_utils import get_current_price
-from btb_manager_telegram.formating import format_float, telegram_text_truncator
+from btb_manager_telegram.formating import (format_float,
+                                            telegram_text_truncator)
 from btb_manager_telegram.logging import if_exception_log, logger
 from btb_manager_telegram.report import get_previous_reports
 from btb_manager_telegram.table import float_strip, tabularize
-from btb_manager_telegram.utils import (
-    find_and_kill_binance_trade_bot_process,
-    get_binance_trade_bot_process,
-    get_db_cursor,
-    get_user_config,
-    is_btb_bot_update_available,
-    is_tg_bot_update_available,
-    setup_coin_list,
-)
+from btb_manager_telegram.utils import (find_and_kill_binance_trade_bot_process,
+                                        get_binance_trade_bot_process,
+                                        get_db_cursor, get_user_config,
+                                        is_btb_bot_update_available,
+                                        is_tg_bot_update_available,
+                                        setup_coin_list)
 
 
 @get_db_cursor
@@ -34,14 +32,7 @@ def current_value(cur):
     cur.execute(
         """SELECT alt_coin_id, crypto_coin_id, state, alt_trade_amount, crypto_starting_balance, crypto_trade_amount FROM trade_history ORDER BY datetime DESC LIMIT 1;"""
     )
-    (
-        current_coin,
-        bridge,
-        state,
-        alt_amount,
-        order_size,
-        buy_price,
-    ) = cur.fetchone()
+    (current_coin, bridge, state, alt_amount, order_size, buy_price) = cur.fetchone()
     if current_coin is None:
         raise Exception("The current coin can be determined from the database")
     if state == "ORDERED":
@@ -303,8 +294,10 @@ def trade_history(cur):
     message = telegram_text_truncator(m_list)
     return message
 
+
 def investments_path():
     return os.path.join(settings.ROOT_PATH, "data", "investments.txt")
+
 
 def delete_investments():
     logger.info("Delete investments button pressed.")
@@ -317,6 +310,7 @@ def delete_investments():
     else:
         message = f"{i18n.t('investment.not_found', path=investments_path())}"
     return [message, delete]
+
 
 def edit_investments():
     logger.info("Add Additional Investments.")
@@ -339,6 +333,7 @@ def edit_investments():
             edit = True
     return [message, edit]
 
+
 # save investments as numbers same as bridge USDT of the StartCoin
 def read_user_investments():
 
@@ -346,13 +341,14 @@ def read_user_investments():
     if os.path.isfile(investment_file_path):
         with open(investment_file_path, "r") as f:
             investments = []
-            for val in f.read().split('\n'):
-                if val != '':
+            for val in f.read().split("\n"):
+                if val != "":
                     investments.append(float(val))
 
             return np.sum(investments)
     else:
         return None
+
 
 @get_db_cursor
 @if_exception_log("Cannot retreive bot statistics data.")
@@ -534,8 +530,7 @@ def bot_stats(cur):
         message += table
 
         if addition_investment != None:
-            message += "\n_Additional Investments is reflected in bot profit. \
-                        You can Manage Investments record from Configuration menu._"
+            message += "\n_Additional Investments is reflected in bot profit. You can Manage Investments record from Configuration menu._"
     message = telegram_text_truncator(message)
     return message
 
@@ -788,10 +783,7 @@ def panic_btn():
                 f"❌ Something went wrong, the panic button is not working at this time: {e}",
                 exc_info=True,
             )
-            return [
-                i18n.t("panic.error"),
-                -1,
-            ]
+            return [i18n.t("panic.error"), -1]
     except Exception as e:
         logger.error(f"❌ Unable to perform actions on the database: {e}", exc_info=True)
         return [i18n.t("panic.db_error"), -1]
