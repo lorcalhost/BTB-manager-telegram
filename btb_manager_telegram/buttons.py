@@ -614,10 +614,10 @@ def update_tg_bot():
 
     message = i18n.t("update.tgb.up_to_date")
     upd = False
-    to_update = is_tg_bot_update_available()
+    to_update, cur_vers, rem_vers = is_tg_bot_update_available()
     if to_update is not None:
         if to_update:
-            message = f"{i18n.t('update.tgb.available')}\n" f"{i18n.t('update.now')}"
+            message = f"{i18n.t('update.tgb.available', current_version=cur_vers, remote_version=rem_vers)}\n{i18n.t('update.now')}"
             upd = True
     else:
         message = i18n.t("update.tgb.error")

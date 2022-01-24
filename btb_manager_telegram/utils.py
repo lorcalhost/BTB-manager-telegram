@@ -168,7 +168,7 @@ def kill_btb_manager_telegram_process():
         logger.info(f"ERROR: {e}")
 
 
-def is_tg_bot_update_available():
+def is_btb_bot_update_available():
     try:
         proc = subprocess.Popen(
             ["bash", "-c", "git remote update origin && git status -uno"],
@@ -182,38 +182,35 @@ def is_tg_bot_update_available():
     return re
 
 
-def is_btb_bot_update_available():
-    try:
-        subprocess.run(["git", "remote", "update", "origin"])
-        current_version = (
-            subprocess.check_output(["git", "describe", "--abbrev=0", "--tags"])
-            .decode()
-            .rstrip("\n")
+def is_tg_bot_update_available():
+    subprocess.run(["git", "remote", "update", "origin"], check=True)
+    current_version = (
+        subprocess.check_output(["git", "describe", "--abbrev=0", "--tags"])
+        .decode()
+        .rstrip("\n")
+    )
+    remote_version = (
+        subprocess.check_output(
+            ["git", "describe", "--abbrev=0", "--tags", "origin/main"]
         )
-        remote_version = (
-            subprocess.check_output(
-                ["git", "describe", "--abbrev=0", "--tags", "origin/main"]
-            )
-            .decode()
-            .rstrip("\n")
-        )
-        re = current_version != remote_version
-    except Exception as e:
-        logger.error(e, exc_info=True)
-        re = None
-    return re
+        .decode()
+        .rstrip("\n")
+    )
+    re = current_version != remote_version
+    return re, current_version, remote_version
 
 
 def update_checker():
     logger.info("Checking for updates.")
 
     if settings.TG_UPDATE_BROADCASTED_BEFORE is False:
-        if is_tg_bot_update_available():
-            logger.info("BTB Manager Telegram update found.")
-            message = (
-                f"{i18n.t('update.tgb.available')}\n\n"
-                f"{i18n.t('update.tgb.instruction')}"
+        to_update, cur_vers, rem_vers = is_tg_bot_update_available()
+        if to_update:
+            logger.info(
+                f"BTB Manager Telegram update found. ({cur_vers} -> {rem_vers})"
             )
+            message = f"{i18n.t('update.tgb.available', current_version=cur_vers, remote_version=rem_vers)}\n\n{i18n.t('update.tgb.instruction')}"
+            print(message)
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
             scheduler.enter(
@@ -286,3 +283,11 @@ def get_custom_scripts_keyboard():
 
     keyboard.append([i18n.t("keyboard.cancel")])
     return keyboard, custom_script_exist, message
+
+
+def get_restart_file_name(old_pid):
+    """
+    returns the name of the file that has to be created
+    by the new process to inform the old process of the btb to stop
+    """
+    return f"_restart_kill_{old_pid}"

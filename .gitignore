@@ -3,6 +3,8 @@ yarn.lock
 node_modules/
 btbmt.pid
 nohup.out
+_restart_kill_*
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

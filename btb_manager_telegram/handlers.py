@@ -5,6 +5,7 @@ import shutil
 import sqlite3
 import subprocess
 import sys
+import time
 import traceback
 
 import i18n
@@ -42,6 +43,7 @@ from btb_manager_telegram.report import get_graph
 from btb_manager_telegram.utils import (
     find_and_kill_binance_trade_bot_process,
     get_custom_scripts_keyboard,
+    get_restart_file_name,
     kill_btb_manager_telegram_process,
 )
 
@@ -453,14 +455,29 @@ def update_tg_bot(update, _):
         )
         try:
             manager_python_path = sys.executable
-            subprocess.call(
-                f"git pull && {manager_python_path} -m pip install -r requirements.txt --upgrade && "
-                f"{manager_python_path} -m btb_manager_telegram {settings.RAW_ARGS} &",
+            subprocess.run(
+                f"git pull"
+                f" && git checkout $(git describe --abbrev=0 --tags)"
+                f" && {manager_python_path} -m pip install -r requirements.txt --upgrade"
+                f" && {manager_python_path} -m btb_manager_telegram {' '.join(settings.RAW_ARGS)} --_remove_this_arg_auto_restart_old_pid _remove_this_arg_{os.getpid()} &",
                 shell=True,
+                check=True
             )
-            kill_btb_manager_telegram_process()
+            restart_filename = get_restart_file_name(os.getpid())
+            max_attempts = 200
+            attempts = 0
+            while (not os.path.isfile(restart_filename)) and (attempts < max_attempts):
+                # waiting for the tg bot to prove it is alive
+                attempts += 1
+                time.sleep(0.1)
+            if os.path.isfile(restart_filename):
+                logger.info("The old process says : The new process has started. Exiting.")
+                kill_btb_manager_telegram_process()
+            else:
+                logger.error(f"Unable to restart the telegram bot")
+
         except Exception as e:
-            logger.error(f"❌ Unable to update BTB Manager Telegram: {e}", exc_info=True)
+            logger.error(f"Unable to update BTB Manager Telegram: {e}", exc_info=True)
             message = i18n.t("update.tgb.error")
             reply_text_escape_fun(
                 message, reply_markup=reply_markup, parse_mode="MarkdownV2"

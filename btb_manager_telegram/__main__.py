@@ -3,9 +3,11 @@ import json
 import os
 import subprocess
 import sys
+import time
 
 import colorama
 import i18n
+import psutil
 import telegram
 import telegram.ext
 
@@ -29,6 +31,7 @@ from btb_manager_telegram.formating import escape_tg
 from btb_manager_telegram.logging import logger, tg_error_handler
 from btb_manager_telegram.report import make_snapshot, migrate_reports
 from btb_manager_telegram.utils import (
+    get_restart_file_name,
     retreive_btb_constants,
     setup_coin_list,
     setup_i18n,
@@ -97,7 +100,23 @@ def pre_run_main() -> None:
         "NOTE: Run the 'docker_setup.py' file before passing this flag.",
     )
 
+    parser.add_argument(
+        "--_remove_this_arg_auto_restart_old_pid", type=str, default=None
+    )
+
     args = parser.parse_args()
+
+    if args._remove_this_arg_auto_restart_old_pid is not None:
+        old_pid = int(args._remove_this_arg_auto_restart_old_pid.lstrip("_remove_this_arg_"))
+        logger.info(
+            f"The new process says : Restart initied. Waiting for the old process with pid {old_pid} to terminate."
+        )
+        restart_filename = get_restart_file_name(old_pid)
+        open(restart_filename, "w").close()
+        while psutil.pid_exists(old_pid):
+            time.sleep(0.1)
+        os.remove(restart_filename)
+        logger.info(f"The new process says : The old process has terminated. Starting.")
 
     if args.docker:
         run_on_docker()
@@ -111,7 +130,7 @@ def pre_run_main() -> None:
     settings.START_TRADE_BOT = args.start_trade_bot
     settings.CURRENCY = args.currency
     settings.OER_KEY = args.oer_key
-    settings.RAW_ARGS = " ".join(sys.argv[1:])
+    settings.RAW_ARGS = [i for i in sys.argv[1:] if "_remove_this_arg_" not in i]
 
     if settings.CURRENCY not in ("USD", "EUR") and (
         settings.OER_KEY is None or settings.OER_KEY == ""
