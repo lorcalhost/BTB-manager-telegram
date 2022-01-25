@@ -15,7 +15,7 @@ import requests
 
 from btb_manager_telegram import scheduler, settings
 from btb_manager_telegram.formating import escape_tg
-from btb_manager_telegram.logging import logger
+from btb_manager_telegram.logging import if_exception_log, logger
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -139,19 +139,9 @@ def save_report(report, old_reports):
 
 def make_snapshot():
     logger.info("Retreive balance information from binance")
-    try:
-        crypto_report = get_report()
-        crypto_reports = save_report(crypto_report, get_previous_reports())
-        logger.info("Snapshot saved")
-    except Exception as e:
-        logger.error(
-            f"❌ Unable to take a snapshot of the binance account: {e}", exc_info=True
-        )
-        message = f"{i18n.t('snapshot.error')}\n ```\n"
-        message += "".join(traceback.format_exception(*sys.exc_info()))
-        message += "\n```"
-        settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
-    scheduler.enter(dt.timedelta(hours=1).total_seconds(), 2, make_snapshot)
+    crypto_report = get_report()
+    crypto_reports = save_report(crypto_report, get_previous_reports())
+    logger.info("Snapshot saved")
 
 
 def get_graph(relative, symbols, days, graph_type, ref_currency):

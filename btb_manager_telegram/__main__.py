@@ -1,4 +1,5 @@
 import argparse
+import datetime as dt
 import json
 import os
 import subprocess
@@ -30,6 +31,7 @@ from btb_manager_telegram.buttons import start_bot
 from btb_manager_telegram.formating import escape_tg
 from btb_manager_telegram.logging import logger, tg_error_handler
 from btb_manager_telegram.report import make_snapshot, migrate_reports
+from btb_manager_telegram.schedule import TgScheduler
 from btb_manager_telegram.utils import (
     get_restart_file_name,
     retreive_btb_constants,
@@ -154,9 +156,11 @@ def pre_run_main() -> None:
 
     migrate_reports()
 
-    scheduler.enter(1, 1, update_checker)
-    scheduler.enter(1, 1, make_snapshot)
-    scheduler_thread.start()
+    scheduler = TgScheduler()
+
+    scheduler.exec_periodically(update_checker, dt.timedelta(days=7).total_seconds())
+    scheduler.exec_periodically(make_snapshot, dt.timedelta(seconds=10).total_seconds())
+    scheduler.start()
 
     return False
 
@@ -249,8 +253,8 @@ def main() -> None:
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 
-    scheduler_thread.stop()
-    scheduler_thread.join()
+    scheduler.stop()
+    scheduler.join()
 
     try:
         os.remove("btbmt.pid")

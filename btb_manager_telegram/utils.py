@@ -213,12 +213,6 @@ def update_checker():
             print(message)
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
-            scheduler.enter(
-                dt.timedelta(days=7).total_seconds(),
-                1,
-                update_reminder,
-                ("_*Reminder*_:\n\n" + message,),
-            )
 
     if settings.BTB_UPDATE_BROADCASTED_BEFORE is False:
         if is_btb_bot_update_available():
@@ -229,33 +223,6 @@ def update_checker():
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
-            scheduler.enter(
-                dt.timedelta(days=7).total_seconds(),
-                1,
-                update_reminder,
-                ("_*Reminder*_:\n\n" + message,),
-            )
-
-    if (
-        settings.TG_UPDATE_BROADCASTED_BEFORE is False
-        or settings.BTB_UPDATE_BROADCASTED_BEFORE is False
-    ):
-        scheduler.enter(
-            dt.timedelta(days=1).total_seconds(),
-            1,
-            update_checker,
-        )
-
-
-def update_reminder(self, message):
-    logger.info(f"Reminding user: {message}")
-    settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
-    scheduler.enter(
-        dt.timedelta(days=7).total_seconds(),
-        1,
-        update_reminder,
-        ("_*Reminder*_:\n\n" + message,),
-    )
 
 
 def get_custom_scripts_keyboard():
