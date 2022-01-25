@@ -461,7 +461,7 @@ def update_tg_bot(update, _):
                 f" && {manager_python_path} -m pip install -r requirements.txt --upgrade"
                 f" && {manager_python_path} -m btb_manager_telegram {' '.join(settings.RAW_ARGS)} --_remove_this_arg_auto_restart_old_pid _remove_this_arg_{os.getpid()} &",
                 shell=True,
-                check=True
+                check=True,
             )
             restart_filename = get_restart_file_name(os.getpid())
             max_attempts = 200
@@ -471,7 +471,9 @@ def update_tg_bot(update, _):
                 attempts += 1
                 time.sleep(0.1)
             if os.path.isfile(restart_filename):
-                logger.info("The old process says : The new process has started. Exiting.")
+                logger.info(
+                    "The old process says : The new process has started. Exiting."
+                )
                 kill_btb_manager_telegram_process()
             else:
                 logger.error(f"Unable to restart the telegram bot")

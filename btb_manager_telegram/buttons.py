@@ -30,13 +30,15 @@ def current_value(cur):
     logger.info("Current value button pressed.")
 
     # Get current coin symbol, bridge symbol, order state, order size, initial buying price
-    cur.execute("""
+    cur.execute(
+        """
         SELECT alt_coin_id, crypto_coin_id, state, alt_trade_amount, crypto_starting_balance, crypto_trade_amount 
         FROM trade_history 
         WHERE state!='STARTING' 
         ORDER BY datetime DESC 
         LIMIT 1;
-    """)
+        """
+    )
     (
         current_coin,
         bridge,

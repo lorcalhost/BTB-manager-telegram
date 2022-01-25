@@ -60,8 +60,12 @@ def tg_error_handler(update, context):
     """
     Error handler for the telegram conversation handler
     """
-    message = "".join(traceback.format_exception(*sys.exc_info()))
-    message = f"```\n{message}\n```"
+    error = sys.exc_info()
+    if error[0] is None:
+        error = context.error
+    else:
+        error = "".join(traceback.format_exception(*sys.exc_info()))
+    message = f"```\n{error}\n```"
     settings.CHAT.send_message(
         escape_tg(message, exclude_parenthesis=True), parse_mode="MarkdownV2"
     )

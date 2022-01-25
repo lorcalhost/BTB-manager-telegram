@@ -107,7 +107,9 @@ def pre_run_main() -> None:
     args = parser.parse_args()
 
     if args._remove_this_arg_auto_restart_old_pid is not None:
-        old_pid = int(args._remove_this_arg_auto_restart_old_pid.lstrip("_remove_this_arg_"))
+        old_pid = int(
+            args._remove_this_arg_auto_restart_old_pid.lstrip("_remove_this_arg_")
+        )
         logger.info(
             f"The new process says : Restart initied. Waiting for the old process with pid {old_pid} to terminate."
         )
