@@ -13,9 +13,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import requests
 
-from btb_manager_telegram import scheduler, settings
+from btb_manager_telegram import settings
 from btb_manager_telegram.formating import escape_tg
 from btb_manager_telegram.logging import if_exception_log, logger
+from btb_manager_telegram.schedule import scheduler
 
 warnings.filterwarnings("ignore", category=UserWarning)
 

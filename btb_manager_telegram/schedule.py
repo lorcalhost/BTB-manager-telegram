@@ -35,3 +35,6 @@ class TgScheduler(threading.Thread):
         for event in self.scheduler.queue:
             self.scheduler.cancel(event)
         self.running = False
+
+
+scheduler = TgScheduler()

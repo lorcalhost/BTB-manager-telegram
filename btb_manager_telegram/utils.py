@@ -9,9 +9,10 @@ import i18n
 import psutil
 import yaml
 
-from btb_manager_telegram import scheduler, settings
+from btb_manager_telegram import settings
 from btb_manager_telegram.formating import escape_tg
 from btb_manager_telegram.logging import logger
+from btb_manager_telegram.schedule import scheduler
 
 
 def setup_i18n(lang):

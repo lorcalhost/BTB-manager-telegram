@@ -23,15 +23,13 @@ from btb_manager_telegram import (
     PANIC_BUTTON,
     UPDATE_BTB,
     UPDATE_TG,
-    scheduler,
-    scheduler_thread,
     settings,
 )
 from btb_manager_telegram.buttons import start_bot
 from btb_manager_telegram.formating import escape_tg
 from btb_manager_telegram.logging import logger, tg_error_handler
 from btb_manager_telegram.report import make_snapshot, migrate_reports
-from btb_manager_telegram.schedule import TgScheduler
+from btb_manager_telegram.schedule import scheduler
 from btb_manager_telegram.utils import (
     get_restart_file_name,
     retreive_btb_constants,
@@ -156,10 +154,8 @@ def pre_run_main() -> None:
 
     migrate_reports()
 
-    scheduler = TgScheduler()
-
     scheduler.exec_periodically(update_checker, dt.timedelta(days=7).total_seconds())
-    scheduler.exec_periodically(make_snapshot, dt.timedelta(seconds=10).total_seconds())
+    scheduler.exec_periodically(make_snapshot, dt.timedelta(hours=1).total_seconds())
     scheduler.start()
 
     return False
