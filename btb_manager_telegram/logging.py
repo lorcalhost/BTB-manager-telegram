@@ -40,14 +40,13 @@ def if_exception_log(message=None, level=logging.ERROR, raise_error=True):
                 result = fun(*args, **kwargs)
             except Exception as e:
                 if message is not None:
-                    if logger is not None:
-                        logger.log(
-                            level,
-                            message.replace(
-                                "%{e}",
-                                f"\n```\n{''.join(traceback.format_exception(*sys.exc_info()))}\n```\n",
-                            ).rstrip("\n"),
-                        )
+                    logger.log(
+                        level,
+                        message.replace(
+                            "%{e}",
+                            f"\n```\n{''.join(traceback.format_exception(*sys.exc_info()))}\n```\n",
+                        ).rstrip("\n"),
+                    )
                 raise e
             return result
 
@@ -61,10 +60,10 @@ def tg_error_handler(update, context):
     Error handler for the telegram conversation handler
     """
     error = sys.exc_info()
-    if error[0] is None:
+    if None in error:
         error = context.error
     else:
-        error = "".join(traceback.format_exception(*sys.exc_info()))
+        error = "".join(traceback.format_exception(*error))
     message = f"```\n{error}\n```"
     settings.CHAT.send_message(
         escape_tg(message, exclude_parenthesis=True), parse_mode="MarkdownV2"
