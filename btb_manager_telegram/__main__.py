@@ -99,7 +99,6 @@ def pre_run_main() -> None:
         help="(optional) Run the script in a docker container."
         "NOTE: Run the 'docker_setup.py' file before passing this flag.",
     )
-
     parser.add_argument(
         "--_remove_this_arg_auto_restart_old_pid", type=str, default=None
     )

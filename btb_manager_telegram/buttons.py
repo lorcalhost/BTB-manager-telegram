@@ -175,6 +175,8 @@ def check_progress(cur):
             f"\t{i18n.t('progress.trade_datetime', date=last_trade_date)}\n\n"
         )
 
+    m_list.reverse()
+
     message = telegram_text_truncator(m_list)
     return message
 
