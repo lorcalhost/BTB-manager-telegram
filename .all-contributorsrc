@@ -272,6 +272,16 @@
       "contributions": [
         "translation"
       ]
+    },
+    {
+      "login": "TSecretT",
+      "name": "Timur",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36734601?v=4",
+      "profile": "https://github.com/TSecretT",
+      "contributions": [
+        "code",
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,
