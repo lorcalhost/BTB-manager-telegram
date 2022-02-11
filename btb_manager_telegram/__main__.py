@@ -9,9 +9,9 @@ import time
 import colorama
 import i18n
 import psutil
+
 import telegram
 import telegram.ext
-
 from btb_manager_telegram import (
     CREATE_GRAPH,
     CUSTOM_SCRIPT,

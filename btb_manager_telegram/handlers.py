@@ -10,9 +10,9 @@ import traceback
 
 import i18n
 import numpy as np
+
 import telegram
 import telegram.ext
-
 from btb_manager_telegram import (
     BOUGHT,
     BUYING,
@@ -352,7 +352,7 @@ def edit_coin(update, _):
         else:
             coin_file_path = os.path.join(
                 settings.ROOT_PATH, settings.SUPPORTED_COIN_LIST_FILE
-                )
+            )
         try:
             shutil.copyfile(coin_file_path, f"{coin_file_path}.backup")
             with open(coin_file_path, "w") as f:
