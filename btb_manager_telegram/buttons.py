@@ -582,7 +582,10 @@ def delete_db():
 
     message = i18n.t("db.delete.stop_bot")
     delete = False
-    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+    if settings.DATABASE_FILE is None:
+        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+    else:
+        db_file_path = os.path.join(settings.ROOT_PATH, settings.DATABASE_FILE)
     if not get_binance_trade_bot_process():
         if os.path.exists(db_file_path):
             message = i18n.t("db.delete.sure")
@@ -597,7 +600,10 @@ def edit_user_cfg():
 
     message = i18n.t("config.stop_bot")
     edit = False
-    user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    if settings.CONFIG_FILE is None:
+        user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    else:
+        user_cfg_file_path = os.path.join(settings.ROOT_PATH, settings.CONFIG_FILE)
     if not get_binance_trade_bot_process():
         if os.path.exists(user_cfg_file_path):
             with open(user_cfg_file_path) as f:
@@ -620,7 +626,12 @@ def edit_coin():
 
     message = i18n.t("coin_list.stop_bot")
     edit = False
-    coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
+    if settings.SUPPORTED_COIN_LIST_FILE is None:
+        coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
+    else:
+        coin_file_path = os.path.join(
+            settings.ROOT_PATH, settings.SUPPORTED_COIN_LIST_FILE
+        )
     if not get_binance_trade_bot_process():
         if os.path.exists(coin_file_path):
             with open(coin_file_path) as f:
@@ -640,7 +651,10 @@ def export_db():
     logger.info("Export database button pressed.")
 
     message = i18n.t("db.export.stop_bot")
-    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+    if settings.DATABASE_FILE is None:
+        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+    else:
+        db_file_path = os.path.join(settings.ROOT_PATH, settings.DATABASE_FILE)
     file = None
     if not get_binance_trade_bot_process():
         if os.path.exists(db_file_path):
@@ -686,11 +700,17 @@ def panic_btn():
     logger.info("🚨 Panic Button button pressed.")
 
     # Check if open orders / not in usd
-    db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+    if settings.DATABASE_FILE is None:
+        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+    else:
+        db_file_path = os.path.join(settings.ROOT_PATH, settings.DATABASE_FILE)
     if not os.path.exists(db_file_path):
         return [i18n.t("database_not_found"), -1]
 
-    user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    if settings.CONFIG_FILE is None:
+        user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    else:
+        user_cfg_file_path = os.path.join(settings.ROOT_PATH, settings.CONFIG_FILE)
     if not os.path.exists(user_cfg_file_path):
         return [i18n.t("config.not_found"), -1]
 

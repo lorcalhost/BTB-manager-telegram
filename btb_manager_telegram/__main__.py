@@ -53,6 +53,34 @@ def pre_run_main() -> None:
         default="../binance-trade-bot/",
     )
     parser.add_argument(
+        "-cfg",
+        "--config",
+        type=str,
+        help="(optional) binance-trade-bot config file path.",
+        default="../binance-trade-bot/user.cfg",
+    )
+    parser.add_argument(
+        "-db",
+        "--database",
+        type=str,
+        help="(optional) binance-trade-bot database to use.",
+        default="../binance-trade-bot/data/crypto_trading.db",
+    )
+    parser.add_argument(
+        "-cl",
+        "--coinlist",
+        type=str,
+        help="(optional) binance-trade-bot supported_coin_list file path.",
+        default="../binance-trade-bot/supported_coin_list",
+    )
+    parser.add_argument(
+        "-ar",
+        "--apprise",
+        type=str,
+        help="(optional) binance-trade-bot apprise's file path.",
+        default="../binance-trade-bot/config/apprise.yml",
+    )
+    parser.add_argument(
         "-pp",
         "--python_path",
         type=str,
@@ -124,6 +152,10 @@ def pre_run_main() -> None:
         exit(1)
 
     settings.ROOT_PATH = os.path.join(args.path, "")
+    settings.CONFIG_FILE = args.config
+    settings.DATABASE_FILE = args.database
+    settings.SUPPORTED_COIN_LIST_FILE = args.coinlist
+    settings.APPRISE_FILE = args.apprise
     settings.PYTHON_PATH = args.python_path
     settings.TOKEN = args.token
     settings.CHAT_ID = args.chat_id

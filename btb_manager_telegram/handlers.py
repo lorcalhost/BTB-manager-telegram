@@ -347,7 +347,12 @@ def edit_coin(update, _):
             f"{update.message.text}\n"
             f"```"
         )
-        coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
+        if settings.SUPPORTED_COIN_LIST_FILE is None:
+            coin_file_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
+        else:
+            coin_file_path = os.path.join(
+                settings.ROOT_PATH, settings.SUPPORTED_COIN_LIST_FILE
+                )
         try:
             shutil.copyfile(coin_file_path, f"{coin_file_path}.backup")
             with open(coin_file_path, "w") as f:
@@ -377,7 +382,10 @@ def edit_user_config(update, _):
         message = (
             f"{i18n.t('config.success')}\n\n" f"```\n" f"{update.message.text}\n" f"```"
         )
-        user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+        if settings.CONFIG_FILE is None:
+            user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+        else:
+            user_cfg_file_path = os.path.join(settings.ROOT_PATH, settings.CONFIG_FILE)
         try:
             shutil.copyfile(user_cfg_file_path, f"{user_cfg_file_path}.backup")
             with open(user_cfg_file_path, "w") as f:
@@ -411,7 +419,10 @@ def delete_db(update, _):
 
     if update.message.text != i18n.t("keyboard.go_back"):
         message = i18n.t("db.delete.success")
-        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        if settings.DATABASE_FILE is None:
+            db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        else:
+            db_file_path = os.path.join(settings.ROOT_PATH, settings.DATABASE_FILE)
         pw_file_path = os.path.join(settings.ROOT_PATH, "data/paper_wallet.json")
         log_file_path = os.path.join(settings.ROOT_PATH, "logs/crypto_trading.log")
         try:
@@ -552,7 +563,10 @@ def panic(update, _):
         find_and_kill_binance_trade_bot_process()
 
         # Get current coin pair
-        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        if settings.DATABASE_FILE is None:
+            db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        else:
+            db_file_path = os.path.join(settings.ROOT_PATH, settings.DATABASE_FILE)
         con = sqlite3.connect(db_file_path)
         cur = con.cursor()
 
@@ -563,7 +577,10 @@ def panic(update, _):
         alt_coin_id, crypto_coin_id = cur.fetchone()
 
         # Get Binance api keys and tld
-        user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+        if settings.CONFIG_FILE is None:
+            user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+        else:
+            user_cfg_file_path = os.path.join(settings.ROOT_PATH, settings.CONFIG_FILE)
         with open(user_cfg_file_path) as cfg:
             config = configparser.ConfigParser()
             config.read_file(cfg)
