@@ -30,9 +30,7 @@ def reports_path():
             settings.ROOT_PATH, "data", "btbmt_reports.npy"
         )
     else:
-        btbmt_reports_file_path = os.path.join(
-            settings.ROOT_PATH, settings.BTBMT_REPORTS_PATH
-        )
+        btbmt_reports_file_path = os.path.abspath(settings.BTBMT_REPORTS_PATH)
     return btbmt_reports_file_path
 
 
