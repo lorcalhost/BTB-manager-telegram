@@ -81,6 +81,13 @@ def pre_run_main() -> None:
         default="../binance-trade-bot/config/apprise.yml",
     )
     parser.add_argument(
+        "-rp",
+        "--reports",
+        type=str,
+        help="(optional) binance-trade-bot btbmt_reports.npy file path.",
+        default="../binance-trade-bot/data/btbmt_reports.npy",
+    )
+    parser.add_argument(
         "-pp",
         "--python_path",
         type=str,
@@ -155,6 +162,7 @@ def pre_run_main() -> None:
     settings.CONFIG_FILE = args.config
     settings.DATABASE_FILE = args.database
     settings.SUPPORTED_COIN_LIST_FILE = args.coinlist
+    settings.BTBMT_REPORTS_PATH = args.reports
     settings.APPRISE_FILE = args.apprise
     settings.PYTHON_PATH = args.python_path
     settings.TOKEN = args.token

@@ -25,7 +25,15 @@ include_only_coinlist = True
 
 
 def reports_path():
-    return os.path.join(settings.ROOT_PATH, "data", "btbmt_reports.npy")
+    if settings.DATABASE_FILE is None:
+        btbmt_reports_file_path = os.path.join(
+            settings.ROOT_PATH, "data", "btbmt_reports.npy"
+        )
+    else:
+        btbmt_reports_file_path = os.path.join(
+            settings.ROOT_PATH, settings.BTBMT_REPORTS_PATH
+        )
+    return btbmt_reports_file_path
 
 
 def migrate_reports():
