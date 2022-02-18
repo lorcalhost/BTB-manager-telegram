@@ -284,9 +284,9 @@ ORDER BY percentage DESC;
                 i18n.t("next_coin.target_price"),
             ],
             [[q[0], str(round(q[3], 2)), q[1], q[2]] for q in query],
-            [6, 7, 8, 8],
+            [6, 8, 8, 8],
             add_spaces=[True, True, False, False],
-            align=["center", "left", "left", "left"],
+            align=["center", "right", "left", "left"],
         )
     )
 
