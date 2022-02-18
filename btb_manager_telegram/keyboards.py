@@ -1,5 +1,4 @@
 import i18n
-
 import telegram
 
 menu = telegram.ReplyKeyboardMarkup(

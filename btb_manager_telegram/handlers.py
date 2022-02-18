@@ -10,9 +10,9 @@ import traceback
 
 import i18n
 import numpy as np
-
 import telegram
 import telegram.ext
+
 from btb_manager_telegram import (
     BOUGHT,
     BUYING,
