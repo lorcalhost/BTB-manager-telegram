@@ -1,8 +1,3 @@
-import threading
-import time
-
-from btb_manager_telegram.logging import logger, logger_handler
-
 (
     MENU,
     EDIT_COIN_LIST,

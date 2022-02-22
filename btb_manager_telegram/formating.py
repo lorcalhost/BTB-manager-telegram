@@ -8,7 +8,7 @@ def format_float(num):
 def escape_tg(message, exclude_parenthesis=False):
     escape_char = [".", "-", "?", "!", ">", "{", "}", "=", "+", "|"]
     if exclude_parenthesis:
-        escape_char += ["(", ")"]
+        escape_char += ["(", ")", "[", "]"]
     escaped_message = ""
     is_escaped = False
     for cur_char in message:

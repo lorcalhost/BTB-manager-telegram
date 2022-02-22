@@ -1,7 +1,7 @@
 import logging
 import sys
 import traceback
-
+from telegram.utils.helpers import escape_markdown
 from btb_manager_telegram import settings
 from btb_manager_telegram.formating import escape_tg
 
@@ -15,7 +15,20 @@ class LoggerHandler(logging.Handler):
         super().__init__()
 
     def emit(self, record):
-        logger_handler(record)
+        if record.levelno >= logging.WARNING:  # warning, critical or error
+           emoji = ""
+        if record.levelno == logging.WARNING:
+            emoji = "⚠️"
+        elif record.levelno == logging.ERROR:
+            emoji = "❌"
+        elif record.levelno == logging.CRITICAL:
+            emoji = "☠️"
+        else:
+            return
+        message = f"{emoji} {record.levelname.title()} : {record.msg}"
+        settings.CHAT.send_message(
+            escape_tg(message, exclude_parenthesis=True), parse_mode="MarkdownV2"
+        )
 
 
 logging.basicConfig(
@@ -68,18 +81,4 @@ def tg_error_handler(update, context):
     settings.CHAT.send_message(
         escape_tg(message, exclude_parenthesis=True), parse_mode="MarkdownV2"
     )
-
-
-def logger_handler(record):
-    if record.levelno >= logging.WARNING:  # warning, critical or error
-        emoji = ""
-        if record.levelno == logging.WARNING:
-            emoji = "⚠️"
-        elif record.levelno == logging.ERROR:
-            emoji = "❌"
-        elif record.levelno == logging.CRITICAL:
-            emoji = "☠️"
-        message = f"{emoji} {record.levelname.title()} : {record.msg}"
-        settings.CHAT.send_message(
-            escape_tg(message, exclude_parenthesis=True), parse_mode="MarkdownV2"
-        )
+    

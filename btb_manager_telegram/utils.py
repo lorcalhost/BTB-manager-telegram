@@ -39,7 +39,7 @@ def get_db_cursor(fun):
             con.close()
             return result
         else:
-            logger.error(f"The database file cannot be found at {db_file_path}")
+            logger.error(f"The database file cannot be found at `{db_file_path}`")
             return
 
     return _f_get_db_cursor
@@ -59,7 +59,7 @@ def get_user_config(fun):
             result = fun(*args, **kwargs, config=config)
             return result
         else:
-            logger.error(f"The user.cfg file cannot be found at {user_cfg_file_path}")
+            logger.error(f"The user.cfg file cannot be found at `{user_cfg_file_path}`")
             return
 
     return _f_user_config
@@ -111,7 +111,7 @@ def retreive_btb_constants():
     btb_config_path = os.path.join(settings.ROOT_PATH, "user.cfg")
     if not os.path.isfile(btb_config_path):
         logger.critical(
-            f"Binance Trade Bot config file cannot be found at {btb_config_path}"
+            f"Binance Trade Bot config file cannot be found at `{btb_config_path}`"
         )
         exit(-1)
     btb_config = configparser.ConfigParser()
@@ -184,19 +184,20 @@ def is_btb_bot_update_available():
 
 
 def is_tg_bot_update_available():
-    subprocess.run(["git", "remote", "update", "origin"], check=True)
-    current_version = (
-        subprocess.check_output(["git", "describe", "--abbrev=0", "--tags"])
-        .decode()
-        .rstrip("\n")
-    )
-    remote_version = (
-        subprocess.check_output(
-            ["git", "describe", "--abbrev=0", "--tags", "origin/main"]
-        )
-        .decode()
-        .rstrip("\n")
-    )
+    result = subprocess.run(["git", "remote", "update", "origin"], capture_output=True)
+    if result.returncode != 0:
+        raise SystemError(result.stderr.decode())
+
+    result = subprocess.run(["git", "describe", "--abbrev=0", "--tags"], capture_output=True)
+    if result.returncode != 0:
+        raise SystemError(result.stderr.decode())
+    current_version = result.stdout.decode().rstrip("\n")
+
+    result = subprocess.run(["git", "describe", "--abbrev=0", "--tags", "origin/main"], capture_output=True)
+    if result.returncode != 0:
+        raise SystemError(result.stderr.decode())
+    remote_version = result.stdout.decode().rstrip("\n")
+    
     re = current_version != remote_version
     return re, current_version, remote_version
 
