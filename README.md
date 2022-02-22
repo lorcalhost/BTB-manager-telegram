@@ -50,7 +50,7 @@ However, you can run the bot with options :
 # (Otherwise you will have to manually start the Binance Trade Bot from telegram)
 python3 -m btb_manager_telegram -s
 
-# Use the french translation. Available translation : en, ru, fr, de, nl, es, id, cn
+# Use the french translation. Available translation : en, ru, fr, de, nl, es, id, cn, pt
 python3 -m btb_manager_telegram -l fr
 
 # Make possible to plot the bot's performance in EUR instead of USD
@@ -197,6 +197,9 @@ This project follows the [all-contributors] specification.
     <td align="center"><a href="https://github.com/renkasiyas"><img src="https://avatars.githubusercontent.com/u/7783256?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ren Kasiyas</b></sub></a><br /><a href="#translation-renkasiyas" title="Translation">🌍</a></td>
     <td align="center"><a href="https://github.com/KevinTroyT"><img src="https://avatars.githubusercontent.com/u/35399999?v=4?s=100" width="100px;" alt=""/><br /><sub><b>KevinTroyT</b></sub></a><br /><a href="#translation-KevinTroyT" title="Translation">🌍</a></td>
     <td align="center"><a href="https://github.com/TSecretT"><img src="https://avatars.githubusercontent.com/u/36734601?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Timur</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=TSecretT" title="Code">💻</a> <a href="#translation-TSecretT" title="Translation">🌍</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://links.diogomarques.dev/"><img src="https://avatars.githubusercontent.com/u/52538977?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Diogo Marques</b></sub></a><br /><a href="#translation-DiogoMarques2003" title="Translation">🌍</a></td>
   </tr>
 </table>
 
