@@ -282,6 +282,15 @@
         "code",
         "translation"
       ]
+    },
+    {
+      "login": "DiogoMarques2003",
+      "name": "Diogo Marques",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52538977?v=4",
+      "profile": "https://links.diogomarques.dev/",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,
