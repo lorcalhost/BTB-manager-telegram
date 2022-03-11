@@ -15,6 +15,8 @@ class LoggerHandler(logging.Handler):
         super().__init__()
 
     def emit(self, record):
+        if settings.CHAT is None:
+            return
         if record.levelno >= logging.WARNING:  # warning, critical or error
            emoji = ""
         if record.levelno == logging.WARNING:
