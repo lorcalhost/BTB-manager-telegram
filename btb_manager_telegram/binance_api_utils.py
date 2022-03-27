@@ -45,6 +45,6 @@ def send_signed_request(key, secret, base_url, http_method, url_path, payload={}
 
 def get_current_price(ticker, bridge):
     response = requests.get(
-        f"https://api.binance.com/api/v3/avgPrice?symbol={ticker}{bridge}"
+        f"https://api.binance.com/api/v3/ticker/price?symbol={ticker}{bridge}"
     ).json()
     return eval(response["price"])
