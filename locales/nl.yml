@@ -1,4 +1,4 @@
-﻿exited_no_change: "👌 Afgesloten zonder wijzigingen."
+exited_no_change: "👌 Afgesloten zonder wijzigingen."
 stop_to_stop: "Schrijf /stop om het bewerken te stoppen en af te sluiten zonder te wijzigingen."
 bye: "Dag! Ik hoop dat we ooit weer kunnen praten."
 killed_bot: "Afgesloten _Binance Trade Bot_!"
@@ -6,7 +6,6 @@ logging_enabled_error: "⚠ Zorg ervoor dat de logging voor _Binance Trade Bot_ 
 database_not_found: "❌ Kan databasebestand niet vinden op `%{path}`."
 conversation_started: "Gesprek gestart!"
 select_option: "Selecteer één van de opties."
-
 
 welcome:
   hello: "Hallo *%{name}*!"
@@ -21,7 +20,6 @@ welcome:
     bot_error: "Het lijkt erop dat de bot een fout is tegengekomen bij het opstarten."
     no_python: "Ik heb de python binaries niet gevonden."
     bad_path: "Ik heb de handelsbot niet gevonden."
-
 
 value:
   order_placed: "Een kooporder van `%{order_size}` *%{bridge}* is momenteel geplaatst op munt *%{current_coin}*."
@@ -40,7 +38,6 @@ value:
   value_btc:               "Waarde in BTC         : %{value} BTC"
   bought_for:              "Gekocht voor          : %{value} %{coin}"
 
-
 progress:
   coin: "Overzicht transacties:"
   amount: "- Bedrag: `%{amount}` *%{coin}*"
@@ -48,7 +45,6 @@ progress:
   change_over_days: "- Verandering: `%{amount}` *%{coin}* `%{percent}` *%* in %{days} dagen, %{hours} uren"
   trade_datetime: "- Handelstijd: `%{date}`"
   db_error: "❌ Kan geen voortgangsinformatie ophalen uit de database."
-
 
 ratios:
   last_update: "Laatste update: `%{update}`"
@@ -58,13 +54,11 @@ ratios:
   gen_error: "❌ Er ging iets mis, niet in staat om op dit moment ratio's te genereren."
   db_error: "❌ Kan geen ratio ophalen uit database."
 
-
 next_coin:
   current_price: "Huidige prijs"
   target_price: "Doel prijs"
   error: "❌ Er is iets misgegaan, niet in staat om op dit moment de volgende munt te genereren."
   db_error: "❌ Kan volgende munt niet ophalen uit database."
-
 
 history:
   last_x_trades: "Laatste **%{trades}** transacties:"
@@ -75,6 +69,28 @@ history:
   error: "❌ Er ging iets mis, niet in staat om op dit moment handelsgeschiedenis te genereren."
   db_error: "❌ Kan handelshistorie niet ophalen uit database."
 
+bot_stats:
+  bot_started:  "Bot gestart  : %{date} (%{no_days} dagen geleden)"
+  nb_jumps:     "Aantal Trades:"
+  start_coin:   "Start Munt   :"
+  current_coin: "Huidige munt :"
+  hodl:         "Koop & houd  :"
+  profit:       "Bot Winst    :"
+  min_max_usd:  "Min/Max USD  :"
+  min_max_btc:  "Min/Max BTC  :"
+  coin_progress: "Vooruitgang :"
+  table:
+    coin: "Munt"
+    from: "Van"
+    to: "Naar"
+  error:
+    db_error: "❌ Kan geen statistieken ophalen uit de database."
+    date_error: "❌ Kan datumgegevens niet ophalen."
+    empty_trade_history: "❌ Handelsgeschiedenis is leeg, wacht op transacties om statistieken te krijgen."
+    first_coin_error: "❌ Kan de startmuntinformatie van de bot niet ophalen uit de database."
+    current_coin_error: "❌ Kan de huidige muntinformatie van de bot niet ophalen uit de database."
+    value_error: "❌ Fout bij het ophalen van informatie uit db. Foutcode = `%{error_code}`."
+    start_coin_not_found: "❌ Bot-startmunt niet gevonden in ondersteunde lijst."
 
 btb:
   not_running: "⚠ Binance Trade Bot is niet actief."
@@ -90,11 +106,9 @@ btb:
   lib_error: "❌ Kan python binair niet vinden in `%{path}`."
   windows_hint: "Als u de telegram-bot op Windows uitvoert, zorg er dan voor dat u met beheerdersrechten werkt."
 
-
 log:
   error: "❌ Kan het logboekbestand niet vinden in `%{path}`."
   last_4000_characters: "Laatste *4000* tekens in logbestand:"
-
 
 panic:
   holding: "U heeft momenteel `%{amount1}` *%{coin1}* gekocht voor `%{amount2}` *%{coin2}*."
@@ -113,7 +127,6 @@ panic:
   error: "❌ Er is iets misgegaan, de paniekknop werkt op dit moment niet."
   db_error: "❌ Kan de benodigde acties in de database niet uitvoeren"
 
-
 coin_list:
   success: "✔ Met succes bewerkt muntenlijstbestand naar:"
   error: "❌ Kan het muntenlijstbestand niet bewerken."
@@ -123,7 +136,6 @@ coin_list:
   reply: "_*Gelieve te antwoorden met een bericht met de bijgewerkte muntenlijst*_."
   stop_bot: "⚠ Stop Binance Trade Bot voordat u de muntenlijst bewerkt."
 
-
 config:
   success: "✔ Gebruikersconfiguratiebestand met succes bewerkt naar:"
   error: "❌ Kan het configuratiebestand van de gebruiker niet bewerken."
@@ -132,7 +144,6 @@ config:
   is: "Huidig configuratiebestand is:"
   reply: "_*Antwoord met een bericht met de bijgewerkte configuratie*_."
   stop_bot: "⚠ Stop Binance Trade Bot voordat u het configuratiebestand bewerkt."
-
 
 db:
   delete:
@@ -147,7 +158,6 @@ db:
     stop_bot: "⚠ Stop Binance Trade Bot voordat u het databasebestand exporteert."
     file: "Hier is uw databasebestand:"
     error: "❌ Kan het databasebestand niet exporteren."
-
 
 update:
   now: "Wilt u nu updaten??"
@@ -171,13 +181,15 @@ update:
     instruction: "Werk bij door naar *🛠 Onderhoud* te gaan en op de knop *Update Binance Trade Bot* te drukken."
     start_manually: "Wacht een paar seconden en start vervolgens handmatig opnieuw op."
 
-
 script:
   not_found: "Kan script niet vinden met de naam %{name} in bestand custom_scripts.json."
   error: "Fout tijdens het uitvoeren van de script."
   no_script: "Er is geen aangepast script gevonden in *BTB-manager-telegram* 's `/config/custom_scripts.json` bestand."
   no_config: "Kan bestand `custom_scripts.json` niet vinden binnen in de  *BTB-manager-telegram* 's `config/` map."
   select: "Selecteer één van uw aangepaste scripts om deze uit te voeren."
+  
+snapshot:
+  error: "❌ Kan momenteel geen "snapshot" van de binance-account verkrijgen. Foutmelding:"
 
 graph:
   msg_existing_graphs: "Kies een grafiek of maak een nieuwe. Tip : de opbouw is 'MUNT1,MUNT2,MUNT3 AantalDagen'"

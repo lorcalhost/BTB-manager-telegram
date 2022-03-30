@@ -1,18 +1,18 @@
 import configparser
+import datetime as dt
 import json
 import os
+import sqlite3
 import subprocess
-from time import sleep
-from typing import List, Optional
-
-import psutil
-import telegram
-import yaml
-from telegram import Bot
-from telegram.utils.helpers import escape_markdown
 
 import i18n
-from btb_manager_telegram import logger, scheduler, settings
+import psutil
+import yaml
+
+from btb_manager_telegram import settings
+from btb_manager_telegram.formating import escape_tg
+from btb_manager_telegram.logging import logger
+from btb_manager_telegram.schedule import scheduler
 
 
 def setup_i18n(lang):
@@ -20,38 +20,49 @@ def setup_i18n(lang):
     i18n.set("fallback", "en")
     i18n.set("skip_locale_root_data", True)
     i18n.set("filename_format", "{locale}.{format}")
-    i18n.load_path.append("./i18n")
+    i18n.load_path.append("./locales")
 
 
-def format_float(num):
-    return f"{num:0.8f}".rstrip("0").rstrip(".")
+def get_db_cursor(fun):
+    def _f_get_db_cursor(*args, **kwargs):
+        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        if os.path.isfile(db_file_path):
+            try:
+                con = sqlite3.connect(db_file_path)
+                cur = con.cursor()
+            except Exception as e:
+                logger.error(
+                    f"Cannot connect to database, even if the file has been found."
+                )
+                return
+            result = fun(*args, **kwargs, cur=cur)
+            con.close()
+            return result
+        else:
+            logger.error(f"The database file cannot be found at `{db_file_path}`")
+            return
+
+    return _f_get_db_cursor
 
 
-def escape_tg(message):
-    escape_char = (".", "-", "?", "!", ">", "{", "}", "=", "+", "|")
-    escaped_message = ""
-    is_escaped = False
-    for cur_char in message:
-        if cur_char in escape_char and not is_escaped:
-            escaped_message += "\\"
-        escaped_message += cur_char
-        is_escaped = cur_char == "\\" and not is_escaped
-    return escaped_message
+def get_user_config(fun):
+    def _f_user_config(*args, **kwargs):
+        user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+        if os.path.isfile(user_cfg_file_path):
+            try:
+                with open(user_cfg_file_path) as cfg:
+                    config = configparser.ConfigParser()
+                    config.read_file(cfg)
+            except Exception as e:
+                logger.error(f"Cannot read user.cfg, even if the file has been found.")
+                return
+            result = fun(*args, **kwargs, config=config)
+            return result
+        else:
+            logger.error(f"The user.cfg file cannot be found at `{user_cfg_file_path}`")
+            return
 
-
-def reply_text_escape(reply_text_fun):
-    def reply_text_escape_fun(message, **kwargs):
-        return reply_text_fun(escape_tg(message), **kwargs)
-
-    return reply_text_escape_fun
-
-
-def setup_root_path_constant():
-    if settings.ROOT_PATH is None:
-        logger.info("No root_path was specified. Aborting.")
-        exit(-1)
-    else:
-        settings.ROOT_PATH = os.path.join(settings.ROOT_PATH, "")
+    return _f_user_config
 
 
 def setup_telegram_constants():
@@ -62,41 +73,47 @@ def setup_telegram_constants():
         with open(yaml_file_path) as f:
             try:
                 parsed_urls = yaml.load(f, Loader=yaml.FullLoader)["urls"]
-            except Exception:
+            except Exception as e:
                 logger.error(
-                    "Unable to correctly read apprise.yml file. Make sure it is correctly set up. Aborting."
+                    "Unable to correctly read apprise.yml file. Make sure it is correctly set up."
                 )
-                exit(-1)
+                raise e
             for url in parsed_urls:
                 if url.startswith("tgram"):
                     telegram_url = url.split("//")[1]
-        if not telegram_url:
-            logger.error(
-                "No telegram configuration was found in your apprise.yml file. Aborting."
+        if telegram_url is None:
+            logger.critical(
+                "The telegram configuration cannot be retrieved from apprise.yml, even if the file has been found."
             )
             exit(-1)
     else:
-        logger.error(
-            f'Unable to find apprise.yml file at "{yaml_file_path}". Aborting.'
+        logger.critical(
+            "The apprise.yml file cannot be found, and the token and/or chat_id options are not set."
         )
         exit(-1)
-    try:
-        settings.TOKEN = telegram_url.split("/")[0]
-        settings.CHAT_ID = telegram_url.split("/")[1]
-        logger.info(
-            f"Successfully retrieved Telegram configuration. "
-            f"The bot will only respond to user in the chat with chat_id {settings.CHAT_ID}"
-        )
-    except Exception:
-        logger.error(
-            "No chat_id has been set in the yaml configuration, anyone would be able to control your bot. Aborting."
+
+    telegram_url = telegram_url.split("/")
+    if len(telegram_url) != 2:
+        logger.critical(
+            "The telegram configuration cannot be retrieved from apprise.yml, even if the file has been found."
         )
         exit(-1)
+
+    settings.TOKEN, settings.CHAT_ID = telegram_url
+    logger.info(
+        f"Successfully retrieved Telegram configuration. "
+        f"The bot will only respond to user in the chat with chat_id {settings.CHAT_ID}"
+    )
 
 
 def retreive_btb_constants():
     logger.info("Retreiving binance tokens")
     btb_config_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    if not os.path.isfile(btb_config_path):
+        logger.critical(
+            f"Binance Trade Bot config file cannot be found at `{btb_config_path}`"
+        )
+        exit(-1)
     btb_config = configparser.ConfigParser()
     btb_config.read(btb_config_path)
     settings.BINANCE_API_KEY = btb_config.get("binance_user_config", "api_key")
@@ -114,26 +131,7 @@ def setup_coin_list():
     settings.COIN_LIST = [i for i in coin_list if i != ""]
 
 
-def telegram_text_truncator(
-    m_list, padding_chars_head="", padding_chars_tail=""
-) -> List[str]:
-    message = [padding_chars_head]
-    index = 0
-    for mes in m_list:
-        if (
-            len(message[index]) + len(mes) + len(padding_chars_tail)
-            <= telegram.constants.MAX_MESSAGE_LENGTH
-        ):
-            message[index] += mes
-        else:
-            message[index] += padding_chars_tail
-            message.append(padding_chars_head + mes)
-            index += 1
-    message[index] += padding_chars_tail
-    return message
-
-
-def get_binance_trade_bot_process() -> Optional[psutil.Process]:
+def get_binance_trade_bot_process():
     name = "binance_trade_bot"
     is_root_path_absolute = os.path.isabs(settings.ROOT_PATH)
     bot_path = os.path.normpath(settings.ROOT_PATH)
@@ -171,7 +169,7 @@ def kill_btb_manager_telegram_process():
         logger.info(f"ERROR: {e}")
 
 
-def is_tg_bot_update_available():
+def is_btb_bot_update_available():
     try:
         proc = subprocess.Popen(
             ["bash", "-c", "git remote update origin && git status -uno"],
@@ -185,92 +183,48 @@ def is_tg_bot_update_available():
     return re
 
 
-def is_btb_bot_update_available():
-    try:
-        subprocess.run(["git", "remote", "update", "origin"])
-        branch = (
-            subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
-            .decode()
-            .rstrip("\n")
-        )
-        try:
-            current_version = (
-                subprocess.check_output(["git", "describe", "--tags", branch])
-                .decode()
-                .rstrip("\n")
-            )
-        except subprocess.CalledProcessError:
-            return True
-        remote_version = (
-            subprocess.check_output(["git", "describe", "--tags", f"origin/{branch}"])
-            .decode()
-            .rstrip("\n")
-        )
-        current_version = current_version.split("-")[0]
-        remote_version = remote_version.split("-")[0]
-        re = current_version != remote_version
-    except Exception as e:
-        logger.error(e, exc_info=True)
-        re = None
-    return re
+def is_tg_bot_update_available():
+    result = subprocess.run(["git", "remote", "update", "origin"], capture_output=True)
+    if result.returncode != 0:
+        raise SystemError(result.stderr.decode())
+
+    result = subprocess.run(["git", "describe", "--abbrev=0", "--tags"], capture_output=True)
+    if result.returncode != 0:
+        raise SystemError(result.stderr.decode())
+    current_version = result.stdout.decode().rstrip("\n")
+
+    result = subprocess.run(["git", "describe", "--abbrev=0", "--tags", "origin/main"], capture_output=True)
+    if result.returncode != 0:
+        raise SystemError(result.stderr.decode())
+    remote_version = result.stdout.decode().rstrip("\n")
+    
+    re = current_version != remote_version
+    return re, current_version, remote_version
 
 
 def update_checker():
     logger.info("Checking for updates.")
 
     if settings.TG_UPDATE_BROADCASTED_BEFORE is False:
-        if is_tg_bot_update_available():
-            logger.info("BTB Manager Telegram update found.")
-
-            message = (
-                f"{i18n.t('update.tgb.available')}\n\n"
-                f"{i18n.t('update.tgb.instruction')}"
+        to_update, cur_vers, rem_vers = is_tg_bot_update_available()
+        if to_update:
+            logger.info(
+                f"BTB Manager Telegram update found. ({cur_vers} -> {rem_vers})"
             )
+            message = f"{i18n.t('update.tgb.available', current_version=cur_vers, remote_version=rem_vers)}\n\n{i18n.t('update.tgb.instruction')}"
+            print(message)
             settings.TG_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
-            scheduler.enter(
-                60 * 60 * 12 * 7,
-                1,
-                update_reminder,
-                ("_*Reminder*_:\n\n" + message,),
-            )
 
     if settings.BTB_UPDATE_BROADCASTED_BEFORE is False:
         if is_btb_bot_update_available():
             logger.info("Binance Trade Bot update found.")
-
             message = (
                 f"{i18n.t('update.btb.available')}\n\n"
                 f"{i18n.t('update.btb.instruction')}"
             )
             settings.BTB_UPDATE_BROADCASTED_BEFORE = True
             settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
-            scheduler.enter(
-                60 * 60 * 24 * 7,
-                1,
-                update_reminder,
-                ("_*Reminder*_:\n\n" + message,),
-            )
-
-    if (
-        settings.TG_UPDATE_BROADCASTED_BEFORE is False
-        or settings.BTB_UPDATE_BROADCASTED_BEFORE is False
-    ):
-        scheduler.enter(
-            60 * 60 * 24,
-            1,
-            update_checker,
-        )
-
-
-def update_reminder(self, message):
-    logger.info(f"Reminding user: {message}")
-    settings.CHAT.send_message(escape_tg(message), parse_mode="MarkdownV2")
-    scheduler.enter(
-        60 * 60 * 12 * 7,
-        1,
-        update_reminder,
-    )
 
 
 def get_custom_scripts_keyboard():
@@ -298,3 +252,11 @@ def get_custom_scripts_keyboard():
 
     keyboard.append([i18n.t("keyboard.cancel")])
     return keyboard, custom_script_exist, message
+
+
+def get_restart_file_name(old_pid):
+    """
+    returns the name of the file that has to be created
+    by the new process to inform the old process of the btb to stop
+    """
+    return f"_restart_kill_{old_pid}"

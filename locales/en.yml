@@ -184,7 +184,7 @@ update:
     error: "Unable to update BTB Manager Telegram"
     not_updated: "BTB Manager Telegram was *not* updated."
     up_to_date: "Your BTB Manager Telegram installation is already up to date."
-    available: "An update for BTB Manager Telegram is available."
+    available: "Your telegram manager is currently on version %{current_version}, and version %{remote_version} is available."
     instruction: "Please update by going to *🛠 Maintenance* and pressing the *⬆ Update Telegram Bot* button."
 
   btb:
