@@ -291,6 +291,15 @@
       "contributions": [
         "translation"
       ]
+    },
+    {
+      "login": "stavsher",
+      "name": "stavsher",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33731979?v=4",
+      "profile": "https://github.com/stavsher",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
