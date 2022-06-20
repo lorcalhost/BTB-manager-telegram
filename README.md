@@ -200,6 +200,7 @@ This project follows the [all-contributors] specification.
   </tr>
   <tr>
     <td align="center"><a href="https://links.diogomarques.dev/"><img src="https://avatars.githubusercontent.com/u/52538977?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Diogo Marques</b></sub></a><br /><a href="#translation-DiogoMarques2003" title="Translation">🌍</a></td>
+    <td align="center"><a href="https://github.com/stavsher"><img src="https://avatars.githubusercontent.com/u/33731979?v=4?s=100" width="100px;" alt=""/><br /><sub><b>stavsher</b></sub></a><br /><a href="https://github.com/lorcalhost/BTB-manager-telegram/commits?author=stavsher" title="Code">💻</a></td>
   </tr>
 </table>
 
