@@ -188,16 +188,20 @@ def is_tg_bot_update_available():
     if result.returncode != 0:
         raise SystemError(result.stderr.decode())
 
-    result = subprocess.run(["git", "describe", "--abbrev=0", "--tags"], capture_output=True)
+    result = subprocess.run(
+        ["git", "describe", "--abbrev=0", "--tags"], capture_output=True
+    )
     if result.returncode != 0:
         raise SystemError(result.stderr.decode())
     current_version = result.stdout.decode().rstrip("\n")
 
-    result = subprocess.run(["git", "describe", "--abbrev=0", "--tags", "origin/main"], capture_output=True)
+    result = subprocess.run(
+        ["git", "describe", "--abbrev=0", "--tags", "origin/main"], capture_output=True
+    )
     if result.returncode != 0:
         raise SystemError(result.stderr.decode())
     remote_version = result.stdout.decode().rstrip("\n")
-    
+
     re = current_version != remote_version
     return re, current_version, remote_version
 
