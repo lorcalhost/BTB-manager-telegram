@@ -229,7 +229,6 @@ def main() -> None:
         f"{i18n.t('welcome.welcome')}\n\n"
         f"{i18n.t('welcome.developed_by', contributors=contributors)}\n"
         f"{i18n.t('welcome.project_link')}\n\n"
-        f"{i18n.t('welcome.donation')}\n\n"
         f"{message_trade_bot}"
         f"{i18n.t('welcome.how_to_start')}"
     )

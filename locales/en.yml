@@ -13,7 +13,6 @@ welcome:
   welcome: "Welcome to _Binance Trade Bot Manager Telegram_."
   developed_by: "This Telegram bot was developed by %{contributors}."
   project_link: "Find out more about the project [here](https://github.com/lorcalhost/BTB-manager-telegram)."
-  donation: "*If you like my work please [consider supporting the project through a small donation](https://github.com/sponsors/lorcalhost). ❤*"
   how_to_start: "*To start the conversation, click on the button `/start`*"
   bot_started: "I already started the trade bot for you, no need to start it again!"
   bot_not_started:

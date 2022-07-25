@@ -1,29 +1,44 @@
 # Binance Trade Bot Manager Telegram
 
-A Telegram bot for remotely managing Edendg23's [Binance Trade Bot](https://github.com/edeng23/binance-trade-bot) and its forks.
+A Telegram bot for remotely managing Edendg23's [Binance Trade Bot](https://github.com/edeng23/binance-trade-bot) and its forks ([Idkravitz's](https://github.com/idkravitz/binance-trade-bot), [Tntwist's](https://github.com/tntwist/binance-trade-bot), [MasaiasuOse's](https://github.com/MasaiasuOse/binance-trade-bot) being the major forks).
 
-This program aims to be an easy way of managing Binance Trade Bot] so that I wouldn't have to constantly ssh into my VPS, and my non-techy friends could enjoy the benefits of automated trading.
+This program aims to be an easy way of managing Binance Trade Bot so that I wouldn't have to constantly ssh into my VPS, and my non-techy friends could enjoy the benefits of automated trading.
 
-The program's default behavior fetches Telegram `token` and `chat_id` from [Binance Trade Bot]'s `apprise.yml` file. For a quick Telegram bot setup guide [click here](./docs/telegram-setup.md).
+This program supports only Linux and WSL. Other distributions (BSD, MacOS, Windows, ...) are unmainted and support is not currently planned and is supposed to run 24/7. If you can't have a long running computer on linux, you can use a free VPS, such as Oracle Cloud's.
 
-## Installation
-### Docker install
-For a Docker setup guide [click here](./docs/docker-setup.md).
-
-### Manual install
+##  Manual install
 **Python 3.7, 3.8 or 3.9** is required.
-**BTB-manager-telegram** should be installed in the same parent directory as **Binance Trade Bot**. Your filesystem should look like this:
 
-```
-PARENT_DIR
-  ├── BTB-manager-telegram
-  └── binance-trade-bot
+### 0 - Create a dedicated folder
+Create a dedicated directory for the binance trade bot and the present manager. In this tutorial, we will be using **as an example** the folder `~/trading-bot`:
+```bash
+cd ~
+mkdir trading-bot
 ```
 
-To begin with, open a terminal and place yourself in the directory where the binance-trade-bot is already present, e.g. if the binance_trade_bot directory is located in `/home/user/trading_bot` run:
-```console
-cd /home/user/trading_bot
+### 1 - Install binance trade bot.
+Choose the fork you want to use. The main one ([Edendg23's](https://github.com/edeng23/binance-trade-bot)) is fine to go with.
+
+Place youself in the previously created directory, e.g.:
+```bash
+cd ~/trading-bot
 ```
+
+Then follow the install instruction given on the binance-trade-bot's readme. **Setup telegram bot during the install of binance-trade-bot (see the section `Notifications with Apprise` in the README)**
+
+Once the binance-trade-bot has been installed, make sure everything is properly installed : the following commands should yeild no errors.
+```
+cd ~/trading-bot
+ls binance-trade-bot/binance_trade_bot/__main__.py
+ls binance-trade-bot/config/apprise.yml
+```
+
+### 2 - Install the telegram manager next to the binance trade bot
+As always, place youself in the install directory, e.g.:
+```bash
+cd ~/trading-bot
+```
+
 Then, run the following lines:
 ```console
 git clone https://github.com/lorcalhost/BTB-manager-telegram.git
@@ -31,8 +46,16 @@ cd BTB-manager-telegram
 python3 -m pip install -r requirements.txt
 ```
 
-## Usage
+## Other Install Methods
+### Automated Install
+For an automated install, please refer to [Enriko82's Install Script](https://github.com/Enriko82/BTB-Install-script)
 
+### Docker Install
+**This method is discouraged as it is no longer maintained.**
+*If you crave to contain the bot and its manager, you can always use python's virtual environments.*
+However, you can still find a docker setup guide [here](./docs/docker-setup.md).
+
+## Usage
 As the telegram bot is launching itself the **Binance Trade Bot**, you only have to start the **BTB Manager Telegram** like so:
 
 ```console
@@ -121,17 +144,6 @@ Severa known problems are present on **native Windows** and will not be asserted
     <img height="20%" width="20%" src="https://i.imgur.com/UKyREe9.jpg" />
 </p>
 </details>
-
-## Support the project
-If you like the **BTB manager telegram** and use it on a daily basis consider supporting the project through a small donation. :smile:
-
-[:heart: Sponsor on GitHub](https://github.com/sponsors/lorcalhost)
-
-<a href="https://www.buymeacoffee.com/lorcalhost">
-  <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=lorcalhost&button_colour=FFDD00&font_colour=000000&font_family=Lato&outline_colour=000000&coffee_colour=ffffff">
-</a>
-
-_Donations through GitHub sponsors will be matched by GitHub (e.g. if you decide to donate 10$, GitHub will add 10$ to the donation)._
 
 ## Contributions and feature requests
 
