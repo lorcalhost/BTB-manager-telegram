@@ -3,7 +3,7 @@ import sys
 import traceback
 from telegram.utils.helpers import escape_markdown
 from btb_manager_telegram import settings
-from btb_manager_telegram.formating import escape_tg
+from btb_manager_telegram.formating import escape_tg, telegram_text_truncator
 
 
 class LoggerHandler(logging.Handler):
@@ -15,8 +15,6 @@ class LoggerHandler(logging.Handler):
         super().__init__()
 
     def emit(self, record):
-        if settings.CHAT is None:
-            return
         if record.levelno >= logging.WARNING:  # warning, critical or error
            emoji = ""
         if record.levelno == logging.WARNING:
@@ -28,10 +26,15 @@ class LoggerHandler(logging.Handler):
         else:
             return
         message = f"{emoji} {record.levelname.title()} : {record.msg}"
-        settings.CHAT.send_message(
-            escape_tg(message, exclude_parenthesis=True), parse_mode="MarkdownV2"
-        )
-
+        message_list = telegram_text_truncator(message)
+        for msg in message_list:
+            try:
+                settings.CHAT.send_message(
+                    escape_tg(message, exclude_parenthesis=True), parse_mode="MarkdownV2"
+                )
+            except Exception as e:
+                #do not use logging.error here! it will end badly.
+                print(f"The latest error cannot be sent to telegram, reason : {e}")
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
