@@ -25,7 +25,10 @@ def setup_i18n(lang):
 
 def get_db_cursor(fun):
     def _f_get_db_cursor(*args, **kwargs):
-        db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        if settings.DATABASE_FILE is None:
+            db_file_path = os.path.join(settings.ROOT_PATH, "data/crypto_trading.db")
+        else:
+            db_file_path = os.path.join(settings.ROOT_PATH, settings.DATABASE_FILE)
         if os.path.isfile(db_file_path):
             try:
                 con = sqlite3.connect(db_file_path)
@@ -47,7 +50,10 @@ def get_db_cursor(fun):
 
 def get_user_config(fun):
     def _f_user_config(*args, **kwargs):
-        user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+        if settings.CONFIG_FILE is None:
+            user_cfg_file_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+        else:
+            user_cfg_file_path = os.path.join(settings.ROOT_PATH, settings.CONFIG_FILE)
         if os.path.isfile(user_cfg_file_path):
             try:
                 with open(user_cfg_file_path) as cfg:
@@ -68,7 +74,10 @@ def get_user_config(fun):
 def setup_telegram_constants():
     logger.info("Retrieving Telegram token and chat_id from apprise.yml file.")
     telegram_url = None
-    yaml_file_path = os.path.join(settings.ROOT_PATH, "config/apprise.yml")
+    if settings.APPRISE_FILE is None:
+        yaml_file_path = os.path.join(settings.ROOT_PATH, "config/apprise.yml")
+    else:
+        yaml_file_path = os.path.join(settings.ROOT_PATH, settings.APPRISE_FILE)
     if os.path.exists(yaml_file_path):
         with open(yaml_file_path) as f:
             try:
@@ -108,7 +117,10 @@ def setup_telegram_constants():
 
 def retreive_btb_constants():
     logger.info("Retreiving binance tokens")
-    btb_config_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    if settings.CONFIG_FILE is None:
+        btb_config_path = os.path.join(settings.ROOT_PATH, "user.cfg")
+    else:
+        btb_config_path = os.path.join(settings.ROOT_PATH, settings.CONFIG_FILE)
     if not os.path.isfile(btb_config_path):
         logger.critical(
             f"Binance Trade Bot config file cannot be found at `{btb_config_path}`"
@@ -125,7 +137,12 @@ def retreive_btb_constants():
 
 def setup_coin_list():
     logger.info("Retreiving coin list")
-    coin_list_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
+    if settings.SUPPORTED_COIN_LIST_FILE is None:
+        coin_list_path = os.path.join(settings.ROOT_PATH, "supported_coin_list")
+    else:
+        coin_list_path = os.path.join(
+            settings.ROOT_PATH, settings.SUPPORTED_COIN_LIST_FILE
+        )
     with open(coin_list_path, "r") as f:
         coin_list = [line.replace("\n", "").replace(" ", "") for line in f.readlines()]
     settings.COIN_LIST = [i for i in coin_list if i != ""]
